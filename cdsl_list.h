@@ -1,12 +1,16 @@
 /*
  * tch_list.h
  *
+ * \brief doubly linked list library (can be used as stack or queue)
+ *
+ *
  *  Created on: 2014. 7. 25.
  *      Author: innocentevil
  */
 
-#ifndef TCH_LIST_H_
-#define TCH_LIST_H_
+#ifndef CDSL_DLIST_H_
+#define CDSL_DLIST_H_
+
 
 
 #if defined(__cplusplus)
@@ -24,13 +28,22 @@ typedef struct cdsl_dlnode cdsl_dlistNode_t;
 };
 
 extern void cdsl_listInit(cdsl_dlistNode_t* lentry);
+/**
+ *  Queue like interface
+ */
 extern void cdsl_listEnqueuePriority(cdsl_dlistNode_t* lentry,cdsl_dlistNode_t* item,cdsl_listPriorityRule rule);
+extern void cdsl_listInsertAfter(cdsl_dlistNode_t* ahead,cdsl_dlistNode_t* item);
 extern cdsl_dlistNode_t* cdsl_listDequeue(cdsl_dlistNode_t* lentry);
+
+/**
+ *  Stack like interface
+ */
 extern void cdsl_listPutHead(cdsl_dlistNode_t* lentry,cdsl_dlistNode_t* item);
 extern void cdsl_listPutTail(cdsl_dlistNode_t* lentry,cdsl_dlistNode_t* item);
-extern void cdsl_listInsertAfter(cdsl_dlistNode_t* ahead,cdsl_dlistNode_t* item);
 extern cdsl_dlistNode_t* cdsl_listGetHead(cdsl_dlistNode_t* lentry);
 extern cdsl_dlistNode_t* cdsl_listGetTail(cdsl_dlistNode_t* lentry);
+
+
 extern int cdsl_listRemove(cdsl_dlistNode_t* item);
 extern int cdsl_listSize(cdsl_dlistNode_t* lentry);
 extern int cdsl_listContain(cdsl_dlistNode_t* lentry,cdsl_dlistNode_t* item);

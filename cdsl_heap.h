@@ -5,8 +5,15 @@
  *      Author: innocentevil
  */
 
-#ifndef HEAP_H_
-#define HEAP_H_
+#ifndef CDSL_HEAP_H_
+#define CDSL_HEAP_H_
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+
+
+
 
 #include <stdint-gcc.h>
 typedef struct heap_node cdsl_heapNode_t;
@@ -22,5 +29,9 @@ struct heap_node{
 extern int cdsl_heapEnqueue(cdsl_heapNode_t** heap,cdsl_heapNode_t* item,heapEvaluate eval);
 extern cdsl_heapNode_t* cdsl_heapDeqeue(cdsl_heapNode_t** heap,heapEvaluate eval);
 extern void cdsl_heapPrint(cdsl_heapNode_t** heap,heapPrint prt);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif /* HEAP_H_ */

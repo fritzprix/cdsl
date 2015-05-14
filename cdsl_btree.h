@@ -5,8 +5,8 @@
  *      Author: innocentevil
  */
 
-#ifndef TCH_BTREE_H_
-#define TCH_BTREE_H_
+#ifndef CDSL_BIN_TREE_H_
+#define CDSL_BIN_TREE_H_
 
 #if defined(__cplusplus)
 extern "C"{
