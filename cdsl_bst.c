@@ -6,36 +6,41 @@
  */
 
 
-#include "cdsl_btree.h"
+#include "cdsl_bst.h"
+#include "cdsl.h"
+#include <stdio.h>
 #include <stddef.h>
 
 
-void cdsl_btreeInit(cdsl_bstNode_t* node,int key){
+static void print_r(bs_treeNode_t* current,cdsl_generic_printer_t prt,int depth);
+static void print_tab(int cnt);
+
+void cdsl_bstreeNodeInit(bs_treeNode_t* node,int key){
 	node->key = key;
 	node->left = NULL;
 	node->right = NULL;
 }
 
-static cdsl_bstNode_t* tch_btree_get_rightmost(cdsl_bstNode_t* node){
+static bs_treeNode_t* tch_btree_get_rightmost(bs_treeNode_t* node){
 	if(!node) return NULL;
 	if(!node->right) return node;
-	cdsl_bstNode_t* rightmost = tch_btree_get_rightmost(node->right);
+	bs_treeNode_t* rightmost = tch_btree_get_rightmost(node->right);
 	node->right = rightmost->left;
 	rightmost->left = node;
 	return rightmost;
 }
 
-static cdsl_bstNode_t* tch_btree_get_leftmost(cdsl_bstNode_t* node){
+static bs_treeNode_t* tch_btree_get_leftmost(bs_treeNode_t* node){
 	if(!node) return NULL;
 	if(!node->left) return node;
-	cdsl_bstNode_t* leftmost = tch_btree_get_leftmost(node->left);
+	bs_treeNode_t* leftmost = tch_btree_get_leftmost(node->left);
 	node->left = leftmost->right;
 	leftmost->right = node;
 	return leftmost;
 }
 
 
-cdsl_bstNode_t* cdsl_btree_insert(cdsl_bstNode_t** root,cdsl_bstNode_t* item){
+bs_treeNode_t* cdsl_bstreeInsert(bs_treeNode_t** root,bs_treeNode_t* item){
 	if(!root || !item)
 		return NULL;
 	if(!*root){
@@ -44,7 +49,7 @@ cdsl_bstNode_t* cdsl_btree_insert(cdsl_bstNode_t** root,cdsl_bstNode_t* item){
 	}
 	item->left = NULL;
 	item->right = NULL;
-	cdsl_bstNode_t* current = *root;
+	bs_treeNode_t* current = *root;
 	while(current){
 		if(current->key < item->key){
 			if(!current->right){
@@ -63,7 +68,7 @@ cdsl_bstNode_t* cdsl_btree_insert(cdsl_bstNode_t** root,cdsl_bstNode_t* item){
 	return NULL;
 }
 
-cdsl_bstNode_t* cdsl_btree_lookup(cdsl_bstNode_t* root,int key){
+bs_treeNode_t* cdsl_bstreeLookup(bs_treeNode_t* root,int key){
 	if(!root)
 		return NULL;
 	while(root && (root->key != key)){
@@ -75,12 +80,12 @@ cdsl_bstNode_t* cdsl_btree_lookup(cdsl_bstNode_t* root,int key){
 	return root;
 }
 
-cdsl_bstNode_t* cdsl_btree_delete(cdsl_bstNode_t** root,int key){
+bs_treeNode_t* cdsl_bstreeDelete(bs_treeNode_t** root,int key){
 
-	cdsl_bstNode_t* todelete = NULL;
+	bs_treeNode_t* todelete = NULL;
 	if(!root || !*root)
 		return NULL;
-	cdsl_bstNode_t** current = root;
+	bs_treeNode_t** current = root;
 	while((*current) && ((*current)->key != key)){
 		if((*current)->key < key){
 			current = &(*current)->right;
@@ -103,16 +108,36 @@ cdsl_bstNode_t* cdsl_btree_delete(cdsl_bstNode_t** root,int key){
 	return todelete;
 }
 
-int cdsl_btree_size(cdsl_bstNode_t* root){
-	int cnt = 0;
-	if(root)
-		cnt = 1;
-	if(!root->left && !root->right) return cnt;
-	if(root->left)
-		cnt += cdsl_btree_size(root->left);
-	if(root->right)
-		cnt += cdsl_btree_size(root->right);
-	return cnt;
+void cdsl_bstreePrint(bs_treeNode_t** root,cdsl_generic_printer_t prt){
+	if(!root)
+		return;
+	print_r(*root,prt,0);
 }
 
 
+int cdsl_bstreeSize(bs_treeNode_t** root){
+	int cnt = 0;
+	if(!root || !(*root))
+		return 0;
+	if((*root))
+		cnt = 1;
+	if(!(*root)->left && !(*root)->right) return cnt;
+	if((*root)->left)
+		cnt += cdsl_bstreeSize(&(*root)->left);
+	if((*root)->right)
+		cnt += cdsl_bstreeSize(&(*root)->right);
+	return cnt;
+}
+
+static void print_r(bs_treeNode_t* current,cdsl_generic_printer_t prt,int depth){
+	if(!current)
+		return;
+	print_r(current->right,prt,depth + 1);
+	print_tab(depth); if(prt) prt(current); printf("{key : %d} @ depth %d\n",current->key,depth);
+	print_r(current->left,prt,depth + 1);
+}
+
+static void print_tab(int cnt){
+	while(cnt--)
+		printf("\t");
+}

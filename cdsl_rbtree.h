@@ -26,7 +26,7 @@ struct rb_treeNode {
 
 extern void cdsl_rbtreeNodeInit(rb_treeNode_t* item,int key);
 extern BOOL cdsl_rbtreeInsert(rb_treeNode_t** root,rb_treeNode_t* item);
-extern BOOL cdsl_rbtreeDelete(rb_treeNode_t** root,int key);
+extern rb_treeNode_t* cdsl_rbtreeDelete(rb_treeNode_t** root,int key);
 extern void cdsl_rbtreePrint(rb_treeNode_t** root);
 
 

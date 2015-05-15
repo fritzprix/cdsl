@@ -27,13 +27,15 @@ const static rb_treeNode_t NIL_NODE = {
 		.color = BLACK
 };
 
-const static rb_treeNode_t* RB_NIL_PTR = &NIL_NODE;
 
-#define RB_NIL 		(rb_treeNode_t*) RB_NIL_PTR
+#define RB_NIL 		((rb_treeNode_t*) &NIL_NODE)
 
 static rb_treeNode_t* rotateLeft(rb_treeNode_t* rot_pivot);
 static rb_treeNode_t* rotateRight(rb_treeNode_t* rot_pivot);
-static rb_treeNode_t* insert_r(rb_treeNode_t* parent,rb_treeNode_t* item,uint8_t* prev_info);
+static rb_treeNode_t* insert_r(rb_treeNode_t* parent,rb_treeNode_t* item,uint8_t* context);
+static rb_treeNode_t* delete_r(rb_treeNode_t* parent,rb_treeNode_t* delete_node,uint8_t* context);
+static rb_treeNode_t* getLeftMost(rb_treeNode_t* root);
+static rb_treeNode_t* getRightMost(rb_treeNode_t* root);
 static void print_r(rb_treeNode_t* current,int depth);
 static void print_tab(int cnt);
 
@@ -59,8 +61,29 @@ BOOL cdsl_rbtreeInsert(rb_treeNode_t** root,rb_treeNode_t* item){
 	return TRUE;
 }
 
-BOOL cdsl_rbtreeDelete(rb_treeNode_t** root,int key){
-
+rb_treeNode_t* cdsl_rbtreeDelete(rb_treeNode_t** root,int key){
+	if(!root || !(*root))
+		return FALSE;
+	uint8_t context = 0;
+	rb_treeNode_t* replacement = RB_NIL;
+	rb_treeNode_t* current_node = *root;
+	rb_treeNode_t* parent_node = RB_NIL;
+	while((current_node != RB_NIL) && (current_node->key != key)){
+		parent_node = current_node;
+		if(current_node->key < key)
+		{
+			context = DIR_RIGHT;
+			current_node = current_node->right;
+		}
+		else
+		{
+			context = DIR_LEFT;
+			current_node = current_node->left;
+		}
+	}
+	if(current_node == RB_NIL)
+		return FALSE;
+	replacement = delete_r(parent_node,current_node,&context);
 }
 
 
@@ -72,70 +95,64 @@ void cdsl_rbtreePrint(rb_treeNode_t** root){
 	printf("\n");
 }
 
-static rb_treeNode_t* insert_r(rb_treeNode_t* parent,rb_treeNode_t* item,uint8_t* prev_info){
+static rb_treeNode_t* insert_r(rb_treeNode_t* parent,rb_treeNode_t* item,uint8_t* context){
 	if(!item || !parent)
 		return RB_NIL;
 	if(parent == RB_NIL){
-		*prev_info = CLEAN;
+		*context = CLEAN;
 		return item;
 	}
-	uint8_t direction = *prev_info;
+	uint8_t direction = *context;
 	if(parent->key < item->key){
-		*prev_info = DIR_RIGHT;
-		parent->right = insert_r(parent->right,item,prev_info);
-		if((*prev_info) == COLLISION)		// if collision
+		*context = DIR_RIGHT;
+		parent->right = insert_r(parent->right,item,context);
+		if((*context) == COLLISION)		// if collision
 		{
 			if(parent->left->color == parent->right->color){
 				parent->right->color = !parent->left->color;
 				parent->left->color =!parent->left->color;
 				if((parent->left->color == BLACK) && (parent->right->color == BLACK))
 					parent->color = RED;
-				*prev_info = CLEAN;
+				*context = CLEAN;
 				return parent;
 			}
 			parent = rotateLeft(parent);
 			parent->color = parent->left->color;
 			parent->left->color = !parent->left->color;
-			*prev_info = CLEAN;
+			*context = CLEAN;
 			return parent;
 		}
 
 		if((parent->color == RED) && (parent->right->color == RED)){
-			*prev_info = COLLISION;
+			*context = COLLISION;
 			if(direction == DIR_LEFT){
 				parent = rotateLeft(parent);
-				parent->color = parent->left->color;
-				parent->left->color = !parent->left->color;
 			}
 		}
 	}else{
-		*prev_info = DIR_LEFT;
-		parent->left = insert_r(parent->left,item,prev_info);
-		if((*prev_info) == COLLISION)
+		*context = DIR_LEFT;
+		parent->left = insert_r(parent->left,item,context);
+		if((*context) == COLLISION)
 		{
 			if(parent->left->color == parent->right->color){
 				parent->right->color = !parent->left->color;
 				parent->left->color =!parent->left->color;
 				if((parent->left->color == BLACK) && (parent->right->color == BLACK))
 					parent->color = RED;
-				*prev_info = CLEAN;
+				*context = CLEAN;
 				return parent;
 			}
 			parent = rotateRight(parent);
 			parent->color = parent->right->color;
 			parent->right->color = !parent->right->color;
-			*prev_info = CLEAN;
+			*context = CLEAN;
 			return parent;
 		}
 
 		if((parent->color == RED) && (parent->left->color == RED)){
-			*prev_info = COLLISION;
+			*context = COLLISION;
 			if(direction == DIR_RIGHT){
 				parent = rotateRight(parent);
-				parent->color = parent->right->color;
-				parent->right->color = !parent->right->color;
-				*prev_info = CLEAN;
-				return parent;
 			}
 		}
 	}
@@ -171,3 +188,37 @@ static void print_r(rb_treeNode_t* current,int depth){
 	print_tab(depth); printf("{Color : %s, Key: %d} @Depth %d \n",current->color == BLACK? "BLACK" : "RED",current->key,depth);
 	print_r(current->left,depth + 1);
 }
+
+static rb_treeNode_t* delete_r(rb_treeNode_t* parent,rb_treeNode_t* delete_node,uint8_t* context){
+	if(!parent || !delete_node || !context)		// unexpected parameter error
+		return RB_NIL;
+	uint8_t direction = *context;
+	if((delete_node->right == RB_NIL) && (delete_node->left == RB_NIL)){
+		if(direction == DIR_RIGHT)
+			parent->right = RB_NIL;
+		else
+			parent->left = RB_NIL;
+		return delete_node;
+	}
+
+
+	if(direction == DIR_RIGHT)
+	{
+
+	} else
+	{
+
+	}
+
+}
+
+
+static rb_treeNode_t* getLeftMost(rb_treeNode_t* root){
+
+}
+
+static rb_treeNode_t* getRightMost(rb_treeNode_t* root){
+
+}
+
+
