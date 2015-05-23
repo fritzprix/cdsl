@@ -38,14 +38,9 @@ static rb_treeNode_t* rotateLeft(rb_treeNode_t* rot_pivot,BOOL paint);
 static rb_treeNode_t* rotateRight(rb_treeNode_t* rot_pivot,BOOL paint);
 static rb_treeNode_t* insert_r(rb_treeNode_t* parent,rb_treeNode_t* item,uint8_t* context);
 static rb_treeNode_t* delete_r(rb_treeNode_t* cur,int key,rb_treeNode_t** del,uint8_t* context,int k);
-#if 0
-static rb_treeNode_t* delete_r(rb_treeNode_t* parent,rb_treeNode_t* delete_node,uint8_t* context);
-#endif
 static rb_treeNode_t* deleteLeft_r(rb_treeNode_t* root,rb_treeNode_t** l_most,uint8_t* context);
 static rb_treeNode_t* deleteRight_r(rb_treeNode_t* root,rb_treeNode_t** r_most,uint8_t* context);
 static rb_treeNode_t* handleDoubleBlack(rb_treeNode_t* parent,uint8_t* context);
-static rb_treeNode_t* deleteLeftMost(rb_treeNode_t* root,rb_treeNode_t** leftmost);
-static rb_treeNode_t* deleteRightMost(rb_treeNode_t* root,rb_treeNode_t** rightmost);
 static void print_r(rb_treeNode_t* current,int depth);
 static void print_tab(int cnt);
 
@@ -71,30 +66,6 @@ BOOL cdsl_rbtreeInsert(rb_treeNode_t** root,rb_treeNode_t* item){
 	return TRUE;
 }
 
-#ifdef BEFORE
-rb_treeNode_t* cdsl_rbtreeDelete(rb_treeNode_t** root,int key){
-	if(!root || !(*root))
-		return NULL;
-	uint8_t context = 0;
-	rb_treeNode_t** parent_node = NULL;
-	rb_treeNode_t** current_node = root;
-	while((*current_node)->key != key){
-		if((*current_node) == RB_NIL)
-			return NULL;
-		parent_node = current_node;
-		if((*current_node)->key < key){
-			context = DIR_RIGHT;
-			current_node = &(*current_node)->right;
-		}else{
-			context = DIR_LEFT;
-			current_node = &(*current_node)->left;
-		}
-	}
-
-	*parent_node = delete_r(*parent_node,*current_node,&context);
-	return (*current_node);
-}
-#else
 rb_treeNode_t* cdsl_rbtreeDelete(rb_treeNode_t** root,int key){
 	if(!root || !(*root))
 		return NULL;		// red black tree is empty or invalid arg
@@ -103,7 +74,6 @@ rb_treeNode_t* cdsl_rbtreeDelete(rb_treeNode_t** root,int key){
 	*root = delete_r(*root,key,&del_node,&context,0);
 	return del_node;
 }
-#endif
 
 static rb_treeNode_t* deleteLeft_r(rb_treeNode_t* root,rb_treeNode_t** l_most,uint8_t* context){
 	if(!root)
@@ -162,10 +132,12 @@ static rb_treeNode_t* delete_r(rb_treeNode_t* cur,int key,rb_treeNode_t** del,ui
 		cur->right = delete_r(cur->right,key,del,context,k + 1);
 		if((*context) == COLLISION){
 			//handle subtree double black condition
+			if(cur->right->color != RED){
 			*context = DIR_RIGHT;
-	/*		if(!k)
-				return cur;*/
 			return handleDoubleBlack(cur,context);
+			}
+			cur->right->color = BLACK;
+			*context = CLEAN;
 		}
 		return cur;
 	}
@@ -174,10 +146,12 @@ static rb_treeNode_t* delete_r(rb_treeNode_t* cur,int key,rb_treeNode_t** del,ui
 		cur->left = delete_r(cur->left,key,del,context,k + 1);
 		if((*context) == COLLISION){
 			//handle subtree double black condition
-			*context = DIR_LEFT;
-	/*		if(!k)
-				return cur;*/
-			return handleDoubleBlack(cur,context);
+			if(cur->left->color != RED){
+				*context = DIR_LEFT;
+				return handleDoubleBlack(cur,context);
+			}
+			cur->left->color = BLACK;
+			*context = CLEAN;
 		}
 		return cur;
 	}
@@ -190,8 +164,6 @@ static rb_treeNode_t* delete_r(rb_treeNode_t* cur,int key,rb_treeNode_t** del,ui
 		cur->left = (*del)->left;
 		if((*context) == COLLISION){
 			*context = DIR_LEFT;
-	/*		if(!k)
-				return cur;*/
 			return handleDoubleBlack(cur,context);
 		}
 		return cur;
@@ -204,8 +176,6 @@ static rb_treeNode_t* delete_r(rb_treeNode_t* cur,int key,rb_treeNode_t** del,ui
 		cur->right = (*del)->right;
 		if((*context) == COLLISION){
 			*context = DIR_RIGHT;
-/*			if(!k)
-				return cur;*/
 			return handleDoubleBlack(cur,context);
 		}
 		return cur;
@@ -232,7 +202,7 @@ static rb_treeNode_t* handleDoubleBlack(rb_treeNode_t* parent,uint8_t* context){
 			}
 			if(parent->left->right->color == RED){
 				parent->left = rotateLeft(parent->left,TRUE);
-				parent = rotateRight(parent,FALSE);
+				parent = rotateRight(parent,TRUE);
 				parent->left->color = BLACK;
 				*context = CLEAN;
 				return parent;
@@ -261,7 +231,7 @@ static rb_treeNode_t* handleDoubleBlack(rb_treeNode_t* parent,uint8_t* context){
 			}
 			if(parent->right->left->color == RED){
 				parent->right = rotateRight(parent->right,TRUE);
-				parent = rotateLeft(parent,FALSE);
+				parent = rotateLeft(parent,TRUE);
 				parent->right->color = BLACK;
 				*context = CLEAN;
 				return parent;
@@ -354,23 +324,27 @@ static rb_treeNode_t* insert_r(rb_treeNode_t* parent,rb_treeNode_t* item,uint8_t
 }
 
 static rb_treeNode_t* rotateLeft(rb_treeNode_t* rot_pivot,BOOL paint){
+	uint8_t color;
 	rb_treeNode_t* nparent = rot_pivot->right;
 	rot_pivot->right = nparent->left;
 	nparent->left = rot_pivot;
 	if(paint){
+		color = nparent->color;
 		nparent->color = nparent->left->color;
-		nparent->left->color = !nparent->left->color;
+		nparent->left->color = color;
 	}
 	return nparent;
 }
 
 static rb_treeNode_t* rotateRight(rb_treeNode_t* rot_pivot,BOOL paint){
+	uint8_t color;
 	rb_treeNode_t* nparent = rot_pivot->left;
 	rot_pivot->left = nparent->right;
 	nparent->right = rot_pivot;
 	if(paint){
+		color = nparent->color;
 		nparent->color = nparent->right->color;
-		nparent->right->color = !nparent->right->color;
+		nparent->right->color = color;
 	}
 	return nparent;
 }
@@ -393,109 +367,3 @@ static void print_r(rb_treeNode_t* current,int depth){
 	print_r(current->left,depth + 1);
 	printf("\n");
 }
-
-
-
-#if 0
-/**
- *  \param[in] parent parent node of the node to be deleted
- *  \param[in] delete_node	node to be deleted
- *  \param[in] context  contains relational information between parent and delete node
- */
-static rb_treeNode_t* delete_r(rb_treeNode_t* parent,rb_treeNode_t* delete_node,uint8_t* context){
-	if(!parent || !delete_node || !context)		// unexpected parameter error
-		return RB_NIL;
-	uint8_t direction = *context;
-	if(IS_LEAF_NODE(delete_node)){
-		// if leaf node (meaning at least one of two childs is nil)
-		if((delete_node->left == RB_NIL) && (delete_node->right == RB_NIL)){
-			if(direction == DIR_RIGHT)
-				parent->right = RB_NIL;
-			else
-				parent->left = RB_NIL;
-			return parent;
-		}
-
-		if(direction == DIR_RIGHT){
-			if(delete_node->right != RB_NIL){
-				if((delete_node->color == RED) || (delete_node->right->color == RED)){
-					parent->right = delete_node->right;		// establish link between right child of delete node an parent as right
-					parent->right->color = BLACK;			// change color
-					return parent;
-				}
-			} else {
-				if ((delete_node->color == RED) || (delete_node->left->color == RED)) {
-					parent->right = delete_node->left;
-					parent->left->color = BLACK;
-					return parent;
-				}
-			}
-
-			// both delete node and its child are black
-			if(parent->left->color == BLACK) {	// color of sibling is also black
-				if(parent->left->left->color == RED){
-					parent->right = delete_node->right;
-					parent = rotateRight(parent,FALSE);
-					return parent;
-				}
-				if(parent->left->right->color == RED){
-					parent->left = rotateLeft(parent->left,TRUE);
-					parent = rotateRight(parent,FALSE);
-					return parent;
-				}
-				// both child of sibling are black
-			}
-
-		}else{
-			if(delete_node->left != RB_NIL){
-				if((delete_node->color == RED) || (delete_node->left->color == RED)){
-					parent->left = delete_node->left;
-					parent->left->color = BLACK;
-					return parent;
-				}
-			}else{
-				if ((delete_node->color == RED) || (delete_node->right->color == RED)) {
-					parent->right = delete_node->right;
-					parent->left->color = BLACK;
-					return parent;
-				}
-			}
-
-			// both delete node and its child are black
-		}
-		return parent;
-	}
-
-	rb_treeNode_t* replace = NULL;
-	if(delete_node->right != RB_NIL){
-		delete_node->right = deleteLeftMost(delete_node->right,&replace);
-		if(delete_node->right == replace)
-			delete_node->right = RB_NIL;
-	}
-
-	if(delete_node->left != RB_NIL){
-		delete_node->left = deleteRightMost(delete_node->left,&replace);
-		if(delete_node->left == replace)
-			delete_node->left = RB_NIL;
-	}
-	replace->color = delete_node->color;
-	replace->left = delete_node->left;
-	replace->right = delete_node->right;
-	if(direction == DIR_RIGHT)
-		parent->right = replace;
-	else
-		parent->left = replace;
-	return parent;
-}
-
-#endif
-
-static rb_treeNode_t* deleteLeftMost(rb_treeNode_t* root,rb_treeNode_t** leftmost){
-
-}
-
-static rb_treeNode_t* deleteRightMost(rb_treeNode_t* root,rb_treeNode_t** rightmost){
-
-}
-
-
