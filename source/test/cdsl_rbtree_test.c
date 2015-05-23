@@ -19,20 +19,18 @@ BOOL cdsl_rbtreeDoTest(void){
 
 	for(i = 0;i < TEST_SIZE;i++){
 		keys[i] = rand() % TEST_SIZE;
-		printf("Insert : %d\n",keys[i]);
 		cdsl_rbtreeNodeInit(&node_pool[i],keys[i]);
 		cdsl_rbtreeInsert(&root,&node_pool[i]);
 	}
-	cdsl_rbtreePrint(&root);
 
 	rb_treeNode_t* del = NULL;
-	printf("start Deletiong\n\n");
 	for(i = 0;i < TEST_SIZE;i++){
-		printf("Delete : %d\n",keys[i]);
+		del = NULL;
 		del = cdsl_rbtreeDelete(&root,keys[i]);
-		cdsl_rbtreePrint(&root);
-		printf("\n");
+		if(!del)
+			return FALSE;
 	}
-	return FALSE;
+
+	return TRUE;
 
 }
