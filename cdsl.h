@@ -15,7 +15,7 @@ extern "C" {
 #include "stdint.h"
 
 #ifndef TEST_SIZE
-#define TEST_SIZE 100
+#define TEST_SIZE 10
 #endif
 
 
