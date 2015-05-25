@@ -5,10 +5,11 @@
  *      Author: innocentevil
  */
 
-
-#include <stddef.h>
-#include <stdio.h>
+#include "cdsl.h"
 #include "cdsl_rbtree.h"
+#include <stdio.h>
+
+
 
 
 #define BLACK					((unsigned) (1 > 0))
@@ -133,8 +134,8 @@ static rb_treeNode_t* delete_r(rb_treeNode_t* cur,int key,rb_treeNode_t** del,ui
 		if((*context) == COLLISION){
 			//handle subtree double black condition
 			if(cur->right->color != RED){
-			*context = DIR_RIGHT;
-			return handleDoubleBlack(cur,context);
+				*context = DIR_RIGHT;
+				return handleDoubleBlack(cur,context);
 			}
 			cur->right->color = BLACK;
 			*context = CLEAN;
@@ -193,17 +194,23 @@ static rb_treeNode_t* handleDoubleBlack(rb_treeNode_t* parent,uint8_t* context){
 	if(!parent)
 		return parent;
 	if((*context) == DIR_RIGHT){
+		if(parent->left == RB_NIL)
+			return parent;
 		if(parent->left->color == BLACK){ // if sibling is black
-			if(parent->left->left->color == RED){
-				parent = rotateRight(parent,FALSE);
-				parent->left->color = BLACK;
-				*context = CLEAN;
-				return parent;
-			}
-			if(parent->left->right->color == RED){
-				parent->left = rotateLeft(parent->left,TRUE);
-				parent = rotateRight(parent,TRUE);
-				parent->left->color = BLACK;
+			if ((parent->left->left->color == RED)
+				|| (parent->left->right->color == RED))
+			{
+				if (parent->left->left->color != RED) {
+					parent->left = rotateLeft(parent->left, TRUE);
+				}
+				parent = rotateRight(parent, FALSE);	//roate right
+
+				// color check
+				parent->left->color = RED;
+				if(parent->color == RED){
+					parent->color = BLACK;
+					parent->right->color = RED;
+				}
 				*context = CLEAN;
 				return parent;
 			}
@@ -222,17 +229,21 @@ static rb_treeNode_t* handleDoubleBlack(rb_treeNode_t* parent,uint8_t* context){
 			return parent;
 		}
 	}else {
+		if(parent->right == RB_NIL)
+			return parent;
 		if(parent->right->color == BLACK){ // if sibling is black
-			if(parent->right->right->color == RED){
-				parent = rotateLeft(parent,FALSE);
-				parent->right->color = BLACK;
-				*context = CLEAN;
-				return parent;
-			}
-			if(parent->right->left->color == RED){
-				parent->right = rotateRight(parent->right,TRUE);
-				parent = rotateLeft(parent,TRUE);
-				parent->right->color = BLACK;
+			if ((parent->right->right->color == RED)
+					|| (parent->right->left->right))
+			{
+				if (parent->right->right->color != RED) {
+					parent->right = rotateRight(parent->right, TRUE);
+				}
+				parent = rotateLeft(parent, TRUE);
+				parent->right->color = RED;
+				if(parent->color == RED){
+					parent->color = BLACK;
+					parent->left->color = RED;
+				}
 				*context = CLEAN;
 				return parent;
 			}
@@ -253,6 +264,13 @@ static rb_treeNode_t* handleDoubleBlack(rb_treeNode_t* parent,uint8_t* context){
 	return parent;
 }
 
+int cdsl_rbtreeSize(rb_treeNode_t** root){
+	if(!root || !(*root))
+		return 0;
+	if((*root) == RB_NIL)
+		return 0;
+	return cdsl_rbtreeSize(&(*root)->left) + 1 + cdsl_rbtreeSize(&(*root)->right);
+}
 
 
 void cdsl_rbtreePrint(rb_treeNode_t** root){
@@ -262,6 +280,21 @@ void cdsl_rbtreePrint(rb_treeNode_t** root){
 	print_r(*root,0);
 	printf("\n");
 }
+
+int cdsl_rbtreeMaxDepth(rb_treeNode_t** root){
+	if(!root || !(*root))
+		return 0;
+	if((*root) == RB_NIL)
+		return 0;
+	int max = 0;
+	int temp = 0;
+	if(max < (temp = cdsl_rbtreeMaxDepth(&(*root)->left)))
+		max = temp;
+	if(max < (temp = cdsl_rbtreeMaxDepth(&(*root)->right)))
+		max = temp;
+	return max + 1;
+}
+
 
 static rb_treeNode_t* insert_r(rb_treeNode_t* parent,rb_treeNode_t* item,uint8_t* context){
 	if(!item || !parent)

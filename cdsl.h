@@ -15,12 +15,21 @@ extern "C" {
 #include "stdint.h"
 
 #ifndef TEST_SIZE
-#define TEST_SIZE 10
+#define TEST_SIZE 5000
+#endif
+
+#define VERBOSE_LOG
+
+#ifdef VERBOSE_LOG
+#define log(...) 	printf(__VA_ARGS__)
+#else
+#define log(...)
 #endif
 
 
 typedef enum { TRUE = ((uint8_t) 1 > 0), FALSE = ((uint8_t) 1 < 0) } BOOL;
 typedef void (*cdsl_generic_printer_t) (void*);
+
 #ifndef NULL
 #define NULL 	((void*) 0)
 #endif

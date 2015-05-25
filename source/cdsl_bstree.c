@@ -114,6 +114,18 @@ void cdsl_bstreePrint(bs_treeNode_t** root,cdsl_generic_printer_t prt){
 	print_r(*root,prt,0);
 }
 
+int cdsl_bstreeMaxDepth(bs_treeNode_t** root){
+	if(!root || !(*root))
+		return 0;
+	int max = 0;
+	int temp = 0;
+	if(max < (temp = cdsl_bstreeMaxDepth(&(*root)->left)))
+		max = temp;
+	if(max < (temp = cdsl_bstreeMaxDepth(&(*root)->right)))
+		max = temp;
+	return max + 1;
+}
+
 
 int cdsl_bstreeSize(bs_treeNode_t** root){
 	int cnt = 0;
