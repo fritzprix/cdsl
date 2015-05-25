@@ -4,7 +4,8 @@
  *  Created on: 2015. 5. 10.
  *      Author: innocentevil
  */
-#include <stdlib.h>
+
+
 #include <stdio.h>
 
 const char* RESULT_STRING[] = {

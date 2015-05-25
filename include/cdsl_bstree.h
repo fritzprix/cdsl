@@ -31,6 +31,7 @@ extern bs_treeNode_t* cdsl_bstreeLookup(bs_treeNode_t* root,int key);
 extern bs_treeNode_t* cdsl_bstreeDelete(bs_treeNode_t** root,int key);
 extern int cdsl_bstreeSize(bs_treeNode_t** root);
 extern void cdsl_bstreePrint(bs_treeNode_t** root,cdsl_generic_printer_t prt);
+extern int cdsl_bstreeMaxDepth(bs_treeNode_t** root);
 
 
 #if defined(__cplusplus)
