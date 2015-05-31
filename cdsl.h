@@ -12,7 +12,7 @@
 extern "C" {
 #endif
 
-#include "stdint.h"
+#include <stdint.h>
 
 #ifndef TEST_SIZE
 #define TEST_SIZE 5000
@@ -33,6 +33,7 @@ typedef void (*cdsl_generic_printer_t) (void*);
 #ifndef NULL
 #define NULL 	((void*) 0)
 #endif
+
 
 
 #if defined(__cplusplus)
