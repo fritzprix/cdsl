@@ -10,13 +10,13 @@
 #include "cdsl_slist.h"
 
 
-void cdsl_slistInit(cdsl_slistNode_t* lentry){
+void cdsl_slistInit(slistNode_t* lentry){
 	lentry->next = NULL;
 }
 
 
-void cdsl_slistEnqueuePriority(cdsl_slistNode_t* lentry,cdsl_slistNode_t* item,cdsl_slistPriorityRule rule){
-	cdsl_slistNode_t** cnode = &lentry;
+void cdsl_slistEnqueuePriority(slistNode_t* lentry,slistNode_t* item,cdsl_slistPriorityRule rule){
+	slistNode_t** cnode = &lentry;
 	while((*cnode)->next != NULL){
 		if(rule((*cnode)->next,item) == item){
 			item->next = (*cnode)->next;
@@ -28,24 +28,24 @@ void cdsl_slistEnqueuePriority(cdsl_slistNode_t* lentry,cdsl_slistNode_t* item,c
 	(*cnode)->next = item;
 }
 
-void cdsl_slistInsertAfter(cdsl_slistNode_t* ahead,cdsl_slistNode_t* item){
+void cdsl_slistInsertAfter(slistNode_t* ahead,slistNode_t* item){
 	if(!ahead || !item)
 		return;
 	item->next = ahead->next;
 	ahead->next = item;
 }
 
-cdsl_slistNode_t* cdsl_slistDequeue(cdsl_slistNode_t* lentry){
+slistNode_t* cdsl_slistDequeue(slistNode_t* lentry){
 	if(!lentry)
 		return NULL;
-	cdsl_slistNode_t* head = lentry->next;
+	slistNode_t* head = lentry->next;
 	if(head)
 		lentry->next = head->next;
 	return head;
 }
 
 
-void cdsl_slistPutHead(cdsl_slistNode_t* lentry,cdsl_slistNode_t* item){
+void cdsl_slistPutHead(slistNode_t* lentry,slistNode_t* item){
 	if(!lentry || !item)
 		return;
 	if(lentry->next)
@@ -55,26 +55,26 @@ void cdsl_slistPutHead(cdsl_slistNode_t* lentry,cdsl_slistNode_t* item){
 	lentry->next = item;
 }
 
-void cdsl_slistPutTail(cdsl_slistNode_t* lentry,cdsl_slistNode_t* item){
+void cdsl_slistPutTail(slistNode_t* lentry,slistNode_t* item){
 	if(!lentry || !item)
 		return;
 	item->next = NULL;
-	cdsl_slistNode_t* cnode = lentry;
+	slistNode_t* cnode = lentry;
 	while(cnode->next != NULL){
 		cnode = cnode->next;
 	}
 	cnode->next = item;
 }
 
-cdsl_slistNode_t* cdsl_slistGetHead(cdsl_slistNode_t* lentry){
+slistNode_t* cdsl_slistGetHead(slistNode_t* lentry){
 	return cdsl_slistDequeue(lentry);
 }
 
-cdsl_slistNode_t* cdsl_slistGetTail(cdsl_slistNode_t* lentry){
+slistNode_t* cdsl_slistGetTail(slistNode_t* lentry){
 	if(!lentry)
 		return NULL;
-	cdsl_slistNode_t* tail = NULL;
-	cdsl_slistNode_t** cnode = &lentry;
+	slistNode_t* tail = NULL;
+	slistNode_t** cnode = &lentry;
 	while((*cnode)->next != NULL){
 		cnode = &(*cnode)->next;
 	}
@@ -83,10 +83,10 @@ cdsl_slistNode_t* cdsl_slistGetTail(cdsl_slistNode_t* lentry){
 	return tail;
 }
 
-BOOL cdsl_slistRemove(cdsl_slistNode_t* lentry,cdsl_slistNode_t* item){
+BOOL cdsl_slistRemove(slistNode_t* lentry,slistNode_t* item){
 	if(!lentry || !item)
 		return FALSE;
-	cdsl_slistNode_t* cnode = lentry;
+	slistNode_t* cnode = lentry;
 	while(cnode->next != NULL){
 		if(cnode->next == item){
 			cnode->next = item->next;
@@ -97,11 +97,11 @@ BOOL cdsl_slistRemove(cdsl_slistNode_t* lentry,cdsl_slistNode_t* item){
 	return FALSE;
 }
 
-int cdsl_slistSize(cdsl_slistNode_t* lentry){
+int cdsl_slistSize(slistNode_t* lentry){
 	if(!lentry)
 		return FALSE;
 	int cnt = 0;
-	cdsl_slistNode_t* cnode = lentry;
+	slistNode_t* cnode = lentry;
 	while(cnode->next){
 		cnode = cnode->next;
 		cnt++;
@@ -109,10 +109,10 @@ int cdsl_slistSize(cdsl_slistNode_t* lentry){
 	return cnt;
 }
 
-BOOL cdsl_slistContain(cdsl_slistNode_t* lentry,cdsl_slistNode_t* item){
+BOOL cdsl_slistContain(slistNode_t* lentry,slistNode_t* item){
 	if(!lentry)
 		return FALSE;
-	cdsl_slistNode_t* cnode = lentry;
+	slistNode_t* cnode = lentry;
 	while(cnode->next){
 		if(cnode->next == item)
 			return TRUE;
@@ -121,10 +121,10 @@ BOOL cdsl_slistContain(cdsl_slistNode_t* lentry,cdsl_slistNode_t* item){
 	return FALSE;
 }
 
-void cdsl_slistPrint(cdsl_slistNode_t* lentry,cdsl_generic_printer_t prt){
+void cdsl_slistPrint(slistNode_t* lentry,cdsl_generic_printer_t prt){
 	if(!lentry || !prt)
 		return;
-	cdsl_slistNode_t* cnode = lentry;
+	slistNode_t* cnode = lentry;
 	while(cnode->next){
 		cnode = cnode->next;
 		prt(cnode->next);

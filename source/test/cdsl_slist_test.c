@@ -13,7 +13,7 @@
 
 
 typedef struct card {
-	cdsl_slistNode_t	list_head;
+	slistNode_t	list_head;
 	int card_num;
 }card_t;
 
@@ -21,7 +21,7 @@ typedef struct card {
 static card_t Cards[TEST_SIZE];
 static DECLARE_COMPARE_FN(card_compare);
 static void printCard(void* card);
-static cdsl_slistNode_t listEntry;
+static slistNode_t listEntry;
 
 
 BOOL cdsl_slistDoTest(void){
@@ -30,7 +30,7 @@ BOOL cdsl_slistDoTest(void){
 
 	for(;i < TEST_SIZE;i++){
 		Cards[i].card_num = i;
-		cdsl_slistEnqueuePriority(&listEntry,(cdsl_slistNode_t*) &Cards[i],card_compare);
+		cdsl_slistEnqueuePriority(&listEntry,(slistNode_t*) &Cards[i],card_compare);
 	}
 	cdsl_slistPrint(&listEntry,printCard);
 	return TRUE;
