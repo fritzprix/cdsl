@@ -6,6 +6,7 @@ TEST_HEADER_DIR=$(HEADER_ROOT)/test
 TEST_SRCS=cdsl_bstree_test.c\
 	cdsl_heap_test.c\
 	cdsl_list_test.c\
+	cdsl_slist_test.c\
 	cdsl_rbtree_test.c\
 	cdsl_spltree_test.c
 
