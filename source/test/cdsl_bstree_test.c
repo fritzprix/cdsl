@@ -30,7 +30,7 @@ BOOL cdsl_bstreeDoTest(void){
 		cdsl_bstreeInsert(&root,&bst_nodepool[i]);
 		depth_temp = cdsl_bstreeMaxDepth(&root);
 		if(depth != depth_temp){
-			log("Max Depth of Tree : %d @ N : %d\n",depth_temp,i);
+//			log("Max Depth of Tree : %d @ N : %d\n",depth_temp,i);
 			depth = depth_temp;
 		}
 	}
