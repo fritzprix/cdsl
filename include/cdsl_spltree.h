@@ -19,12 +19,14 @@ struct spltree_node {
 	int key;
 };
 
-extern void cdsl_spltreeInitNode(spltreeNode_t* node,int key);
+extern void cdsl_spltreeNodeInit(spltreeNode_t* node,int key);
 extern void cdsl_spltreeInsert(spltreeNode_t** root,spltreeNode_t* item);
 extern spltreeNode_t* cdsl_spltreeLookup(spltreeNode_t** root,int key,BOOL splay);
 extern spltreeNode_t* cdsl_spltreeLookupLargest(spltreeNode_t** root,BOOL splay);
 extern spltreeNode_t* cdsl_spltreeLookupSmallest(spltreeNode_t** root,BOOL splay);
 extern spltreeNode_t* cdsl_spltreeDelete(spltreeNode_t** root,int key);
+extern int cdsl_spltreeSize(spltreeNode_t** root);
+extern int cdsl_spltreeMaxDepth(spltreeNode_t** root);
 extern void cdsl_spltreePrint(spltreeNode_t** root);
 
 

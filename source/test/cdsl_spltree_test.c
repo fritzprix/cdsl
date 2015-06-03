@@ -18,12 +18,47 @@ static spltreeNode_t* root;
 BOOL cdsl_spltreeDoTest(void){
 	int i = 0;
 	root = NULL;
-	for(;i < 100;i++){
-		keys[i] = rand() % 100;
-		log("Inserted : %d\n",keys[i]);
-		cdsl_spltreeInitNode(&nodes[i],keys[i]);
+
+	int depth,depth_temp;
+	depth = 0;
+	depth_temp = 0;
+
+	for(;i < TEST_SIZE;i++){
+		keys[i] = rand() % TEST_SIZE;
+		cdsl_spltreeNodeInit(&nodes[i],keys[i]);
 		cdsl_spltreeInsert(&root,&nodes[i]);
-		cdsl_spltreePrint(&root);
+		depth_temp = cdsl_spltreeMaxDepth(&root);
+		if(depth != depth_temp){
+//			log("Max Depth of Tree : %d @ N : %d\n",depth_temp,i);
+			depth = depth_temp;
+		}
 	}
+
+	if(cdsl_spltreeSize(&root) != TEST_SIZE)
+		return FALSE;
+
+	spltreeNode_t* del = NULL;
+	for(i = 0;i < TEST_SIZE;i++){
+		del = cdsl_spltreeDelete(&root,keys[i]);
+		if(!del)
+			return FALSE;
+		if(del->key != keys[i])
+			return FALSE;
+		// insert new random value to the tree
+		keys[i] = rand() % TEST_SIZE;
+		cdsl_spltreeNodeInit(del,keys[i]);
+		cdsl_spltreeInsert(&root,del);
+	}
+
+	for(i = 0;i < TEST_SIZE;i++){
+		del = NULL;
+		del = cdsl_spltreeDelete(&root,keys[i]);
+		if(!del)
+			return FALSE;
+		if(del->key != keys[i])
+			return FALSE;
+	}
+	if(cdsl_spltreeSize(&root) > 0)
+		return FALSE;
 	return TRUE;
 }
