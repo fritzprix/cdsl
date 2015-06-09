@@ -30,7 +30,10 @@ extern rb_treeNode_t* cdsl_rbtreeDelete(rb_treeNode_t** root,int key);
 extern int cdsl_rbtreeSize(rb_treeNode_t** root);
 extern void cdsl_rbtreePrint(rb_treeNode_t** root);
 extern int cdsl_rbtreeMaxDepth(rb_treeNode_t** root);
-
+extern void cdsl_rbtreePrint(rb_treeNode_t** root);
+extern int cdsl_rbtreeMaxDepth(rb_treeNode_t** root);
+extern rb_treeNode_t* cdsl_rbtreeDeleteMin(rb_treeNode_t** root);
+extern rb_treeNode_t* cdsl_rbtreeDeleteMax(rb_treeNode_t** root);
 
 #if defined(__cplusplus)
 }

@@ -76,6 +76,24 @@ rb_treeNode_t* cdsl_rbtreeDelete(rb_treeNode_t** root,int key){
 	return del_node;
 }
 
+rb_treeNode_t* cdsl_rbtreeDeleteMin(rb_treeNode_t** root){
+	if(!root || !(*root))
+		return NULL;
+	rb_treeNode_t* min = NULL;
+	uint8_t context = 0;
+	*root = deleteLeft_r(*root,&min,&context);
+	return min;
+}
+
+rb_treeNode_t* cdsl_rbtreeDeleteMax(rb_treeNode_t** root){
+	if(!root || !(*root))
+		return NULL;
+	rb_treeNode_t* max = NULL;
+	uint8_t context = 0;
+	*root = deleteRight_r(*root,&max,&context);
+	return max;
+}
+
 static rb_treeNode_t* deleteLeft_r(rb_treeNode_t* root,rb_treeNode_t** l_most,uint8_t* context){
 	if(!root)
 		return NULL;
@@ -97,6 +115,8 @@ static rb_treeNode_t* deleteLeft_r(rb_treeNode_t* root,rb_treeNode_t** l_most,ui
 	}
 	return root;
 }
+
+
 
 static rb_treeNode_t* deleteRight_r(rb_treeNode_t* root,rb_treeNode_t** r_most,uint8_t* context){
 	if(!root)
