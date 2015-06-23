@@ -10,6 +10,7 @@
 #include "cdsl_slist.h"
 
 
+
 void cdsl_slistInit(cdsl_slistNode_t* lentry){
 	lentry->next = NULL;
 }

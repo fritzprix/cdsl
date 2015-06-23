@@ -27,7 +27,12 @@ extern "C" {
 #endif
 
 
-typedef enum { TRUE = ((uint8_t) 1 > 0), FALSE = ((uint8_t) 1 < 0) } BOOL;
+#ifndef BOOL
+#define BOOL uint8_t
+#define FALSE ((uint8_t) 1 < 0)
+#define TRUE  ((uint8_t) 1 > 0)
+#endif
+
 typedef void (*cdsl_generic_printer_t) (void*);
 
 #ifndef NULL
