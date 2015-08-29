@@ -13,12 +13,12 @@
 /**
  * recursive interanl function
  */
-static cdsl_heapNode_t* cdsl_heapInsertFromBottom(cdsl_heapNode_t* current,cdsl_heapNode_t* item,heapEvaluate eval);
-static cdsl_heapNode_t* cdsl_heapMoveNodeDown(cdsl_heapNode_t* current,heapEvaluate eval);
-static cdsl_heapNode_t* cdsl_heapGetLeafNode(cdsl_heapNode_t* current);
+static heapNode_t* cdsl_heapInsertFromBottom(heapNode_t* current,heapNode_t* item,heapEvaluate eval);
+static heapNode_t* cdsl_heapMoveNodeDown(heapNode_t* current,heapEvaluate eval);
+static heapNode_t* cdsl_heapGetLeafNode(heapNode_t* current);
 
 
-int cdsl_heapEnqueue(cdsl_heapNode_t** heap,cdsl_heapNode_t* item,heapEvaluate eval){
+int cdsl_heapEnqueue(heapNode_t** heap,heapNode_t* item,heapEvaluate eval){
 	item->left = item->right = NULL;
 	if(!heap)
 		return (1 < 0);
@@ -26,10 +26,10 @@ int cdsl_heapEnqueue(cdsl_heapNode_t** heap,cdsl_heapNode_t* item,heapEvaluate e
 	return (1 > 0);
 }
 
-cdsl_heapNode_t* cdsl_heapDeqeue(cdsl_heapNode_t** heap,heapEvaluate eval){
+heapNode_t* cdsl_heapDeqeue(heapNode_t** heap,heapEvaluate eval){
 	if(!heap)
 		return NULL;
-	cdsl_heapNode_t* current = *heap;
+	heapNode_t* current = *heap;
 	*heap = cdsl_heapGetLeafNode(*heap);
 	if(current == *heap){
 		*heap = NULL;
@@ -43,7 +43,7 @@ cdsl_heapNode_t* cdsl_heapDeqeue(cdsl_heapNode_t** heap,heapEvaluate eval){
 }
 
 
-void cdsl_heapPrint(cdsl_heapNode_t** root,heapPrint prt){
+void cdsl_heapPrint(heapNode_t** root,heapPrint prt){
 	if(!root || !*root)
 		return;
 	prt(*root);
@@ -52,8 +52,8 @@ void cdsl_heapPrint(cdsl_heapNode_t** root,heapPrint prt){
 }
 
 
-static cdsl_heapNode_t* cdsl_heapInsertFromBottom(cdsl_heapNode_t* current,cdsl_heapNode_t* item,heapEvaluate eval){
-	cdsl_heapNode_t* child,*left,*right = NULL;
+static heapNode_t* cdsl_heapInsertFromBottom(heapNode_t* current,heapNode_t* item,heapEvaluate eval){
+	heapNode_t* child,*left,*right = NULL;
 	if(!current){
 //		DBG_PRT("Current is Null Node\n");
 		return item;
@@ -102,8 +102,8 @@ static cdsl_heapNode_t* cdsl_heapInsertFromBottom(cdsl_heapNode_t* current,cdsl_
 
 
 
-static cdsl_heapNode_t* cdsl_heapGetLeafNode(cdsl_heapNode_t* current){
-	cdsl_heapNode_t* leaf = NULL;
+static heapNode_t* cdsl_heapGetLeafNode(heapNode_t* current){
+	heapNode_t* leaf = NULL;
 	if(!current) return leaf;
 	if(!current->right && !current->left){
 		return current;
@@ -127,8 +127,8 @@ static cdsl_heapNode_t* cdsl_heapGetLeafNode(cdsl_heapNode_t* current){
 	return current;
 }
 
-static cdsl_heapNode_t* cdsl_heapMoveNodeDown(cdsl_heapNode_t* current,heapEvaluate eval){
-	cdsl_heapNode_t* largest = current,*left = NULL,*right = NULL;
+static heapNode_t* cdsl_heapMoveNodeDown(heapNode_t* current,heapEvaluate eval){
+	heapNode_t* largest = current,*left = NULL,*right = NULL;
 	if(!largest)
 		return NULL;
 	largest = eval(largest,current->right);

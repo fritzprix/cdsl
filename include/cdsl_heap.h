@@ -16,19 +16,19 @@ extern "C" {
 
 
 #include <stdint-gcc.h>
-typedef struct heap_node cdsl_heapNode_t;
-typedef cdsl_heapNode_t* (*heapEvaluate)(cdsl_heapNode_t* a, cdsl_heapNode_t* b);
-typedef void (*heapPrint)(cdsl_heapNode_t* item);
+typedef struct heap_node heapNode_t;
+typedef heapNode_t* (*heapEvaluate)(heapNode_t* a, heapNode_t* b);
+typedef void (*heapPrint)(heapNode_t* item);
 
 struct heap_node{
-	cdsl_heapNode_t*	right;
-	cdsl_heapNode_t*	left;
+	heapNode_t*	right;
+	heapNode_t*	left;
 	uint8_t 	flipper;
 };
 
-extern int cdsl_heapEnqueue(cdsl_heapNode_t** heap,cdsl_heapNode_t* item,heapEvaluate eval);
-extern cdsl_heapNode_t* cdsl_heapDeqeue(cdsl_heapNode_t** heap,heapEvaluate eval);
-extern void cdsl_heapPrint(cdsl_heapNode_t** heap,heapPrint prt);
+extern int cdsl_heapEnqueue(heapNode_t** heap,heapNode_t* item,heapEvaluate eval);
+extern heapNode_t* cdsl_heapDeqeue(heapNode_t** heap,heapEvaluate eval);
+extern void cdsl_heapPrint(heapNode_t** heap,heapPrint prt);
 
 #if defined(__cplusplus)
 }

@@ -3,6 +3,7 @@
 
 CC=gcc
 CPP=g++
+AR=ar
 
 CFLAG=
 INC=
@@ -34,12 +35,13 @@ SOURCE_ROOT=$(PROJECT_ROOT_DIR)/source
 
 
 TARGET=cdsl
+ARCHIVE=libcdsl.a
 
 include $(SOURCE_ROOT)/Makefile
 
 
 
-all : $(DIRS) $(TARGET)
+all : $(DIRS) $(TARGET) $(ARCHIVE)
 
 
 
@@ -47,13 +49,17 @@ all : $(DIRS) $(TARGET)
 $(TARGET) : main.o $(OBJS)
 	$(CC) -o $@ $(CFLAG) $(INC) $< $(OBJS)
 	
+$(ARCHIVE) : $(OBJS)
+	$(AR) rcs $@ $<
+	
+	
 main.o  : main.c 
 	$(CC) $(CFLAG) -c -o $@ $< $(INC)
 
 
 
 clean :
-	rm -rf $(OBJS) $(TARGET) $(DIRS) main.o
+	rm -rf $(OBJS) $(TARGET) $(DIRS) $(ARCHIVE) main.o
 
  
 	

@@ -15,9 +15,9 @@ extern "C"{
 #endif
 
 
-typedef struct cdsl_bst_node bs_treeNode_t;
+typedef struct bst_node bs_treeNode_t;
 
-struct cdsl_bst_node {
+struct bst_node {
 	bs_treeNode_t* right;
 	bs_treeNode_t* left;
 	int key;
