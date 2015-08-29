@@ -14,7 +14,6 @@ void cdsl_slistInit(slistNode_t* lentry){
 	lentry->next = NULL;
 }
 
-
 void cdsl_slistEnqueuePriority(slistNode_t* lentry,slistNode_t* item,cdsl_slistPriorityRule rule){
 	slistNode_t** cnode = &lentry;
 	while((*cnode)->next != NULL){

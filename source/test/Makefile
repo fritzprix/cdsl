@@ -8,7 +8,8 @@ TEST_SRCS=cdsl_bstree_test.c\
 	cdsl_list_test.c\
 	cdsl_slist_test.c\
 	cdsl_rbtree_test.c\
-	cdsl_spltree_test.c
+	cdsl_spltree_test.c\
+	cdsl_hash_test.c
 
 TEST_OBJS=$(TEST_SRCS:%.c=$(TEST_GEN_DIR)/%.o)
 
