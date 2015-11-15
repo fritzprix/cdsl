@@ -39,7 +39,9 @@ ARCHIVE=libcdsl.a
 
 include $(SOURCE_ROOT)/Makefile
 
+.SILENT : $(TARGET) $(ARCHIVE) clean 
 
+PHONY += all
 
 all : $(DIRS) $(TARGET) $(ARCHIVE)
 
@@ -58,8 +60,12 @@ main.o  : main.c
 
 
 
+PHONY += clean
+
 clean :
 	rm -rf $(OBJS) $(TARGET) $(DIRS) $(ARCHIVE) main.o
+
+.PHONY = $(PHONY)
 
  
 	

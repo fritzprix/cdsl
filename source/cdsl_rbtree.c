@@ -13,7 +13,7 @@
 
 
 #define BLACK					((unsigned) (1 > 0))
-#define RED						((unsigned) (1 < 0))
+#define RED					((unsigned) (1 < 0))
 
 
 #define CLEAN					((uint8_t) 0)
@@ -45,17 +45,20 @@ static rb_treeNode_t* handleDoubleBlack(rb_treeNode_t* parent,uint8_t* context);
 static void print_r(rb_treeNode_t* current,int depth);
 static void print_tab(int cnt);
 
-void cdsl_rbtreeNodeInit(rb_treeNode_t* item,int key){
+void cdsl_rbtreeNodeInit(rb_treeNode_t* item,int key)
+{
 	item->key = key;
 	item->left = item->right = RB_NIL;
 	item->color = RED;
 }
 
 
-BOOL cdsl_rbtreeInsert(rb_treeNode_t** root,rb_treeNode_t* item){
+BOOL cdsl_rbtreeInsert(rb_treeNode_t** root,rb_treeNode_t* item)
+{
 	if(!root)
 		return FALSE;
-	if(!*root){
+	if(!*root)
+	{
 		*root = item;
 		item->color = BLACK;
 		return TRUE;
@@ -67,7 +70,8 @@ BOOL cdsl_rbtreeInsert(rb_treeNode_t** root,rb_treeNode_t* item){
 	return TRUE;
 }
 
-rb_treeNode_t* cdsl_rbtreeDelete(rb_treeNode_t** root,int key){
+rb_treeNode_t* cdsl_rbtreeDelete(rb_treeNode_t** root,int key)
+{
 	if(!root || !(*root))
 		return NULL;		// red black tree is empty or invalid arg
 	uint8_t context = 0;
@@ -76,7 +80,8 @@ rb_treeNode_t* cdsl_rbtreeDelete(rb_treeNode_t** root,int key){
 	return del_node;
 }
 
-rb_treeNode_t* cdsl_rbtreeDeleteMin(rb_treeNode_t** root){
+rb_treeNode_t* cdsl_rbtreeDeleteMin(rb_treeNode_t** root)
+{
 	if(!root || !(*root))
 		return NULL;
 	rb_treeNode_t* min = NULL;
@@ -85,7 +90,8 @@ rb_treeNode_t* cdsl_rbtreeDeleteMin(rb_treeNode_t** root){
 	return min;
 }
 
-rb_treeNode_t* cdsl_rbtreeDeleteMax(rb_treeNode_t** root){
+rb_treeNode_t* cdsl_rbtreeDeleteMax(rb_treeNode_t** root)
+{
 	if(!root || !(*root))
 		return NULL;
 	rb_treeNode_t* max = NULL;
@@ -99,7 +105,8 @@ static rb_treeNode_t* deleteLeft_r(rb_treeNode_t* root,rb_treeNode_t** l_most,ui
 		return NULL;
 	if(root == RB_NIL)
 		return RB_NIL;
-	if(root->left == RB_NIL){
+	if(root->left == RB_NIL)
+	{
 		*l_most = root;
 		*context = CLEAN;
 		if((root->color == BLACK) && (root->right->color == BLACK))
@@ -109,21 +116,21 @@ static rb_treeNode_t* deleteLeft_r(rb_treeNode_t* root,rb_treeNode_t** l_most,ui
 		return root->right;
 	}
 	root->left = deleteLeft_r(root->left,l_most,context);
-	if((*context) == COLLISION){
+	if((*context) == COLLISION)
+	{
 		(*context) = DIR_LEFT;
 		return handleDoubleBlack(root,context);
 	}
 	return root;
 }
 
-
-
 static rb_treeNode_t* deleteRight_r(rb_treeNode_t* root,rb_treeNode_t** r_most,uint8_t* context){
 	if(!root)
 		return NULL;
 	if(root == RB_NIL)
 		return RB_NIL;
-	if(root->right == RB_NIL){
+	if(root->right == RB_NIL)
+	{
 		*r_most = root;
 		*context = CLEAN;
 		if((root->color == BLACK) && (root->left->color == BLACK))
@@ -133,7 +140,8 @@ static rb_treeNode_t* deleteRight_r(rb_treeNode_t* root,rb_treeNode_t** r_most,u
 		return root->left;
 	}
 	root->right = deleteRight_r(root->right,r_most,context);
-	if((*context) == COLLISION){
+	if((*context) == COLLISION)
+	{
 		*context = DIR_RIGHT;
 		return handleDoubleBlack(root,context);
 	}
@@ -142,18 +150,22 @@ static rb_treeNode_t* deleteRight_r(rb_treeNode_t* root,rb_treeNode_t** r_most,u
 
 static rb_treeNode_t* delete_r(rb_treeNode_t* cur,int key,rb_treeNode_t** del,uint8_t* context,int k){
 	if(!cur) return NULL;
-	if(cur == RB_NIL){
+	if(cur == RB_NIL)
+	{
 		del = NULL;
 		context = CLEAN;
 		return cur;
 	}
 	uint8_t direction = *context;
-	if(cur->key < key){
+	if(cur->key < key)
+	{
 		*context = DIR_RIGHT;
 		cur->right = delete_r(cur->right,key,del,context,k + 1);
-		if((*context) == COLLISION){
+		if((*context) == COLLISION)
+		{
 			//handle subtree double black condition
-			if(cur->right->color != RED){
+			if(cur->right->color != RED)
+			{
 				*context = DIR_RIGHT;
 				return handleDoubleBlack(cur,context);
 			}
@@ -162,12 +174,15 @@ static rb_treeNode_t* delete_r(rb_treeNode_t* cur,int key,rb_treeNode_t** del,ui
 		}
 		return cur;
 	}
-	if(cur->key > key){
+	if(cur->key > key)
+	{
 		*context = DIR_LEFT;
 		cur->left = delete_r(cur->left,key,del,context,k + 1);
-		if((*context) == COLLISION){
+		if((*context) == COLLISION)
+		{
 			//handle subtree double black condition
-			if(cur->left->color != RED){
+			if(cur->left->color != RED)
+			{
 				*context = DIR_LEFT;
 				return handleDoubleBlack(cur,context);
 			}
@@ -177,25 +192,29 @@ static rb_treeNode_t* delete_r(rb_treeNode_t* cur,int key,rb_treeNode_t** del,ui
 		return cur;
 	}
 	*del = cur;
-	if(cur->left != RB_NIL){
+	if(cur->left != RB_NIL)
+	{
 		*context = DIR_LEFT;
 		(*del)->left = deleteRight_r(cur->left,&cur,context);
 		cur->color = (*del)->color;
 		cur->right = (*del)->right;
 		cur->left = (*del)->left;
-		if((*context) == COLLISION){
+		if((*context) == COLLISION)
+		{
 			*context = DIR_LEFT;
 			return handleDoubleBlack(cur,context);
 		}
 		return cur;
 	}
-	if(cur->right != RB_NIL){
+	if(cur->right != RB_NIL)
+	{
 		*context = DIR_RIGHT;
 		(*del)->right = deleteLeft_r(cur->right,&cur,context);
 		cur->color = (*del)->color;
 		cur->left = (*del)->left;
 		cur->right = (*del)->right;
-		if((*context) == COLLISION){
+		if((*context) == COLLISION)
+		{
 			*context = DIR_RIGHT;
 			return handleDoubleBlack(cur,context);
 		}
@@ -213,7 +232,8 @@ static rb_treeNode_t* delete_r(rb_treeNode_t* cur,int key,rb_treeNode_t** del,ui
 static rb_treeNode_t* handleDoubleBlack(rb_treeNode_t* parent,uint8_t* context){
 	if(!parent)
 		return parent;
-	if((*context) == DIR_RIGHT){
+	if((*context) == DIR_RIGHT)
+	{
 		if(parent->left == RB_NIL)
 			return parent;
 		if(parent->left->color == BLACK){ // if sibling is black
