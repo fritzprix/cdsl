@@ -1,6 +1,8 @@
 /Default
+
 *.o
 *.exe
-.cproject
+*.a
+/.cproject
 /.settings
 *.settings

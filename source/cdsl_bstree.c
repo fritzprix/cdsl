@@ -7,17 +7,16 @@
 
 
 #include "cdsl_bstree.h"
+#include "base_tree.h"
 #include "cdsl.h"
 #include <stdio.h>
 #include <stddef.h>
 
-static int calc_max_depth_rc(bs_treeNode_t** root);
-static int calc_size_rc(bs_treeNode_t** root);
-static void print_rc(bs_treeNode_t* current,cdsl_generic_printer_t prt,int depth);
-static int traverse_incremental_rc(bs_treeNode_t* current,int* current_order,bs_tree_callback_t cb);
-static int traverse_decremental_rc(bs_treeNode_t* current,int* current_order,bs_tree_callback_t cb);
-static void print_tab(int cnt);
+#define PRINT		printf
 
+
+static bs_treeNode_t* move_up_rightmost_rc(bs_treeNode_t* node);
+static bs_treeNode_t* move_up_leftmost_rc(bs_treeNode_t* node);
 
 void bstree_root_init(bs_treeRoot_t* rootp)
 {
@@ -36,41 +35,6 @@ void bstree_node_init(bs_treeNode_t* node,int key)
 	node->right = NULL;
 }
 
-static bs_treeNode_t* move_up_rightmost_rc(bs_treeNode_t* node)
-{
-	if(!node)	return NULL;
-	if(!node->right)	return node;
-
-	/** recursively do this (0 is null termination)
-	 *       p             b
-	 *      / \    ->     / \
-	 *     a   b         p   0
-	 *        / \       / \
-	 *       c   0     a   c
-	 */
-	bs_treeNode_t* rightmost = move_up_rightmost_rc(node->right);
-	node->right = rightmost->left;
-	rightmost->left = node;
-	return rightmost;
-}
-
-static bs_treeNode_t* move_up_leftmost_rc(bs_treeNode_t* node)
-{
-	if(!node) 	return NULL;
-	if(!node->left) 	return node;
-
-	/** recursively do this (0 is null termination)
-	 *        p              a
-	 *       / \            / \
-	 *      a   b   ->     0   p
-	 *     / \                / \
-	 *    0   d              d   b
-	 */
-	bs_treeNode_t* leftmost = move_up_leftmost_rc(node->left);
-	node->left = leftmost->right;
-	leftmost->right = node;
-	return leftmost;
-}
 
 bs_treeNode_t* bstree_insert(bs_treeRoot_t* rootp,bs_treeNode_t* item){
 	if((rootp == NULL) || (item == NULL))
@@ -169,102 +133,69 @@ bs_treeNode_t* bstree_delete(bs_treeRoot_t* rootp,int key)
 	return todelete;
 }
 
-void bstree_traverse(bs_treeRoot_t* rootp,bs_tree_callback_t cb,int order)
+void bstree_traverse(bs_treeRoot_t* rootp,base_tree_callback_t cb,int order)
 {
-	if((cb == NULL) || (rootp == NULL) || (rootp->entry == NULL))
-		return;
-	int i = 0;
-	if(order == ORDER_DEC)
-		traverse_decremental_rc(rootp->entry,&i,cb);
-	else
-		traverse_incremental_rc(rootp->entry,&i,cb);
+	tree_traverse((base_treeRoot_t*) rootp,cb,order);
 }
 
 
-void bstree_print(bs_treeRoot_t* rootp,cdsl_generic_printer_t prt)
+void bstree_print(bs_treeRoot_t* rootp,cdsl_generic_printer_t print)
 {
 	if(rootp == NULL)
 		return;
-	print_rc(rootp->entry,prt,0);
+	tree_print((base_treeRoot_t*) rootp,print);
 }
 
 int bstree_max_depth(bs_treeRoot_t* rootp)
 {
 	if((rootp == NULL) || (rootp->entry == NULL))
 		return 0;
-	return calc_max_depth_rc(&rootp->entry);
+	return tree_max_depth((base_treeRoot_t*) rootp);
 }
 
 int bstree_size(bs_treeRoot_t* rootp)
 {
 	if((rootp == NULL) || (rootp->entry == NULL))
 		return 0;
-	return calc_size_rc(&rootp->entry);
+	return tree_size((base_treeRoot_t*) rootp);
 }
 
-static int calc_size_rc(bs_treeNode_t** root)
+
+
+
+static bs_treeNode_t* move_up_rightmost_rc(bs_treeNode_t* node)
 {
-	int cnt = 0;
-	if((root == NULL) || (*root == NULL))
-		return 0;
-	if((*root))
-		cnt = 1;
-	if(!(*root)->left && !(*root)->right) return cnt;
-	if((*root)->left)
-		cnt += calc_size_rc(&(*root)->left);
-	if((*root)->right)
-		cnt += calc_size_rc(&(*root)->right);
-	return cnt;
+	if(!node)	return NULL;
+	if(!node->right)	return node;
+
+	/** recursively do this (0 is null termination)
+	 *       p             b
+	 *      / \    ->     / \
+	 *     a   b         p   0
+	 *        / \       / \
+	 *       c   0     a   c
+	 */
+	bs_treeNode_t* rightmost = move_up_rightmost_rc(node->right);
+	node->right = rightmost->left;
+	rightmost->left = node;
+	return rightmost;
 }
 
-
-static int calc_max_depth_rc(bs_treeNode_t** root)
+static bs_treeNode_t* move_up_leftmost_rc(bs_treeNode_t* node)
 {
-	if((root == NULL) || (*root == NULL))
-		return 0;
-	int max = 0;
-	int temp = 0;
-	if(max < (temp = calc_max_depth_rc(&(*root)->left)))
-		max = temp;
-	if(max < (temp = calc_max_depth_rc(&(*root)->right)))
-		max = temp;
-	return max + 1;
+	if(!node) 	return NULL;
+	if(!node->left) 	return node;
+
+	/** recursively do this (0 is null termination)
+	 *        p              a
+	 *       / \            / \
+	 *      a   b   ->     0   p
+	 *     / \                / \
+	 *    0   d              d   b
+	 */
+	bs_treeNode_t* leftmost = move_up_leftmost_rc(node->left);
+	node->left = leftmost->right;
+	leftmost->right = node;
+	return leftmost;
 }
 
-static void print_rc(bs_treeNode_t* current,cdsl_generic_printer_t prt,int depth)
-{
-	if(!current)
-		return;
-	print_rc(current->right,prt,depth + 1);
-	print_tab(depth); if(prt) prt(current); printf("{key : %d} @ depth %d\n",current->key,depth);
-	print_rc(current->left,prt,depth + 1);
-}
-
-static void print_tab(int cnt)
-{
-	while(cnt--)
-		printf("\t");
-}
-
-static int traverse_incremental_rc(bs_treeNode_t* current, int* current_order, bs_tree_callback_t cb)
-{
-	if(current == NULL)
-		return 0;
-	if(traverse_incremental_rc(current->left,current_order,cb) == BREAK_TRAVERS)
-		return BREAK_TRAVERS;
-	*current_order += 1;
-	if(cb(*current_order,current) == BREAK_TRAVERS)
-		return BREAK_TRAVERS;
-	return traverse_incremental_rc(current->right,current_order,cb);
-}
-
-static int traverse_decremental_rc(bs_treeNode_t* current, int* current_order, bs_tree_callback_t cb)
-{
-	if(current == NULL)
-		return 0;
-	if(traverse_decremental_rc(current->right,current_order,cb) == BREAK_TRAVERS)
-		return BREAK_TRAVERS;
-	if(cb(*current_order,current) == BREAK_TRAVERS)
-		return BREAK_TRAVERS;
-	return traverse_decremental_rc(current->left,current_order,cb);
-}

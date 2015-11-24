@@ -26,6 +26,7 @@ struct heap_node{
 	uint8_t 	flipper;
 };
 
+
 extern int heap_enqueue(heapNode_t** heap,heapNode_t* item,heapEvaluate eval);
 extern heapNode_t* heap_deqeue(heapNode_t** heap,heapEvaluate eval);
 extern void heap_print(heapNode_t** heap,heapPrint prt);

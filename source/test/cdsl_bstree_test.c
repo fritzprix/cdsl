@@ -13,7 +13,9 @@
 
 static int bstree_cb(int order,void* bst);
 static int cb_count;
-BOOL cdsl_bstreeDoTest(void){
+static void bstree_tprint(void*);
+BOOL cdsl_bstreeDoTest(void)
+{
 	bs_treeNode_t bst_nodepool[TEST_SIZE];
 	int keys[TEST_SIZE];
 	bs_treeRoot_t root;
@@ -25,12 +27,14 @@ BOOL cdsl_bstreeDoTest(void){
 	depth = 0;
 	depth_temp = 0;
 
-	for(i = 0;i < TEST_SIZE;i++){
+	for(i = 0;i < TEST_SIZE;i++)
+	{
 		keys[i] = rand() % TEST_SIZE;
 		bstree_node_init(&bst_nodepool[i],keys[i]);
 		bstree_insert(&root,&bst_nodepool[i]);
 		depth_temp = bstree_max_depth(&root);
-		if(depth != depth_temp){
+		if(depth != depth_temp)
+		{
 			depth = depth_temp;
 		}
 	}
@@ -39,7 +43,8 @@ BOOL cdsl_bstreeDoTest(void){
 		return FALSE;
 
 	bs_treeNode_t* delete_node;
-	for(i = 0;i < TEST_SIZE;i++){
+	for(i = 0;i < TEST_SIZE;i++)
+	{
 		delete_node = NULL;
 		delete_node = bstree_delete(&root,keys[i]);
 		if(!delete_node)
@@ -51,11 +56,12 @@ BOOL cdsl_bstreeDoTest(void){
 		bstree_insert(&root,delete_node);
 	}
 
-	bstree_traverse(&root,bstree_cb,ORDER_INC);
+	bstree_traverse(&root,(base_tree_callback_t) bstree_cb,ORDER_INC);
 	if(cb_count != 2000)
 		return FALSE;
 
-	for(i = 0;i < TEST_SIZE;i++){
+	for(i = 0;i < TEST_SIZE;i++)
+	{
 		delete_node = NULL;
 		delete_node = bstree_delete(&root,keys[i]);
 		if(!delete_node)
@@ -70,12 +76,18 @@ BOOL cdsl_bstreeDoTest(void){
 	return TRUE;
 }
 
+static void bstree_tprint(void* nodep)
+{
+	printf("%d\n",((bs_treeNode_t*) nodep)->key);
+}
+
+
 static int bstree_cb(int order,void* bst)
 {
 	cb_count++;
 	if(order == 2000)
 	{
-		return BREAK_TRAVERS;
+		return BREAK_TRAVERSE;
 	}
 	return (1 > 0);
 }

@@ -1,5 +1,7 @@
 
-SRCS=cdsl_bstree.c\
+SRCS=\
+	base_tree.c\
+	cdsl_bstree.c\
 	cdsl_heap.c\
 	cdsl_slist.c\
 	cdsl_dlist.c\
