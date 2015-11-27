@@ -37,7 +37,7 @@ BOOL cdsl_heapDoTest(void)
 			max = node->key;
 	}
 	heap_root_init(&root,MIN_HEAP);
-	for (i = 0;i < 100;i++)
+	for (i = 0;i < 10;i++)
 	{
 		heap_node_init(&nodes[i],rand());
 		heap_enqueue(&root, &nodes[i]);

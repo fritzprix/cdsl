@@ -16,7 +16,7 @@
 /**
  * recursive interanl function
  */
-static heapNode_t* insert_from_bottom_rc(heapNode_t* current,heapNode_t* item, int dir, heapType_t type);
+static heapNode_t* insert_from_bottom_rc(heapRoot_t* rootp, heapNode_t* current,heapNode_t* item);
 static heapNode_t* move_max_tree_down_rc(heapNode_t* current);
 static heapNode_t* move_min_tree_down_rc(heapNode_t* current);
 static heapNode_t* get_leaf_node(heapNode_t* current);
@@ -43,7 +43,7 @@ int heap_enqueue(heapRoot_t* rootp,heapNode_t* item){
 	item->left = item->right = NULL;
 	if(!rootp)
 		return (1 < 0);
-	rootp->entry = insert_from_bottom_rc(rootp->entry,item, rootp->dir, rootp->type);
+	rootp->entry = insert_from_bottom_rc(rootp,rootp->entry,item);
 	rootp->dir = !rootp->dir;
 	return (1 > 0);
 }
@@ -88,7 +88,7 @@ int heap_max_depth(heapRoot_t* rootp)
 }
 
 
-static heapNode_t* insert_from_bottom_rc(heapNode_t* current,heapNode_t* item, int dir, heapType_t type)
+static heapNode_t* insert_from_bottom_rc(heapRoot_t* rootp, heapNode_t* current,heapNode_t* item)
 {
 	heapNode_t* child = NULL;
 	if(!current)
@@ -98,30 +98,29 @@ static heapNode_t* insert_from_bottom_rc(heapNode_t* current,heapNode_t* item, i
 	if(current->right == NULL)
 	{
 		current->right = item;
-		dir = DIR_RIGHT;
 		child = item;
 	}
 	else if(current->left == NULL)
 	{
 		current->left = item;
-		dir = DIR_LEFT;
 		child = item;
 	}
 	else
 	{
-		if(dir == DIR_RIGHT)
+		rootp->dir = !rootp->dir;
+		if(rootp->dir == DIR_RIGHT)
 		{
-			child = insert_from_bottom_rc(current->right,item,!dir,type);
+			child = insert_from_bottom_rc(rootp, current->right,item);
 			current->right = child;
 		}
 		else
 		{
-			child = insert_from_bottom_rc(current->left,item,!dir,type);
+			child = insert_from_bottom_rc(rootp, current->left,item);
 			current->left = child;
 		}
 	}
 
-	if(type == MAX_HEAP)
+	if(rootp->type == MAX_HEAP)
 	{
 		if(current->key >= child->key)
 			return current;
