@@ -27,13 +27,20 @@ typedef struct bs_treeroot bs_treeRoot_t;
 typedef int (*bs_tree_callback_t) (int order,void*);
 
 struct bs_treenode {
-	bs_treeNode_t* right;
-	bs_treeNode_t* left;
+	union {
+		struct {
+			bs_treeNode_t *left, *right;
+		};
+		base_treeNode_t node;
+	};
 	int key;
 };
 
 struct bs_treeroot {
-	bs_treeNode_t* entry;
+	union {
+		bs_treeNode_t* entry;
+		base_treeRoot_t root;
+	};
 };
 
 

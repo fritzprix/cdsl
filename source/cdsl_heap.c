@@ -9,107 +9,159 @@
 #include "cdsl_heap.h"
 #include <stddef.h>
 
+#define DIR_LEFT  1
+#define DIR_RIGHT !DIR_LEFT
+
 
 /**
  * recursive interanl function
  */
-static heapNode_t* insert_from_bottom(heapNode_t* current,heapNode_t* item,heapEvaluate eval);
-static heapNode_t* move_tree_down(heapNode_t* current,heapEvaluate eval);
+static heapNode_t* insert_from_bottom_rc(heapNode_t* current,heapNode_t* item, int dir, heapType_t type);
+static heapNode_t* move_max_tree_down_rc(heapNode_t* current);
+static heapNode_t* move_min_tree_down_rc(heapNode_t* current);
 static heapNode_t* get_leaf_node(heapNode_t* current);
+static heapNode_t* heapify(heapNode_t* current,heapNode_t* child);
 
-int heap_enqueue(heapNode_t** heap,heapNode_t* item,heapEvaluate eval){
+void heap_root_init(heapRoot_t* rootp, heapType_t type)
+{
+	if(rootp == NULL)
+		return;
+	rootp->entry = NULL;
+	rootp->type = type;
+	rootp->dir = DIR_LEFT;
+}
+
+void heap_node_init(heapNode_t* node, int key)
+{
+	if(node == NULL)
+		return;
+	node->left = node->right = NULL;
+	node->key = key;
+}
+
+int heap_enqueue(heapRoot_t* rootp,heapNode_t* item){
 	item->left = item->right = NULL;
-	if(!heap)
+	if(!rootp)
 		return (1 < 0);
-	*heap = insert_from_bottom(*heap,item,eval);
+	rootp->entry = insert_from_bottom_rc(rootp->entry,item, rootp->dir, rootp->type);
+	rootp->dir = !rootp->dir;
 	return (1 > 0);
 }
 
-heapNode_t* heap_deqeue(heapNode_t** heap,heapEvaluate eval){
-	if(!heap)
+heapNode_t* heap_deqeue(heapRoot_t* rootp){
+	if(!rootp)
 		return NULL;
-	heapNode_t* current = *heap;
-	*heap = get_leaf_node(*heap);
-	if(current == *heap){
-		*heap = NULL;
+	heapNode_t* current = rootp->entry;
+	rootp->entry = get_leaf_node(rootp->entry);
+	if(current == rootp->entry){
+		rootp->entry = NULL;
 		return current;
 	}
-	(*heap)->left = current->left;
-	(*heap)->right = current->right;
-
-	*heap = move_tree_down(*heap,eval);
+	rootp->entry->left = current->left;
+	rootp->entry->right = current->right;
+	if(rootp->type == MAX_HEAP)
+		rootp->entry = move_max_tree_down_rc(rootp->entry);
+	else
+		rootp->entry = move_min_tree_down_rc(rootp->entry);
 	return current;
 }
 
 
-void heap_print(heapNode_t** root,heapPrint prt){
-	if(!root || !*root)
+void heap_print(heapRoot_t* rootp,cdsl_generic_printer_t print){
+	if(!rootp || !rootp->entry)
 		return;
-	prt(*root);
-	heap_print(&(*root)->right,prt);
-	heap_print(&(*root)->left,prt);
+	tree_print(&rootp->_root,print);
+}
+
+int heap_size(heapRoot_t* rootp)
+{
+	if(!rootp || !rootp->entry)
+		return 0;
+	return tree_size(&rootp->_root);
+}
+
+int heap_max_depth(heapRoot_t* rootp)
+{
+	if(!rootp || !rootp->entry)
+		return 0;
+	return tree_max_depth(&rootp->_root);
 }
 
 
-static heapNode_t* insert_from_bottom(heapNode_t* current,heapNode_t* item,heapEvaluate eval)
+static heapNode_t* insert_from_bottom_rc(heapNode_t* current,heapNode_t* item, int dir, heapType_t type)
 {
-	heapNode_t* child,*left,*right = NULL;
+	heapNode_t* child = NULL;
 	if(!current)
 	{
 		return item;
 	}
-	current->flipper = !current->flipper;
-	if(current->flipper)
+	if(current->right == NULL)
 	{
-		child = insert_from_bottom(current->right,item,eval);
-		if(current->right != child)
-		{
-			if(current != eval(current,child))
-			{
-				left = child->left;
-				right = child->right;
-				child->left = current->left;
-				child->right = current;
-				current->left = left;
-				current->right = right;
-				child->right = current;
-				return child;
-			}
-			else
-			{
-				current->right = child;
-				return current;
-			}
-		}
-		return current;
+		current->right = item;
+		dir = DIR_RIGHT;
+		child = item;
+	}
+	else if(current->left == NULL)
+	{
+		current->left = item;
+		dir = DIR_LEFT;
+		child = item;
 	}
 	else
 	{
-		child = insert_from_bottom(current->left,item,eval);
-		if(current->left != child)
+		if(dir == DIR_RIGHT)
 		{
-			if(current != eval(current,child))
-			{
-				left = child->left;
-				right = child->right;
-				child->left = current;
-				child->right = current->right;
-				current->left = left;
-				current->right = right;
-				child->left = current;
-				return child;
-			}
-			else
-			{
-				current->left = child;
-				return current;
-			}
+			child = insert_from_bottom_rc(current->right,item,!dir,type);
+			current->right = child;
 		}
-		return current;
+		else
+		{
+			child = insert_from_bottom_rc(current->left,item,!dir,type);
+			current->left = child;
+		}
+	}
+
+	if(type == MAX_HEAP)
+	{
+		if(current->key >= child->key)
+			return current;
+		return heapify(current,child);
+	}
+	else
+	{
+		if(current->key <= child->key)
+			return current;
+		return heapify(current,child);
 	}
 }
 
 
+static heapNode_t* heapify(heapNode_t* current,heapNode_t* child)
+{
+	heapNode_t *left, *right;
+	if(child == current->right)
+	{
+		left = child->left;
+		right = child->right;
+		child->left = current->left;
+		child->right = current;
+		current->left = left;
+		current->right = right;
+		child->right = current;
+		return child;
+	}
+	else
+	{
+		left = child->left;
+		right = child->right;
+		child->left = current;
+		child->right = current->right;
+		current->left = left;
+		current->right = right;
+		child->left = current;
+		return child;
+	}
+}
 
 static heapNode_t* get_leaf_node(heapNode_t* current){
 	heapNode_t* leaf = NULL;
@@ -141,13 +193,15 @@ static heapNode_t* get_leaf_node(heapNode_t* current){
 	return current;
 }
 
-static heapNode_t* move_tree_down(heapNode_t* current,heapEvaluate eval)
+static heapNode_t* move_max_tree_down_rc(heapNode_t* current)
 {
 	heapNode_t* largest = current,*left = NULL,*right = NULL;
 	if(!largest)
 		return NULL;
-	largest = eval(largest,current->right);
-	largest = eval(largest,current->left);
+	if((current->right != NULL) && (largest->key < current->right->key))
+		largest = current->right;
+	if((current->left != NULL) && (largest->key < current->left->key))
+		largest = current->left;
 
 	if(largest == current->left)
 	{
@@ -156,7 +210,7 @@ static heapNode_t* move_tree_down(heapNode_t* current,heapEvaluate eval)
 		largest->right = current->right;
 		current->right = right;
 		current->left = left;
-		largest->left = move_tree_down(current,eval);
+		largest->left = move_max_tree_down_rc(current);
 	}
 	else if(largest == current->right)
 	{
@@ -165,9 +219,41 @@ static heapNode_t* move_tree_down(heapNode_t* current,heapEvaluate eval)
 		largest->left =current->left;
 		current->right = right;
 		current->left = left;
-		largest->right = move_tree_down(current,eval);
+		largest->right = move_max_tree_down_rc(current);
 	}
 	return largest;
 }
+
+static heapNode_t* move_min_tree_down_rc(heapNode_t* current)
+{
+	heapNode_t* smallest = current,*left = NULL,*right = NULL;
+	if(!smallest)
+		return NULL;
+	if((current->right != NULL) && (smallest->key > current->right->key))
+		smallest = current->right;
+	if((current->left != NULL) && (smallest->key > current->left->key))
+		smallest = current->left;
+
+	if(smallest == current->left)
+	{
+		left = smallest->left;
+		right = smallest->right;
+		smallest->right = current->right;
+		current->right = right;
+		current->left = left;
+		smallest->left = move_min_tree_down_rc(current);
+	}
+	else if(smallest == current->right)
+	{
+		left = smallest->left;
+		right = smallest->right;
+		smallest->left =current->left;
+		current->right = right;
+		current->left = left;
+		smallest->right = move_min_tree_down_rc(current);
+	}
+	return smallest;
+}
+
 
 

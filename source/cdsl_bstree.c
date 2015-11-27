@@ -135,7 +135,7 @@ bs_treeNode_t* bstree_delete(bs_treeRoot_t* rootp,int key)
 
 void bstree_traverse(bs_treeRoot_t* rootp,base_tree_callback_t cb,int order)
 {
-	tree_traverse((base_treeRoot_t*) rootp,cb,order);
+	tree_traverse(&rootp->root,cb,order);
 }
 
 
@@ -143,21 +143,21 @@ void bstree_print(bs_treeRoot_t* rootp,cdsl_generic_printer_t print)
 {
 	if(rootp == NULL)
 		return;
-	tree_print((base_treeRoot_t*) rootp,print);
+	tree_print(&rootp->root,print);
 }
 
 int bstree_max_depth(bs_treeRoot_t* rootp)
 {
 	if((rootp == NULL) || (rootp->entry == NULL))
 		return 0;
-	return tree_max_depth((base_treeRoot_t*) rootp);
+	return tree_max_depth(&rootp->root);
 }
 
 int bstree_size(bs_treeRoot_t* rootp)
 {
 	if((rootp == NULL) || (rootp->entry == NULL))
 		return 0;
-	return tree_size((base_treeRoot_t*) rootp);
+	return tree_size(&rootp->root);
 }
 
 

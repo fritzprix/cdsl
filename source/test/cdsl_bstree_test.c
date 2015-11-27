@@ -85,6 +85,7 @@ static void bstree_tprint(void* nodep)
 static int bstree_cb(int order,void* bst)
 {
 	cb_count++;
+//	printf("#%d : %d\n", order, ((bs_treeNode_t*) bst)->key);
 	if(order == 2000)
 	{
 		return BREAK_TRAVERSE;
