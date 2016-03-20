@@ -4,6 +4,7 @@
 	"output":["libcdsl.a"],
 	"version":"0.1",
 	"buildcmd":[
+		"make config",
 		"make release"
 	]
 }
