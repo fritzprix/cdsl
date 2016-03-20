@@ -91,7 +91,6 @@ $(DBG_CACHE_DIR)/%.do : %.c
 $(REL_CACHE_DIR)/%.o : %.c
 	$(CC) -c -o $@ $(REL_CFLAG) $(DYNAMIC_FLAG) $< $(INCS)
 	
-
 PHONY += clean
 
 clean : 

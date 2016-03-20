@@ -1,7 +1,7 @@
 {
 	"name":"cdsl",
-	"include":["./include"],
-	"output":["libcdsl.a"],
+	"include":["./include","./"],
+	"output":["libcdsl.a","libcdsl.so"],
 	"version":"0.1",
 	"buildcmd":[
 		"make config",
