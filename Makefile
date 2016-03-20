@@ -75,7 +75,7 @@ $(DBG_DYNAMIC_TARGET) : $(DBG_OBJS)
 
 $(REL_STATIC_TARGET) : $(REL_OBJS)
 	@echo 'Generating Archive File ....$@'
-	$(AR_ rcs -o $@ $(REL_OBJS)
+	$(AR) rcs -o $@ $(REL_OBJS)
 	
 $(REL_DYNAMIC_TARGET) : $(REL_OBJS)
 	@echo 'Generating Share Library File .... $@'
