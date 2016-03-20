@@ -8,6 +8,10 @@
 
 #include <stdio.h>
 #include "cdsl_heap_test.h"
+#include "cdsl_bstree_test.h"
+#include "cdsl_spltree_test.h"
+#include "cdsl_rbtree_test.h"
+#include "cdsl_hash_test.h"
 
 const char* RESULT_STRING[] = {
 		"FAIL",
@@ -20,8 +24,7 @@ int main(void){
 	printf("Binary Search Tree Test Result : %s\n",RESULT_STRING[cdsl_bstreeDoTest()]);
 	printf("Splay tree Test Result : %s\n",RESULT_STRING[cdsl_spltreeDoTest()]);
 	printf("Red Black Tree Test Result : %s\n",RESULT_STRING[cdsl_rbtreeDoTest()]);
-	printf("Hash Test Result : %s\n",RESULT_STRING[cdsl_hashDoTest()]);
-//	printf("Singly-Linked List Test Result : %s\n",RESULT_STRING[cdsl_slistDoTest()]);
+	printf("Singly-Linked List Test Result : %s\n",RESULT_STRING[cdsl_slistDoTest()]);
 	return 0;
 }
 

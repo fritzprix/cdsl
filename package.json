@@ -1,0 +1,9 @@
+{
+	"name":"cdsl",
+	"include":["./include"],
+	"output":["libcdsl.a"],
+	"version":"0.1",
+	"buildcmd":[
+		"make release"
+	]
+}

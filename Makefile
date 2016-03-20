@@ -2,68 +2,102 @@
 
 
 CC=gcc
-CPP=g++
+CXX=clang++-3.6
 AR=ar
+PYTHON=python
+PIP=pip
+MKDIR=mkdir
 
-CFLAG=
-INC=
-OBJS=
-SRCS=
-DIRS=
-
-
-
-ifeq ($(BUILD),) 
-	BUILD=DEBUG
-endif
-
-
-
-ifeq ($(BUILD),DEBUG)
-	CFLAG +=	-g3\
-				-O0
-else
-	CFLAG +=	-O2
-endif
-
-
+DBG_CFLAG = -O0 -g3 -fmessage-length=0 
+REL_CFLAG = -O2 -g0 -fmessage-length=0
+DYNAMIC_FLAG = -shared -fPIC
 
 
 PROJECT_ROOT_DIR=$(CURDIR)
 HEADER_ROOT=$(PROJECT_ROOT_DIR)/include
 SOURCE_ROOT=$(PROJECT_ROOT_DIR)/source
+TOOL_DIR=$(PROJECT_ROOT_DIR)/tools
+
+CONFIG_PY=$(TOOL_DIR)/jconfigpy/jconfigpy.py
+
+TEST_TARGET=cdsl
+
+DBG_STATIC_TARGET=libcdsld.a
+DBG_DYNAMIC_TARGET=libcdsld.so
+
+REL_STATIC_TARGET=libcdsl.a
+REL_DYNAMIC_TARET=libcdsl.so
+
+-include .config
+
+VPATH=$(SRC-y)
+INCS=$(INC-y:%=-I%)
+
+DBG_OBJS=$(OBJ-y:%=$(DBG_CACHE_DIR)/%.do)
+REL_OBJS=$(OBJ-y:%=$(REL_CACHE_DIR)/%.o)
+
+DBG_CACHE_DIR=Debug
+REL_CACHE_DIR=Release
+
+SILENT+= $(REL_STATIC_TARGET) $(REL_DYNAMIC_TARET) $(DBG_OBJS)
+SILENT+= $(DBG_STATIC_TARGET) $(DBG_DYNAMIC_TARGET) $(REL_OBJS)
+SILENT+= $(TEST_TARGET)
 
 
-TARGET=cdsl
-ARCHIVE=libcdsl.a
+.SILENT :  $(SILENT) clean 
 
-include $(SOURCE_ROOT)/Makefile
+PHONY+= all debug release clean test
 
-.SILENT : $(TARGET) $(ARCHIVE) clean 
+all : debug 
 
-PHONY += all
+debug : $(DBG_CACHE_DIR) $(DBG_STATIC_TARGET) $(DBG_DYNAMIC_TARGET)
 
-all : $(DIRS) $(TARGET) $(ARCHIVE)
+release : $(REL_CACHE_DIR) $(REL_STATIC_TARGET) $(REL_DYNAMIC_TARGET)
 
+test : $(REL_CACHE_DIR)  $(TEST_TARGET) 
 
+config : $(CONFIG_PY)
+	$(PYTHON) $(CONFIG_PY) -c -i config.json
 
+$(CONFIG_PY):
+	$(PIP) install jconfigpy -t $(TOOL_DIR)
+
+$(DBG_CACHE_DIR) $(REL_CACHE_DIR) :
+	$(MKDIR) $@
 	
-$(TARGET) : main.o $(OBJS)
-	$(CC) -o $@ $(CFLAG) $(INC) $< $(OBJS)
+$(DBG_STATIC_TARGET) : $(DBG_OBJS)
+	@echo 'Generating Archive File ....$@'
+	$(AR) rcs -o $@  $(DBG_OBJS)
 	
-$(ARCHIVE) : $(OBJS)
-	$(AR) rcs $@ $<
-	
-	
-main.o  : main.c 
-	$(CC) $(CFLAG) -c -o $@ $< $(INC)
+$(DBG_DYNAMIC_TARGET) : $(DBG_OBJS)
+	@echo 'Generating Share Library File .... $@'
+	$(CC) -o $@ $(DBG_CFLAG) $(DYNAMIC_FLAG) $(DBG_OBJS)
 
-
+$(REL_STATIC_TARGET) : $(REL_OBJS)
+	@echo 'Generating Archive File ....$@'
+	$(AR_ rcs -o $@ $(REL_OBJS)
+	
+$(REL_DYNAMIC_TARGET) : $(REL_OBJS)
+	@echo 'Generating Share Library File .... $@'
+	$(CC) -o $@ $(REL_CFLAG) $(DYNAMIC_FLAG) $(REL_OBJS)
+	
+$(TEST_TARGET) : $(REL_CACHE_DIR)/main.o $(REL_OBJS) 
+	@echo 'Building unit-test executable... $@'
+	$(CC) -o $@ $(REL_CFLAG) $< $(REL_OBJS)
+	
+$(DBG_CACHE_DIR)/%.do : %.c
+	$(CC) -c -o $@ $(DBG_CFLAG) $(DYNAMIC_FLAG) $< $(INCS)
+	
+$(REL_CACHE_DIR)/%.o : %.c
+	$(CC) -c -o $@ $(REL_CFLAG) $(DYNAMIC_FLAG) $< $(INCS)
+	
 
 PHONY += clean
 
-clean :
-	rm -rf $(OBJS) $(TARGET) $(DIRS) $(ARCHIVE) main.o
+clean : 
+	rm -rf $(DBG_CACHE_DIR) $(DBG_STATIC_TARGET) $(DBG_DYNAMIC_TARGET)\
+			$(REL_CACHE_DIR) $(REL_STATIC_TARGET) $(REL_DYNAMIC_TARGET)\
+			$(TEST_TARGET)
 
 .PHONY = $(PHONY)
 

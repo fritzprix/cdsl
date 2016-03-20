@@ -1,4 +1,4 @@
-/Default
+
 
 *.o
 *.exe
@@ -6,3 +6,10 @@
 /.cproject
 /.settings
 *.settings
+.*
+
+.settings/
+
+Debug/
+Release/
+tools/

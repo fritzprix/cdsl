@@ -1,0 +1,10 @@
+{
+	"CDSL_CONFIG":{
+		"type":"config",
+		"path":"./source/config.json"
+	},
+	"ROOT_RECIPE":{
+		"type":"recipe",
+		"path":"recipe.mk"
+	}
+}

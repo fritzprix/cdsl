@@ -32,7 +32,15 @@ BOOL cdsl_slistDoTest(void){
 		Cards[i].card_num = i;
 		cdsl_slistEnqueuePriority(&listEntry,(slistNode_t*) &Cards[i],card_compare);
 	}
-	cdsl_slistPrint(&listEntry,printCard);
+	card_t* card = NULL;
+	int last_num = TEST_SIZE;
+	for(i = 0;i < TEST_SIZE;i++)
+	{
+		card = (card_t*) cdsl_slistDequeue(&listEntry);
+		if(last_num < card->card_num)
+			return FALSE;
+		last_num = card->card_num;
+	}
 	return TRUE;
 }
 

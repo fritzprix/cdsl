@@ -1,0 +1,9 @@
+INC-y+=./include/test
+SRC-y+=./source/test
+OBJ-y+=cdsl_bstree_test\
+		cdsl_hash_test\
+		cdsl_heap_test\
+		cdsl_list_test\
+		cdsl_rbtree_test\
+		cdsl_slist_test\
+		cdsl_spltree_test

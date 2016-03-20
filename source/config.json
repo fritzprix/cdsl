@@ -1,0 +1,10 @@
+{
+	"CDSL_RECIPE":{
+		"type":"recipe",
+		"path":"recipe.mk"
+	},
+	"TEST_CONFIG":{
+		"type":"config",
+		"path":"./test/config.json"
+	}
+}

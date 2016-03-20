@@ -5,6 +5,7 @@
  *      Author: innocentevil
  */
 
+#include <stdlib.h>
 #include "cdsl_dlist.h"
 
 

@@ -7,6 +7,7 @@
 
 #include "cdsl.h"
 #include "cdsl_rbtree.h"
+#include <stdlib.h>
 #include <stdio.h>
 
 
