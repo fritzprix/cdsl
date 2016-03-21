@@ -3,6 +3,7 @@
 *.o
 *.exe
 *.a
+*.so
 /.cproject
 /.settings
 *.settings
