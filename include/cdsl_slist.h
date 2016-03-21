@@ -10,7 +10,9 @@
 
 #include "cdsl.h"
 
-
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
 
 #define cdsl_slistIsEmpty(node) (((cdsl_slistNode_t*) node)->next == NULL)
@@ -47,6 +49,9 @@ extern int cdsl_slistSize(slistEntry_t* lentry);
 extern BOOL cdsl_slistContain(slistEntry_t* lentry,slistNode_t* item);
 extern void cdsl_slistPrint(slistEntry_t* lentry,cdsl_generic_printer_t prt);
 
+#if defined(__cplusplus)
+}
+#endif
 
 
 #endif /* CDSL_SLIST_H_ */
