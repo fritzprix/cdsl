@@ -41,7 +41,7 @@ REL_CACHE_DIR=Release
 
 SILENT+= $(REL_STATIC_TARGET) $(REL_DYNAMIC_TARGET) $(DBG_OBJS)
 SILENT+= $(DBG_STATIC_TARGET) $(DBG_DYNAMIC_TARGET) $(REL_OBJS)
-SILENT+= $(TEST_TARGET)
+SILENT+= $(TEST_TARGET) $(REL_CACHE_DIR)/main.o 
 
 
 .SILENT :  $(SILENT) clean 
@@ -86,9 +86,11 @@ $(TEST_TARGET) : $(REL_CACHE_DIR)/main.o $(REL_OBJS)
 	$(CC) -o $@ $(REL_CFLAG) $< $(REL_OBJS)
 	
 $(DBG_CACHE_DIR)/%.do : %.c
+	@echo 'compile...$@'
 	$(CC) -c -o $@ $(DBG_CFLAG) $(DYNAMIC_FLAG) $< $(INCS)
 	
 $(REL_CACHE_DIR)/%.o : %.c
+	@echo 'compile...$@'
 	$(CC) -c -o $@ $(REL_CFLAG) $(DYNAMIC_FLAG) $< $(INCS)
 	
 PHONY += clean

@@ -8,11 +8,13 @@
 #ifndef CDSL_H_
 #define CDSL_H_
 
+#include <stdint.h>
+#include <stddef.h>
+
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
-
-#include <stdint.h>
 
 #ifndef TEST_SIZE
 #define TEST_SIZE 5000
@@ -26,6 +28,7 @@ extern "C" {
 #define log(...)
 #endif
 
+#define container_of(ptr, type, elem) 	((type*) ((size_t) ptr - offsetof(type, elem)))
 
 #ifndef BOOL
 #define BOOL uint8_t

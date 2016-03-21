@@ -22,35 +22,42 @@ extern "C" {
 #define DECLARE_COMPARE_FN(fn) void* fn(void* a,void* b)
 #endif
 
-#define cdsl_dlistIsEmpty(lhead)   (((dlistNode_t*) lhead)->next == NULL)
+#define cdsl_dlistIsEmpty(lhead)   (((dlistEntry_t*) lhead)->head== NULL)
 typedef void* (*cdsl_dlistPriorityRule)(void* a,void* b);		// should return larger or prior one between two
 typedef struct cdsl_dlnode dlistNode_t;
- struct cdsl_dlnode {
+typedef struct cdsl_dlentry dlistEntry_t;
+
+struct cdsl_dlnode {
 	dlistNode_t* prev;
 	dlistNode_t* next;
 };
 
-extern void cdsl_dlistInit(dlistNode_t* lentry);
+struct cdsl_dlentry {
+	dlistNode_t* tail;
+	dlistNode_t* head;
+};
+extern void cdsl_dlistNodeInit(dlistNode_t* node);
+extern void cdsl_dlistEntryInit(dlistEntry_t* lentry);
 /**
  *  Queue like interface
  */
-extern void cdsl_dlistEnqueuePriority(dlistNode_t* lentry,dlistNode_t* item,cdsl_dlistPriorityRule rule);
+extern void cdsl_dlistEnqueuePriority(dlistEntry_t* lentry,dlistNode_t* item,cdsl_dlistPriorityRule rule);
 extern void cdsl_dlistInsertAfter(dlistNode_t* ahead,dlistNode_t* item);
-extern dlistNode_t* cdsl_dlistDequeue(dlistNode_t* lentry);
+extern dlistNode_t* cdsl_dlistDequeue(dlistEntry_t* lentry);
 
 /**
  *  Stack like interface
  */
-extern void cdsl_dlistPutHead(dlistNode_t* lentry,dlistNode_t* item);
-extern void cdsl_dlistPutTail(dlistNode_t* lentry,dlistNode_t* item);
-extern dlistNode_t* cdsl_dlistGetHead(dlistNode_t* lentry);
-extern dlistNode_t* cdsl_dlistGetTail(dlistNode_t* lentry);
+extern void cdsl_dlistPutHead(dlistEntry_t* lentry,dlistNode_t* item);
+extern void cdsl_dlistPutTail(dlistEntry_t* lentry,dlistNode_t* item);
+extern dlistNode_t* cdsl_dlistRemoveHead(dlistEntry_t* lentry);
+extern dlistNode_t* cdsl_dlistRemoveTail(dlistEntry_t* lentry);
 
 
 extern BOOL cdsl_dlistRemove(dlistNode_t* item);
-extern int cdsl_dlistSize(dlistNode_t* lentry);
-extern BOOL cdsl_dlistContain(dlistNode_t* lentry,dlistNode_t* item);
-extern void cdsl_dlistPrint(dlistNode_t* lentry,cdsl_generic_printer_t prt);
+extern int cdsl_dlistSize(dlistEntry_t* lentry);
+extern BOOL cdsl_dlistContain(dlistEntry_t* lentry,dlistNode_t* item);
+extern void cdsl_dlistPrint(dlistEntry_t* lentry,cdsl_generic_printer_t prt);
 
 #if defined(__cplusplus)
 }
