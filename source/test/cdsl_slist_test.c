@@ -21,15 +21,16 @@ typedef struct card {
 static card_t Cards[TEST_SIZE];
 static DECLARE_COMPARE_FN(card_compare);
 static void printCard(void* card);
-static slistNode_t listEntry;
+static slistEntry_t listEntry;
 
 
 BOOL cdsl_slistDoTest(void){
 	int i = 0;
-	cdsl_slistInit(&listEntry);
+	cdsl_slistEntryInit(&listEntry);
 
 	for(;i < TEST_SIZE;i++){
 		Cards[i].card_num = i;
+		cdsl_slistNodeInit(&Cards[i].list_head);
 		cdsl_slistEnqueuePriority(&listEntry,(slistNode_t*) &Cards[i],card_compare);
 	}
 	card_t* card = NULL;

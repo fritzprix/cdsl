@@ -36,6 +36,11 @@ extern "C" {
 #define TRUE  ((uint8_t) 1 > 0)
 #endif
 
+#ifndef DECLARE_COMPARE_FN
+#define DECLARE_COMPARE_FN(fn) void* fn(void* a,void* b)
+#endif
+
+typedef void* (*cdsl_generic_compare_t)(void*, void*);
 typedef void (*cdsl_generic_printer_t) (void*);
 
 #ifndef NULL

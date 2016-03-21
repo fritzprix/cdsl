@@ -10,6 +10,7 @@
 #include <stdlib.h>
 #include "cdsl_heap_test.h"
 #include "cdsl_list_test.h"
+#include "cdsl_slist_test.h"
 #include "cdsl_bstree_test.h"
 #include "cdsl_spltree_test.h"
 #include "cdsl_rbtree_test.h"

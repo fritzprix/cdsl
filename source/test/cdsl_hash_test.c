@@ -31,9 +31,9 @@ extern BOOL cdsl_hashDoTest(void){
 	int collisionCnt = 0;
 	while(!feof(fp)){
 		result =  (struct hash_result*) malloc(sizeof(struct hash_result));
-		if(fscanf(fp,"%s\n",result->input))
+		if(fscanf(fp,"%s\n",result->input) < 0)
 			exit(-1);
-		result->hash = sbdm_hash(result->input);
+		result->hash = sbdm_hash((unsigned char*)result->input);
 		cdsl_rbtreeNodeInit(&result->rbnode,result->hash);
 		cdsl_rbtreeInsert(&root,&result->rbnode);
 	}

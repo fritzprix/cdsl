@@ -12,34 +12,40 @@
 
 
 
-#ifndef DECLARE_COMPARE_FN
-#define DECLARE_COMPARE_FN(fn) void* fn(void* a,void* b)
-#endif
 
 #define cdsl_slistIsEmpty(node) (((cdsl_slistNode_t*) node)->next == NULL)
 
 typedef struct cdsl_slnode slistNode_t;
-typedef void* (*cdsl_slistPriorityRule)(void* a, void* b);
+typedef struct cdsl_slentry slistEntry_t;
+
+
 struct cdsl_slnode {
 	slistNode_t* next;
 };
 
-extern void cdsl_slistInit(slistNode_t* lentry);
+struct cdsl_slentry {
+	slistNode_t* next;
+};
+
+extern void cdsl_slistEntryInit(slistEntry_t* entry);
+extern void cdsl_slistNodeInit(slistNode_t* node);
 
 
-extern void cdsl_slistEnqueuePriority(slistNode_t* lentry,slistNode_t* item,cdsl_slistPriorityRule rule);
+extern void cdsl_slistEnqueuePriority(slistEntry_t* lentry,slistNode_t* item,cdsl_generic_compare_t rule);
 extern void cdsl_slistInsertAfter(slistNode_t* ahead,slistNode_t* item);
-extern slistNode_t* cdsl_slistDequeue(slistNode_t* lentry);
+extern slistNode_t* cdsl_slistDequeue(slistEntry_t* lentry);
 
-extern void cdsl_slistPutHead(slistNode_t* lentry,slistNode_t* item);
-extern void cdsl_slistPutTail(slistNode_t* lentry,slistNode_t* item);
-extern slistNode_t* cdsl_slistGetHead(slistNode_t* lentry);
-extern slistNode_t* cdsl_slistGetTail(slistNode_t* lentry);
+extern int cdsl_slistPutHead(slistEntry_t* lentry,slistNode_t* item);
+extern int cdsl_slistPutTail(slistEntry_t* lentry,slistNode_t* item);
+extern slistNode_t* cdsl_slistRemoveHead(slistEntry_t* lentry);
+extern slistNode_t* cdsl_slistRemoveTail(slistEntry_t* lentry);
+extern slistNode_t* cdsl_slistRemoveAt(slistEntry_t* entry,int idx);
+extern BOOL cdsl_slistRemove(slistEntry_t* lentry,slistNode_t* item);
 
-extern BOOL cdsl_slistRemove(slistNode_t* lentry,slistNode_t* item);
-extern int cdsl_slistSize(slistNode_t* lentry);
-extern BOOL cdsl_slistContain(slistNode_t* lentry,slistNode_t* item);
-extern void cdsl_slistPrint(slistNode_t* lentry,cdsl_generic_printer_t prt);
+
+extern int cdsl_slistSize(slistEntry_t* lentry);
+extern BOOL cdsl_slistContain(slistEntry_t* lentry,slistNode_t* item);
+extern void cdsl_slistPrint(slistEntry_t* lentry,cdsl_generic_printer_t prt);
 
 
 

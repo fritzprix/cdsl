@@ -1,7 +1,7 @@
 ## makefile for cdsl
 
 
-CC=gcc
+CC=clang-3.6
 CXX=clang++-3.6
 AR=ar
 PYTHON=python

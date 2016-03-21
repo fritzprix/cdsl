@@ -9,6 +9,7 @@
 #include "cdsl_bstree.h"
 #include "cdsl_bstree_test.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 
 static int bstree_cb(int order,void* bst);

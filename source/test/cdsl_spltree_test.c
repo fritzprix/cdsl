@@ -10,6 +10,7 @@
 #include "cdsl_spltree.h"
 #include "cdsl_spltree_test.h"
 #include <stdio.h>
+#include <stdlib.h>
 
 static spltreeNode_t nodes[TEST_SIZE];
 static int keys[TEST_SIZE];

@@ -22,7 +22,7 @@ void cdsl_dlistEntryInit(dlistEntry_t* lentry){
 	lentry->tail = NULL;
 }
 
-void cdsl_dlistEnqueuePriority(dlistEntry_t* lentry,dlistNode_t* item,cdsl_dlistPriorityRule rule){
+void cdsl_dlistEnqueuePriority(dlistEntry_t* lentry,dlistNode_t* item,cdsl_generic_compare_t  rule){
 	dlistNode_t* cnode = (dlistNode_t*) lentry;
 	if(!item)
 		return;
@@ -57,7 +57,7 @@ dlistNode_t* cdsl_dlistDequeue(dlistEntry_t* lentry){
 
 void cdsl_dlistPutHead(dlistEntry_t* lentry,dlistNode_t* item){
 	if(!lentry)
-			return;
+		return;
 	item->next = lentry->head;
 	if(lentry->head)
 		((dlistNode_t*)lentry->head)->prev = item;

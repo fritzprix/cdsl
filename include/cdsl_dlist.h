@@ -18,12 +18,9 @@ extern "C" {
 #endif
 
 
-#ifndef DECLARE_COMPARE_FN
-#define DECLARE_COMPARE_FN(fn) void* fn(void* a,void* b)
-#endif
+
 
 #define cdsl_dlistIsEmpty(lhead)   (((dlistEntry_t*) lhead)->head== NULL)
-typedef void* (*cdsl_dlistPriorityRule)(void* a,void* b);		// should return larger or prior one between two
 typedef struct cdsl_dlnode dlistNode_t;
 typedef struct cdsl_dlentry dlistEntry_t;
 
@@ -41,7 +38,7 @@ extern void cdsl_dlistEntryInit(dlistEntry_t* lentry);
 /**
  *  Queue like interface
  */
-extern void cdsl_dlistEnqueuePriority(dlistEntry_t* lentry,dlistNode_t* item,cdsl_dlistPriorityRule rule);
+extern void cdsl_dlistEnqueuePriority(dlistEntry_t* lentry,dlistNode_t* item,cdsl_generic_compare_t rule);
 extern void cdsl_dlistInsertAfter(dlistNode_t* ahead,dlistNode_t* item);
 extern dlistNode_t* cdsl_dlistDequeue(dlistEntry_t* lentry);
 

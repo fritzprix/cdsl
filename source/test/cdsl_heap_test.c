@@ -10,6 +10,7 @@
 #include "cdsl_heap.h"
 #include "cdsl_heap_test.h"
 #include <limits.h>
+#include <stdlib.h>
 
 static void print_heapnode(void*);
 

@@ -153,7 +153,7 @@ static rb_treeNode_t* delete_r(rb_treeNode_t* cur,int key,rb_treeNode_t** del,ui
 	if(cur == RB_NIL)
 	{
 		del = NULL;
-		context = CLEAN;
+		*context = CLEAN;
 		return cur;
 	}
 	uint8_t direction = *context;
