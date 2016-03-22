@@ -53,7 +53,7 @@ extern slistNode_t* cdsl_slistRemoveTail(slistEntry_t* lentry);
 extern slistNode_t* cdsl_slistRemoveAt(slistEntry_t* entry,int idx);
 extern BOOL cdsl_slistRemove(slistEntry_t* lentry,slistNode_t* item);
 
-extern void cdsl_slistIterRemove(cdsl_iterator_t* iter);
+extern void cdsl_slistIterRemove(listIter_t* iter);
 
 
 #if defined(__cplusplus)

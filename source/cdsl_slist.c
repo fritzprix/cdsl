@@ -146,7 +146,7 @@ slistNode_t* cdsl_slistRemoveAt(slistEntry_t* entry, int idx)
 	return found;
 }
 
-void cdsl_slistIterRemove(cdsl_iterator_t* iter)
+void cdsl_slistIterRemove(listIter_t* iter)
 {
 	if(!iter)
 		return;

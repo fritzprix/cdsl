@@ -147,7 +147,7 @@ BOOL cdsl_dlistRemove(dlistNode_t* item){
 	return TRUE;
 }
 
-void cdsl_dlistIterRemove(cdsl_iterator_t* iter)
+void cdsl_dlistIterRemove(listIter_t* iter)
 {
 	if(!iter)
 		return;

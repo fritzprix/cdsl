@@ -26,11 +26,11 @@ typedef struct {
 typedef struct {
 	listEntry_t* entry;
 	listNode_t* prev;
-} cdsl_iterator_t;
+} listIter_t;
 
-extern void cdsl_iterInit(listEntry_t* lentry, cdsl_iterator_t* iter);
-extern BOOL cdsl_iterHasNext(cdsl_iterator_t* iter);
-extern listNode_t* cdsl_iterNext(cdsl_iterator_t* iter);
+extern void cdsl_iterInit(listEntry_t* lentry, listIter_t* iter);
+extern BOOL cdsl_iterHasNext(listIter_t* iter);
+extern listNode_t* cdsl_iterNext(listIter_t* iter);
 
 
 extern int cdsl_listSize(listEntry_t* lentry);

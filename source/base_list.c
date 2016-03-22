@@ -55,13 +55,13 @@ void cdsl_listPrint(listEntry_t* lentry,cdsl_generic_printer_t prt)
 	}
 }
 
-void cdsl_iterInit(listEntry_t* lentry, cdsl_iterator_t* iter)
+void cdsl_iterInit(listEntry_t* lentry, listIter_t* iter)
 {
 	iter->entry = lentry;
 	iter->prev = NULL;
 }
 
-BOOL cdsl_iterHasNext(cdsl_iterator_t* iter)
+BOOL cdsl_iterHasNext(listIter_t* iter)
 {
 	if(!iter->prev)					// at the first position, test entry
 		return (iter->entry->head != NULL);
@@ -70,7 +70,7 @@ BOOL cdsl_iterHasNext(cdsl_iterator_t* iter)
 	return (iter->prev->next->next != NULL);  // test if next of current is null
 }
 
-listNode_t* cdsl_iterNext(cdsl_iterator_t* iter)
+listNode_t* cdsl_iterNext(listIter_t* iter)
 {
 	if(!iter)
 		return NULL;
