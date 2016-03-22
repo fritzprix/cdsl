@@ -22,7 +22,7 @@ extern "C" {
 #define cdsl_slistContain(lentry, item)		cdsl_listContain((listEntry_t*) lentry, (listNode_t*) item)
 #define cdsl_slistPrint(lentry,print) 		cdsl_listPrint((listEntry_t*) lentry, print)
 
-#define cdsl_slistIterInit(lentry, iter)	cdsl_iterInit(lentry, iter)
+#define cdsl_slistIterInit(lentry, iter)	cdsl_iterInit((listEntry_t*) lentry, iter)
 #define cdsl_slistIterHasNext(iter)			cdsl_iterHasNext(iter)
 #define cdsl_slistIterNext(iter)			cdsl_iterNext(iter)
 
