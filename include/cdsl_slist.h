@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 
-#define cdsl_slistIsEmpty(node) (((cdsl_slistNode_t*) node)->next == NULL)
+#define cdsl_slistIsEmpty(node) (((slistEntry_t*) node)->next == NULL)
 
 typedef struct cdsl_slnode slistNode_t;
 typedef struct cdsl_slentry slistEntry_t;

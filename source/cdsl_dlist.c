@@ -22,6 +22,8 @@ void cdsl_dlistEntryInit(dlistEntry_t* lentry){
 	lentry->tail = NULL;
 }
 
+
+
 void cdsl_dlistEnqueuePriority(dlistEntry_t* lentry,dlistNode_t* item,cdsl_generic_compare_t  rule){
 	dlistNode_t* cnode = (dlistNode_t*) lentry;
 	if(!item)
