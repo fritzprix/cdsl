@@ -9,13 +9,22 @@
 #define CDSL_SLIST_H_
 
 #include "cdsl.h"
+#include "base_list.h"
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
 
-#define cdsl_slistIsEmpty(node) (((slistEntry_t*) node)->next == NULL)
+#define cdsl_slistIsEmpty(node)				(((slistEntry_t*) node)->next == NULL)
+
+#define cdsl_slistSize(lentry)				cdsl_listSize((listEntry_t*) lentry)
+#define cdsl_slistContain(lentry, item)		cdsl_listContain((listEntry_t*) lentry, (listNode_t*) item)
+#define cdsl_slistPrint(lentry,print) 		cdsl_listPrint((listEntry_t*) lentry, print)
+
+#define cdsl_slistIterInit(lentry, iter)	cdsl_iterInit(lentry, iter)
+#define cdsl_slistIterHasNext(iter)			cdsl_iterHasNext(iter)
+#define cdsl_slistIterNext(iter)			cdsl_iterNext(iter)
 
 typedef struct cdsl_slnode slistNode_t;
 typedef struct cdsl_slentry slistEntry_t;
@@ -44,10 +53,8 @@ extern slistNode_t* cdsl_slistRemoveTail(slistEntry_t* lentry);
 extern slistNode_t* cdsl_slistRemoveAt(slistEntry_t* entry,int idx);
 extern BOOL cdsl_slistRemove(slistEntry_t* lentry,slistNode_t* item);
 
+extern void cdsl_slistIterRemove(cdsl_iterator_t* iter);
 
-extern int cdsl_slistSize(slistEntry_t* lentry);
-extern BOOL cdsl_slistContain(slistEntry_t* lentry,slistNode_t* item);
-extern void cdsl_slistPrint(slistEntry_t* lentry,cdsl_generic_printer_t prt);
 
 #if defined(__cplusplus)
 }

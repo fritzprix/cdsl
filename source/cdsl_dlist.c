@@ -147,33 +147,27 @@ BOOL cdsl_dlistRemove(dlistNode_t* item){
 	return TRUE;
 }
 
-int cdsl_dlistSize(dlistEntry_t* lentry){
-	int cnt = 0;
-	dlistNode_t* cnode = (dlistNode_t*) lentry;
-	while(cnode->next != NULL){
-		cnode = cnode->next;
-		cnt++;
-	}
-	return cnt;
-}
-
-BOOL cdsl_dlistContain(dlistEntry_t* lentry,dlistNode_t* item){
-	dlistNode_t* cnode = (dlistNode_t*) lentry;
-	while(cnode->next != NULL){
-		cnode = cnode->next;
-		if(cnode == item){
-			return TRUE;
-		}
-	}
-	return FALSE;
-}
-
-void cdsl_dlistPrint(dlistEntry_t* lentry,cdsl_generic_printer_t prt){
-	dlistNode_t* cnode = (dlistNode_t*) lentry;
-	if(!prt)
+void cdsl_dlistIterRemove(cdsl_iterator_t* iter)
+{
+	if(!iter)
 		return;
-	while(cnode->next != NULL){
-		cnode = cnode->next;
-		prt(cnode);
+	if(!iter->entry || !iter->prev)
+	{
+		/**
+		 * if iter in first position or invalid return immediately
+		 */
+		return;
 	}
+	if(!iter->prev->next)
+	{
+		/**
+		 * if current is null, return immediately
+		 */
+		return;
+	}
+	dlistNode_t* tobrmv = (dlistNode_t*) iter->prev->next;
+	iter->prev->next = &tobrmv->base_node;
+	tobrmv->prev = (dlistNode_t*) iter->prev;
 }
+
+

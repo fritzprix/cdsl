@@ -1,6 +1,7 @@
 SRC-y+=./source
 INC-y+=./include
-OBJ-y+=base_tree\
+OBJ-y+= base_list\
+		base_tree\
 		cdsl_avltree\
 		cdsl_bstree\
 		cdsl_dlist\
