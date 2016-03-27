@@ -1,4 +1,4 @@
-## makefile for cdsl
+# makefile for cdsl
 
 
 CC=clang-3.6
@@ -8,7 +8,7 @@ PYTHON=python
 PIP=pip
 MKDIR=mkdir
 
-DBG_CFLAG = -O0 -g3 -fmessage-length=0 
+DBG_CFLAG = -O0 -g3 -fmessage-length=0   -D__DBG
 REL_CFLAG = -O2 -g0 -fmessage-length=0
 DYNAMIC_FLAG = -fPIC
 
@@ -21,6 +21,7 @@ TOOL_DIR=$(PROJECT_ROOT_DIR)/tools
 CONFIG_PY=$(TOOL_DIR)/jconfigpy/jconfigpy.py
 
 TEST_TARGET=cdsl
+DEV_TEST_TARGET=cdsl_dev
 
 DBG_STATIC_TARGET=libcdsld.a
 DBG_DYNAMIC_TARGET=libcdsld.so
@@ -45,7 +46,7 @@ REL_CACHE_DIR=Release
 SILENT+= $(REL_STATIC_TARGET) $(REL_DYNAMIC_TARGET) $(DBG_OBJS)
 SILENT+= $(DBG_STATIC_TARGET) $(DBG_DYNAMIC_TARGET) $(REL_OBJS)
 SILENT+= $(DBG_SH_OBJS) $(REL_SH_OBJS)
-SILENT+= $(TEST_TARGET) $(REL_CACHE_DIR)/main.o 
+SILENT+= $(TEST_TARGET) $(REL_CACHE_DIR)/main.o  $(DEV_TEST_TARGET) $(DBG_CACHE_DIR)/main.do
 
 
 .SILENT :  $(SILENT) clean 
@@ -58,7 +59,7 @@ debug : $(DBG_CACHE_DIR) $(DBG_STATIC_TARGET) $(DBG_DYNAMIC_TARGET)
 
 release : $(REL_CACHE_DIR) $(REL_STATIC_TARGET) $(REL_DYNAMIC_TARGET)
 
-test : $(REL_CACHE_DIR)  $(TEST_TARGET) 
+test : $(REL_CACHE_DIR) $(DBG_CACHE_DIR) $(TEST_TARGET) $(DEV_TEST_TARGET) 
 
 config : $(CONFIG_PY)
 	$(PYTHON) $(CONFIG_PY) -c -i config.json
@@ -89,6 +90,11 @@ $(TEST_TARGET) : $(REL_CACHE_DIR)/main.o $(REL_OBJS)
 	@echo 'Building unit-test executable... $@'
 	$(CC) -o $@ $(REL_CFLAG) $< $(REL_OBJS)
 	
+
+$(DEV_TEST_TARGET) : $(DBG_CACHE_DIR)/main.do $(DBG_OBJS) 
+	@echo 'Building unit-test executable... $@'
+	$(CC) -o $@ $(DBG_CFLAG) $< $(DBG_OBJS)
+	
 $(DBG_CACHE_DIR)/%.do : %.c
 	@echo 'compile...$@'
 	$(CC) -c -o $@ $(DBG_CFLAG)  $< $(INCS)
@@ -110,7 +116,7 @@ PHONY += clean
 clean : 
 	rm -rf $(DBG_CACHE_DIR) $(DBG_STATIC_TARGET) $(DBG_DYNAMIC_TARGET)\
 			$(REL_CACHE_DIR) $(REL_STATIC_TARGET) $(REL_DYNAMIC_TARGET)\
-			$(TEST_TARGET) $(REL_SH_OBJS) $(DBG_SH_OBJS)
+			$(TEST_TARGET) $(REL_SH_OBJS) $(DBG_SH_OBJS) $(DEV_TEST_TARGET)
 
 .PHONY = $(PHONY)
 

@@ -18,7 +18,6 @@
 #define NOT_FOUND	((uint8_t) 5)
 #define FOUND		((uint8_t) 6)
 
-static void print_r(spltreeNode_t* current,int depth);
 static spltreeNode_t* insert_r(spltreeNode_t* current,spltreeNode_t* item,uint8_t* context);
 static spltreeNode_t* lookup_r(spltreeNode_t* current,int key,uint8_t* context,BOOL splay);
 static spltreeNode_t* delete_r(spltreeNode_t* current,int key,uint8_t* context,spltreeNode_t** found);
@@ -28,89 +27,60 @@ static spltreeNode_t* rotateLeft(spltreeNode_t* parent);
 static spltreeNode_t* rotateRight(spltreeNode_t* parent);
 
 
+void cdsl_spltreeRootInit(spltreeRoot_t* root)
+{
+	if(!root)
+		return;
+	root->entry = NULL;
+}
+
+
 void cdsl_spltreeNodeInit(spltreeNode_t* node,int key){
 	node->key = key;
 	node->left = node->right = NULL;
 }
 
-void cdsl_spltreeInsert(spltreeNode_t** root,spltreeNode_t* item){
+void cdsl_spltreeInsert(spltreeRoot_t* root,spltreeNode_t* item){
 	if(!root)
 		return;
-	if(!(*root)){
-		*root = item;
+	if(!root->entry){
+		root->entry = item;
 		return;
 	}
 	uint8_t context;
 	context = ROOT;
-	*root = insert_r(*root,item,&context);
+	root->entry = insert_r(root->entry,item,&context);
 }
 
-spltreeNode_t* cdsl_spltreeLookup(spltreeNode_t** root,int key,BOOL splay){
-	if(!root || !(*root))
+spltreeNode_t* cdsl_spltreeLookup(spltreeRoot_t* root,int key,BOOL splay){
+	if(!root)
 		return NULL;
 	uint8_t context;
 	context = ROOT;
-	return *root = lookup_r(*root,key,&context,splay);
+	return root->entry = lookup_r(root->entry,key,&context,splay);
 }
 
-spltreeNode_t* cdsl_spltreeLookupLargest(spltreeNode_t** root,BOOL splay){
-	if(!root || !(*root))
+spltreeNode_t* cdsl_spltreeLookupLargest(spltreeRoot_t* root,BOOL splay){
+	if(!root)
 		return NULL;
 	uint8_t context = 0;
-	return (*root = largest_r((*root),&context,splay,FALSE));
+	return (root->entry = largest_r(root->entry,&context,splay,FALSE));
 }
 
-spltreeNode_t* cdsl_spltreeLookupSmallest(spltreeNode_t** root,BOOL splay){
-	if(!root || !(*root))
+spltreeNode_t* cdsl_spltreeLookupSmallest(spltreeRoot_t* root,BOOL splay){
+	if(!root)
 		return NULL;
 	uint8_t context = 0;
-	return (*root = smallest_r((*root),&context,splay,FALSE));
+	return (root->entry = smallest_r(root->entry,&context,splay,FALSE));
 }
 
-spltreeNode_t* cdsl_spltreeDelete(spltreeNode_t** root,int key){
-	if(!root || !(*root))
+spltreeNode_t* cdsl_spltreeDelete(spltreeRoot_t* root,int key){
+	if(!root)
 		return NULL;
 	uint8_t context = ROOT;
 	spltreeNode_t* delNode = NULL;
-	*root = delete_r(*root,key,&context,&delNode);
+	root->entry = delete_r(root->entry,key,&context,&delNode);
 	return delNode;
-}
-
-int cdsl_spltreeSize(spltreeNode_t** root){
-	if(!root || !(*root))
-		return 0;
-	return cdsl_spltreeSize(&(*root)->right) + 1 + cdsl_spltreeSize(&(*root)->left);
-}
-
-
-int cdsl_spltreeMaxDepth(spltreeNode_t** root){
-	if(!root || !(*root))
-		return 0;
-	int max = 0;
-	int temp = 0;
-	if(max < (temp = cdsl_spltreeMaxDepth(&(*root)->left)))
-		max = temp;
-	if(max < (temp = cdsl_spltreeMaxDepth(&(*root)->right)))
-		max = temp;
-	return max + 1;
-}
-
-
-void cdsl_spltreePrint(spltreeNode_t** root){
-	if(!root || !(*root))
-		return;
-	printf("\n");
-	print_r(*root,0);
-	printf("\n");
-}
-
-static void print_r(spltreeNode_t* current,int depth){
-	if(!current)
-		return;
-	int k = depth;
-	print_r(current->right,depth + 1);
-	while(k--) printf("\t"); printf("{key : %d }@depth : %d\n",current->key,depth);
-	print_r(current->left,depth + 1);
 }
 
 

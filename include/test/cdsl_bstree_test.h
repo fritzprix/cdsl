@@ -10,7 +10,14 @@
 
 #include "cdsl.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 extern BOOL cdsl_bstreeDoTest(void);
 
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* CDSL_BSTREE_TEST_H_ */

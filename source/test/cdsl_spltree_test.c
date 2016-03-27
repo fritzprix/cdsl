@@ -14,15 +14,15 @@
 
 static spltreeNode_t nodes[TEST_SIZE];
 static int keys[TEST_SIZE];
-static spltreeNode_t* root;
+static spltreeRoot_t root;
 
 BOOL cdsl_spltreeDoTest(void){
 	int i = 0;
-	root = NULL;
-
 	int depth,depth_temp;
 	depth = 0;
 	depth_temp = 0;
+
+	cdsl_spltreeRootInit(&root);
 
 	for(;i < TEST_SIZE;i++){
 		keys[i] = rand() % TEST_SIZE;
@@ -30,7 +30,7 @@ BOOL cdsl_spltreeDoTest(void){
 		cdsl_spltreeInsert(&root,&nodes[i]);
 		depth_temp = cdsl_spltreeMaxDepth(&root);
 		if(depth != depth_temp){
-//			log("Max Depth of Tree : %d @ N : %d\n",depth_temp,i);
+			__dev_log("Max Depth of Tree : %d @ N : %d\n",depth_temp,i);
 			depth = depth_temp;
 		}
 	}

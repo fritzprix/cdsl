@@ -22,7 +22,7 @@ static heapNode_t* move_min_tree_down_rc(heapNode_t* current);
 static heapNode_t* get_leaf_node(heapNode_t* current);
 static heapNode_t* heapify(heapNode_t* current,heapNode_t* child);
 
-void heap_root_init(heapRoot_t* rootp, heapType_t type)
+void cdsl_heapRootInit(heapRoot_t* rootp, heapType_t type)
 {
 	if(rootp == NULL)
 		return;
@@ -31,7 +31,7 @@ void heap_root_init(heapRoot_t* rootp, heapType_t type)
 	rootp->dir = DIR_LEFT;
 }
 
-void heap_node_init(heapNode_t* node, int key)
+void cdsl_heapNodeInit(heapNode_t* node, int key)
 {
 	if(node == NULL)
 		return;
@@ -39,7 +39,7 @@ void heap_node_init(heapNode_t* node, int key)
 	node->key = key;
 }
 
-int heap_enqueue(heapRoot_t* rootp,heapNode_t* item){
+int cdsl_heapEnqueue(heapRoot_t* rootp,heapNode_t* item){
 	item->left = item->right = NULL;
 	if(!rootp)
 		return (1 < 0);
@@ -48,7 +48,7 @@ int heap_enqueue(heapRoot_t* rootp,heapNode_t* item){
 	return (1 > 0);
 }
 
-heapNode_t* heap_deqeue(heapRoot_t* rootp){
+heapNode_t* cdsl_heapDeqeue(heapRoot_t* rootp){
 	if(!rootp)
 		return NULL;
 	heapNode_t* current = rootp->entry;
@@ -66,26 +66,6 @@ heapNode_t* heap_deqeue(heapRoot_t* rootp){
 	return current;
 }
 
-
-void heap_print(heapRoot_t* rootp,cdsl_generic_printer_t print){
-	if(!rootp || !rootp->entry)
-		return;
-	tree_print(&rootp->_root,print);
-}
-
-int heap_size(heapRoot_t* rootp)
-{
-	if(!rootp || !rootp->entry)
-		return 0;
-	return tree_size(&rootp->_root);
-}
-
-int heap_max_depth(heapRoot_t* rootp)
-{
-	if(!rootp || !rootp->entry)
-		return 0;
-	return tree_max_depth(&rootp->_root);
-}
 
 
 static heapNode_t* insert_from_bottom_rc(heapRoot_t* rootp, heapNode_t* current,heapNode_t* item)

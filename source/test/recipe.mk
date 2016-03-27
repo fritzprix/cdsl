@@ -6,4 +6,5 @@ OBJ-y+=cdsl_bstree_test\
 		cdsl_list_test\
 		cdsl_rbtree_test\
 		cdsl_slist_test\
-		cdsl_spltree_test
+		cdsl_spltree_test\
+		cdsl_nrbtree_test

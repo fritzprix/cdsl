@@ -10,10 +10,15 @@
 
 #include "cdsl.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern BOOL cdsl_hashDoTest(void);
 
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* CDSL_HASH_TEST_H_ */

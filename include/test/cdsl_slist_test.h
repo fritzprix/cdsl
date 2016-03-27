@@ -9,11 +9,14 @@
 #define CDSL_SLIST_TEST_H_
 
 #include "cdsl.h"
-#include "cdsl_slist.h"
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 extern BOOL cdsl_slistDoTest(void);
 
-
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* CDSL_SLIST_TEST_H_ */

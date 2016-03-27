@@ -12,18 +12,18 @@
 
 
 
-#define BLACK					((unsigned) (1 > 0))
-#define RED					((unsigned) (1 < 0))
+#define BLACK                   ((unsigned) (1 > 0))
+#define RED                     ((unsigned) (1 < 0))
 
 
-#define CLEAN					((uint8_t) 0)
-#define COLLISION				((uint8_t) 1)
-#define DIR_RIGHT				((uint8_t) 2)
-#define DIR_LEFT				((uint8_t) 3)
+#define CLEAN                   ((uint8_t) 0)
+#define COLLISION               ((uint8_t) 1)
+#define DIR_RIGHT               ((uint8_t) 2)
+#define DIR_LEFT                ((uint8_t) 3)
 
 
-#define RB_NIL 					((rb_treeNode_t*) &NIL_NODE)
-#define IS_LEAF_NODE(node) 		((node->right == RB_NIL) || (node->left == RB_NIL))
+#define RB_NIL                  ((rb_treeNode_t*) &NIL_NODE)
+#define IS_LEAF_NODE(node)      ((node->right == RB_NIL) || (node->left == RB_NIL))
 
 
 const static rb_treeNode_t NIL_NODE = {
@@ -375,7 +375,7 @@ static rb_treeNode_t* insert_r(rb_treeNode_t* parent,rb_treeNode_t* item,uint8_t
 		{
 			if(parent->left->color == parent->right->color){
 				parent->right->color = !parent->left->color;
-				parent->left->color =!parent->left->color;
+				parent->left->color = !parent->left->color;
 				if((parent->left->color == BLACK) && (parent->right->color == BLACK))
 					parent->color = RED;
 				*context = CLEAN;

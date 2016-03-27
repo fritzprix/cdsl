@@ -8,26 +8,46 @@
 #ifndef CDSL_SPLTREE_H_
 #define CDSL_SPLTREE_H_
 
+#include "base_tree.h"
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
 
+#define cdsl_spltreeMaxDepth(root)                 tree_max_depth((base_treeRoot_t*) root)
+#define cdsl_traverse(root, cb, order)             tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order)
+#define cdsl_spltreeSize(root)                     tree_size((base_treeRoot_t*) root)
+#define cdsl_spltreePrint(root, print)             tree_print((base_treeRoot_t*) root, print)
+
 typedef struct spltree_node spltreeNode_t;
+typedef struct spltree_root spltreeRoot_t;
+
+struct spltree_root {
+	union {
+		base_treeRoot_t	root_base;
+		spltreeNode_t* entry;
+	};
+};
+
 struct spltree_node {
-	spltreeNode_t* left,*right;
+	union {
+		base_treeNode_t node_base;
+		struct {
+			spltreeNode_t* left,*right;
+		};
+	};
 	int key;
 };
 
+
+extern void cdsl_spltreeRootInit(spltreeRoot_t* root);
 extern void cdsl_spltreeNodeInit(spltreeNode_t* node,int key);
-extern void cdsl_spltreeInsert(spltreeNode_t** root,spltreeNode_t* item);
-extern spltreeNode_t* cdsl_spltreeLookup(spltreeNode_t** root,int key,BOOL splay);
-extern spltreeNode_t* cdsl_spltreeLookupLargest(spltreeNode_t** root,BOOL splay);
-extern spltreeNode_t* cdsl_spltreeLookupSmallest(spltreeNode_t** root,BOOL splay);
-extern spltreeNode_t* cdsl_spltreeDelete(spltreeNode_t** root,int key);
-extern int cdsl_spltreeSize(spltreeNode_t** root);
-extern int cdsl_spltreeMaxDepth(spltreeNode_t** root);
-extern void cdsl_spltreePrint(spltreeNode_t** root);
+extern void cdsl_spltreeInsert(spltreeRoot_t* root,spltreeNode_t* item);
+extern spltreeNode_t* cdsl_spltreeLookup(spltreeRoot_t* root,int key,BOOL splay);
+extern spltreeNode_t* cdsl_spltreeLookupLargest(spltreeRoot_t* root,BOOL splay);
+extern spltreeNode_t* cdsl_spltreeLookupSmallest(spltreeRoot_t* root,BOOL splay);
+extern spltreeNode_t* cdsl_spltreeDelete(spltreeRoot_t* root,int key);
 
 
 

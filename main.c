@@ -8,6 +8,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include "cdsl_nrbtree_test.h"
 #include "cdsl_heap_test.h"
 #include "cdsl_list_test.h"
 #include "cdsl_slist_test.h"
@@ -55,6 +56,12 @@ int main(void){
 	}
 
 	printf("Doubly-Linked List Test Result : %s\n",RESULT_STRING[result = cdsl_listDoTest()]);
+	if(result == FALSE)
+	{
+		exit(-1);
+	}
+
+	printf("New Red Black Tree Test Result : %s\n",RESULT_STRING[result = cdsl_nrbtreeDoTest()]);
 	if(result == FALSE)
 	{
 		exit(-1);

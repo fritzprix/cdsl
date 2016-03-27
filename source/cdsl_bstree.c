@@ -12,13 +12,11 @@
 #include <stdio.h>
 #include <stddef.h>
 
-#define PRINT		printf
 
+static bstreeNode_t* move_up_rightmost_rc(bstreeNode_t* node);
+static bstreeNode_t* move_up_leftmost_rc(bstreeNode_t* node);
 
-static bs_treeNode_t* move_up_rightmost_rc(bs_treeNode_t* node);
-static bs_treeNode_t* move_up_leftmost_rc(bs_treeNode_t* node);
-
-void bstree_root_init(bs_treeRoot_t* rootp)
+void cdsl_bstreeRootInit(bstreeRoot_t* rootp)
 {
 	if(rootp == NULL)
 		return;
@@ -26,7 +24,7 @@ void bstree_root_init(bs_treeRoot_t* rootp)
 }
 
 
-void bstree_node_init(bs_treeNode_t* node,int key)
+void cdsl_bstreeNodeInit(bstreeNode_t* node,int key)
 {
 	if(node == NULL)
 		return;
@@ -36,7 +34,7 @@ void bstree_node_init(bs_treeNode_t* node,int key)
 }
 
 
-bs_treeNode_t* bstree_insert(bs_treeRoot_t* rootp,bs_treeNode_t* item){
+bstreeNode_t* cdsl_bstreeInsert(bstreeRoot_t* rootp,bstreeNode_t* item){
 	if((rootp == NULL) || (item == NULL))
 		return NULL;
 	if(rootp->entry == NULL)
@@ -47,8 +45,8 @@ bs_treeNode_t* bstree_insert(bs_treeRoot_t* rootp,bs_treeNode_t* item){
 
 	item->left = NULL;
 	item->right = NULL;
-	bs_treeNode_t* current = rootp->entry;
-	bs_treeNode_t* parent = NULL;
+	bstreeNode_t* current = rootp->entry;
+	bstreeNode_t* parent = NULL;
 
 	while(current)
 	{
@@ -76,11 +74,11 @@ bs_treeNode_t* bstree_insert(bs_treeRoot_t* rootp,bs_treeNode_t* item){
 	return NULL;
 }
 
-bs_treeNode_t* bstree_lookup(bs_treeRoot_t* rootp,int key)
+bstreeNode_t* cdsl_bstreeLookup(bstreeRoot_t* rootp,int key)
 {
 	if(rootp == NULL)
 		return NULL;
-	bs_treeNode_t* current = rootp->entry;
+	bstreeNode_t* current = rootp->entry;
 	while(current == NULL && (current->key != key))
 	{
 		if(current->key < key)
@@ -91,13 +89,13 @@ bs_treeNode_t* bstree_lookup(bs_treeRoot_t* rootp,int key)
 	return current;
 }
 
-bs_treeNode_t* bstree_delete(bs_treeRoot_t* rootp,int key)
+bstreeNode_t* cdsl_bstreeDelete(bstreeRoot_t* rootp,int key)
 {
-	bs_treeNode_t* todelete = NULL;
+	bstreeNode_t* todelete = NULL;
 	if((rootp == NULL) || (rootp->entry == NULL))
 		return NULL;
-	bs_treeNode_t* parent = NULL;
-	bs_treeNode_t** current = &rootp->entry;
+	bstreeNode_t* parent = NULL;
+	bstreeNode_t** current = &rootp->entry;
 	while((*current) && ((*current)->key != key))
 	{
 		if((*current)->key < key)
@@ -133,37 +131,8 @@ bs_treeNode_t* bstree_delete(bs_treeRoot_t* rootp,int key)
 	return todelete;
 }
 
-void bstree_traverse(bs_treeRoot_t* rootp,base_tree_callback_t cb,int order)
-{
-	tree_traverse(&rootp->root,cb,order);
-}
 
-
-void bstree_print(bs_treeRoot_t* rootp,cdsl_generic_printer_t print)
-{
-	if(rootp == NULL)
-		return;
-	tree_print(&rootp->root,print);
-}
-
-int bstree_max_depth(bs_treeRoot_t* rootp)
-{
-	if((rootp == NULL) || (rootp->entry == NULL))
-		return 0;
-	return tree_max_depth(&rootp->root);
-}
-
-int bstree_size(bs_treeRoot_t* rootp)
-{
-	if((rootp == NULL) || (rootp->entry == NULL))
-		return 0;
-	return tree_size(&rootp->root);
-}
-
-
-
-
-static bs_treeNode_t* move_up_rightmost_rc(bs_treeNode_t* node)
+static bstreeNode_t* move_up_rightmost_rc(bstreeNode_t* node)
 {
 	if(!node)	return NULL;
 	if(!node->right)	return node;
@@ -175,13 +144,13 @@ static bs_treeNode_t* move_up_rightmost_rc(bs_treeNode_t* node)
 	 *        / \       / \
 	 *       c   0     a   c
 	 */
-	bs_treeNode_t* rightmost = move_up_rightmost_rc(node->right);
+	bstreeNode_t* rightmost = move_up_rightmost_rc(node->right);
 	node->right = rightmost->left;
 	rightmost->left = node;
 	return rightmost;
 }
 
-static bs_treeNode_t* move_up_leftmost_rc(bs_treeNode_t* node)
+static bstreeNode_t* move_up_leftmost_rc(bstreeNode_t* node)
 {
 	if(!node) 	return NULL;
 	if(!node->left) 	return node;
@@ -193,7 +162,7 @@ static bs_treeNode_t* move_up_leftmost_rc(bs_treeNode_t* node)
 	 *     / \                / \
 	 *    0   d              d   b
 	 */
-	bs_treeNode_t* leftmost = move_up_leftmost_rc(node->left);
+	bstreeNode_t* leftmost = move_up_leftmost_rc(node->left);
 	node->left = leftmost->right;
 	leftmost->right = node;
 	return leftmost;

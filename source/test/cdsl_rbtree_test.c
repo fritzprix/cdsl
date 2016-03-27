@@ -29,7 +29,7 @@ BOOL cdsl_rbtreeDoTest(void){
 		cdsl_rbtreeInsert(&root,&node_pool[i]);
 		depth_temp = cdsl_rbtreeMaxDepth(&root);
 		if(depth != depth_temp){
-	//		log("Max Depth of Tree : %d @ N : %d\n",depth_temp,i);
+			__dev_log("Max Depth of Tree : %d @ N : %d\n",depth_temp,i);
 			depth = depth_temp;
 		}
 	}

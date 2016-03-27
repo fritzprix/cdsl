@@ -8,6 +8,7 @@
 
 
 #include <stdio.h>
+#include "cdsl_slist.h"
 #include "cdsl_slist_test.h"
 #include "cdsl_rbtree_test.h"
 
@@ -52,11 +53,5 @@ static DECLARE_COMPARE_FN(card_compare){
 	if(!b)
 		return a;
 	return ((card_t*) b)->card_num > ((card_t*) a)->card_num? b : a;
-}
-
-static void printCard(void* card){
-	if(!card)
-		return;
-	printf("Card : %d\n",((card_t*)card)->card_num);
 }
 

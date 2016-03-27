@@ -20,12 +20,10 @@ extern "C" {
 #define TEST_SIZE 5000
 #endif
 
-#define VERBOSE_LOG
-
-#ifdef VERBOSE_LOG
-#define log(...) 	printf(__VA_ARGS__)
+#ifdef __DBG
+#define __dev_log(...) 	printf(__VA_ARGS__)
 #else
-#define log(...)
+#define __dev_log(...)
 #endif
 
 #define container_of(ptr, type, elem) 	((type*) ((size_t) ptr - offsetof(type, elem)))
