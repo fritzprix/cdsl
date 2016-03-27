@@ -28,11 +28,11 @@ BOOL cdsl_rbtreeDoTest(void){
 		cdsl_rbtreeNodeInit(&node_pool[i],keys[i]);
 		cdsl_rbtreeInsert(&root,&node_pool[i]);
 		depth_temp = cdsl_rbtreeMaxDepth(&root);
-		if(depth != depth_temp){
-			__dev_log("Max Depth of Tree : %d @ N : %d\n",depth_temp,i);
+		if(depth < depth_temp){
 			depth = depth_temp;
 		}
 	}
+	__dev_log("Max Depth of Red-Black Tree : %d @ N : %d\n",depth,i);
 
 	if(TEST_SIZE != cdsl_rbtreeSize(&root))
 		return FALSE;

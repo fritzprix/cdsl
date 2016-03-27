@@ -33,11 +33,11 @@ BOOL cdsl_bstreeDoTest(void)
 		cdsl_bstreeNodeInit(&bst_nodepool[i],keys[i]);
 		cdsl_bstreeInsert(&root,&bst_nodepool[i]);
 		depth_temp = cdsl_bstreeMaxDepth(&root);
-		if(depth != depth_temp)
-		{
+		if(depth < depth_temp){
 			depth = depth_temp;
 		}
 	}
+	__dev_log("Max Depth of binary search Tree : %d @ N : %d\n",depth,i);
 
 	if(cdsl_bstreeSize(&root) != TEST_SIZE)
 		return FALSE;
@@ -80,7 +80,6 @@ BOOL cdsl_bstreeDoTest(void)
 static int bstree_cb(int order,void* bst)
 {
 	cb_count++;
-	__dev_log("#%d : %d\n", order, ((bstreeNode_t*) bst)->key);
 	if(order == 2000)
 	{
 		return BREAK_TRAVERSE;
