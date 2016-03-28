@@ -13,37 +13,28 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-#undef TEST_SIZE
-#define TEST_SIZE 20
 
+static nrbtreeNode_t node_pool[TEST_SIZE];
+static int keys[TEST_SIZE];
 
 BOOL cdsl_nrbtreeDoTest(void)
 {
 	nrbtreeRoot_t root;
-	nrbtreeNode_t node_pool[TEST_SIZE];
-	int keys[TEST_SIZE];
-
 	cdsl_nrbtreeRootInit(&root);
 	int i = 0;
 	int depth,depth_temp;
 	depth = 0;
 	depth_temp = 0;
-
 	for(i = 0;i < TEST_SIZE;i++){
 		keys[i] = rand() % TEST_SIZE;
+		keys[i] = i;
 		cdsl_nrbtreeNodeInit(&node_pool[i],keys[i]);
-		__dev_log("%d inserted!! \n", keys[i]);
 		cdsl_nrbtreeInsert(&root,&node_pool[i]);
-		cdsl_nrbtreePrint_dev(&root);
-		depth_temp = cdsl_nrbtreeMaxDepth(&root);
-		if(depth != depth_temp){
-			__dev_log("Max Depth of Tree : %d @ N : %d\n",depth_temp,i);
-			depth = depth_temp;
-		}
 	}
+	depth = cdsl_nrbtreeMaxDepth(&root);
+	__dev_log("Max Depth of New Red-Black Tree : %d @ N : %d\n",depth,i);
 	if(cdsl_nrbtreeSize(&root) != TEST_SIZE)
 		return FALSE;
-
 	cdsl_nrbtreePrint_dev(&root);
 	nrbtreeNode_t* delete_node;
 	for(i = 0;i < TEST_SIZE;i++)
@@ -53,13 +44,30 @@ BOOL cdsl_nrbtreeDoTest(void)
 		delete_node = cdsl_nrbtreeDelete(&root,keys[i]);
 		cdsl_nrbtreePrint_dev(&root);
 		if(!delete_node)
+		{
+			__dev_log("null node detected !!\n");
+			return FALSE;
+		}
+		if(delete_node->key != keys[i])
+		{
+			__dev_log("key corrupted !!\n");
+			return FALSE;
+		}
+		keys[i] = rand() % TEST_SIZE;
+		cdsl_nrbtreeNodeInit(delete_node,keys[i]);
+		cdsl_nrbtreeInsert(&root,delete_node);
+	}
+
+	for(i = 0;i < TEST_SIZE;i++){
+		delete_node = NULL;
+		delete_node = cdsl_nrbtreeDelete(&root,keys[i]);
+		if(!delete_node)
 			return FALSE;
 		if(delete_node->key != keys[i])
 			return FALSE;
-//		keys[i] = rand() % TEST_SIZE;
-//		cdsl_nrbtreeNodeInit(delete_node,keys[i]);
-//		cdsl_nrbtreeInsert(&root,delete_node);
 	}
+	if(cdsl_nrbtreeSize(&root) > 0)
+		return FALSE;
 
 	return TRUE;
 }

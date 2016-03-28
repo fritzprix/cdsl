@@ -21,7 +21,6 @@ typedef struct card {
 
 static card_t Cards[TEST_SIZE];
 static DECLARE_COMPARE_FN(card_compare);
-static void printCard(void* card);
 static slistEntry_t listEntry;
 
 

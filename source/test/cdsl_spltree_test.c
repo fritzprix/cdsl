@@ -28,11 +28,9 @@ BOOL cdsl_spltreeDoTest(void){
 		keys[i] = rand() % TEST_SIZE;
 		cdsl_spltreeNodeInit(&nodes[i],keys[i]);
 		cdsl_spltreeInsert(&root,&nodes[i]);
-		depth_temp = cdsl_spltreeMaxDepth(&root);
-		if(depth < depth_temp){
-			depth = depth_temp;
-		}
+
 	}
+	depth = cdsl_spltreeMaxDepth(&root);
 	__dev_log("Max Depth of Splay Tree : %d @ N : %d\n",depth,i);
 
 	if(cdsl_spltreeSize(&root) != TEST_SIZE)

@@ -17,12 +17,12 @@ struct card {
 };
 
 static DECLARE_COMPARE_FN(compare);
+static struct card cards[TEST_SIZE];
 
 BOOL cdsl_listDoTest(void)
 {
 	dlistEntry_t list_entry;
 	cdsl_dlistEntryInit(&list_entry);
-	struct card cards[TEST_SIZE];
 	int idx = 0;
 
 	for(; idx < TEST_SIZE; idx++)

@@ -10,13 +10,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-
+static rb_treeNode_t node_pool[TEST_SIZE];
+static int keys[TEST_SIZE];
 
 BOOL cdsl_rbtreeDoTest(void){
 	rb_treeNode_t* root;
-	rb_treeNode_t node_pool[TEST_SIZE];
-	int keys[TEST_SIZE];
-
 	root = NULL;
 	int i = 0;
 	int depth,depth_temp;
@@ -27,16 +25,13 @@ BOOL cdsl_rbtreeDoTest(void){
 		keys[i] = rand() % TEST_SIZE;
 		cdsl_rbtreeNodeInit(&node_pool[i],keys[i]);
 		cdsl_rbtreeInsert(&root,&node_pool[i]);
-		depth_temp = cdsl_rbtreeMaxDepth(&root);
-		if(depth < depth_temp){
-			depth = depth_temp;
-		}
+		/*
+		*/
 	}
+	depth = cdsl_rbtreeMaxDepth(&root);
 	__dev_log("Max Depth of Red-Black Tree : %d @ N : %d\n",depth,i);
-
 	if(TEST_SIZE != cdsl_rbtreeSize(&root))
 		return FALSE;
-
 	rb_treeNode_t* del = NULL;
 	for(i = 0;i < TEST_SIZE;i++){
 		del = NULL;
@@ -62,7 +57,6 @@ BOOL cdsl_rbtreeDoTest(void){
 	}
 	if(cdsl_rbtreeSize(&root) > 0)
 		return FALSE;
-
 	return TRUE;
 
 }

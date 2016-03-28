@@ -38,7 +38,7 @@ const static rb_treeNode_t NIL_NODE = {
 static rb_treeNode_t* rotateLeft(rb_treeNode_t* rot_pivot,BOOL paint);
 static rb_treeNode_t* rotateRight(rb_treeNode_t* rot_pivot,BOOL paint);
 static rb_treeNode_t* insert_r(rb_treeNode_t* parent,rb_treeNode_t* item,uint8_t* context);
-static rb_treeNode_t* delete_r(rb_treeNode_t* cur,int key,rb_treeNode_t** del,uint8_t* context,int k);
+static rb_treeNode_t* delete_r(rb_treeNode_t* cur,int key,rb_treeNode_t** del,uint8_t* context);
 static rb_treeNode_t* deleteLeft_r(rb_treeNode_t* root,rb_treeNode_t** l_most,uint8_t* context);
 static rb_treeNode_t* deleteRight_r(rb_treeNode_t* root,rb_treeNode_t** r_most,uint8_t* context);
 static rb_treeNode_t* handleDoubleBlack(rb_treeNode_t* parent,uint8_t* context);
@@ -76,7 +76,7 @@ rb_treeNode_t* cdsl_rbtreeDelete(rb_treeNode_t** root,int key)
 		return NULL;		// red black tree is empty or invalid arg
 	uint8_t context = 0;
 	rb_treeNode_t* del_node = NULL;
-	*root = delete_r(*root,key,&del_node,&context,0);
+	*root = delete_r(*root,key,&del_node,&context);
 	return del_node;
 }
 
@@ -148,7 +148,7 @@ static rb_treeNode_t* deleteRight_r(rb_treeNode_t* root,rb_treeNode_t** r_most,u
 	return root;
 }
 
-static rb_treeNode_t* delete_r(rb_treeNode_t* cur,int key,rb_treeNode_t** del,uint8_t* context,int k){
+static rb_treeNode_t* delete_r(rb_treeNode_t* cur,int key,rb_treeNode_t** del,uint8_t* context){
 	if(!cur) return NULL;
 	if(cur == RB_NIL)
 	{
@@ -160,7 +160,7 @@ static rb_treeNode_t* delete_r(rb_treeNode_t* cur,int key,rb_treeNode_t** del,ui
 	if(cur->key < key)
 	{
 		*context = DIR_RIGHT;
-		cur->right = delete_r(cur->right,key,del,context,k + 1);
+		cur->right = delete_r(cur->right,key,del,context);
 		if((*context) == COLLISION)
 		{
 			//handle subtree double black condition
@@ -177,7 +177,7 @@ static rb_treeNode_t* delete_r(rb_treeNode_t* cur,int key,rb_treeNode_t** del,ui
 	if(cur->key > key)
 	{
 		*context = DIR_LEFT;
-		cur->left = delete_r(cur->left,key,del,context,k + 1);
+		cur->left = delete_r(cur->left,key,del,context);
 		if((*context) == COLLISION)
 		{
 			//handle subtree double black condition

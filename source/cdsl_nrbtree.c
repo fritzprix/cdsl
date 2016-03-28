@@ -27,8 +27,10 @@
 	node = (nrbtreeNode_t*) ((uint64_t) node | color);\
 }while(0)
 
-#define GET_COLOR(node)						  ((uint32_t)(node) & 1)
+#define GET_COLOR(node)						  ((uint64_t)(node) & 1)
+#define GET_DIR(node)                         ((uint64_t)(node) & 1)
 
+#define CTX_BB                                ((uint8_t) 2)
 #define CTX_RIGHT                             ((uint8_t) 1)
 #define CTX_LEFT                              ((uint8_t) 0)
 
@@ -39,8 +41,6 @@
 #define PATTERN_RED_RED                       ((uint8_t) 0x3)
 #define PATTERN_BLACK_RED                     ((uint8_t) 0x1)
 #define PATTERN_BLACK_BLACK                   ((uint8_t) 0x0)
-
-#define BB_ALERT                              ((uint8_t) 0x1)
 
 #define PATTERN_RIGHT_RIGHT                   ((uint8_t) 0x3)      // right-right
 #define PATTERN_RIGHT_LEFT                    ((uint8_t) 0x2)      // right-left
@@ -54,17 +54,17 @@ const char* COLOR_STRING[] = {
 
 
 static int max_depth_rc(nrbtreeNode_t* node);
+static nrbtreeNode_t* insert_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t* item, uint8_t* rc_color, uint8_t* rc_dir);
+static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, rb_key_t key, nrbtreeNode_t** rm, uint8_t* ctx);
 static nrbtreeNode_t* rotate_left(nrbtreeNode_t* gparent_c);
 static nrbtreeNode_t* rotate_right(nrbtreeNode_t* gparent_c);
 static nrbtreeNode_t* update_color(nrbtreeNode_t* node_c);
 static nrbtreeNode_t* resolve_red_red(nrbtreeNode_t* gparent_c,uint8_t color_ctx, uint8_t dir_ctx);
-static nrbtreeNode_t* resolve_black_black(nrbtreeNode_t* parent_c, uint8_t color_ctx, uint8_t dir_ctx, nrbtreeNode_t** ctx);
+static nrbtreeNode_t* resolve_black_black(nrbtreeNode_t* parent_c, uint8_t dir_ctx, uint8_t* ctx);
 
-static nrbtreeNode_t* up_from_rightmost_rc(nrbtreeNode_t* node,nrbtreeNode_t** rm);
-static nrbtreeNode_t* up_from_leftmost_rc(nrbtreeNode_t* node, nrbtreeNode_t** lm);
+static nrbtreeNode_t* up_from_rightmost_rc(nrbtreeNode_t* node,nrbtreeNode_t** rm,uint8_t* ctx);
+static nrbtreeNode_t* up_from_leftmost_rc(nrbtreeNode_t* node, nrbtreeNode_t** lm,uint8_t* ctx);
 
-static BOOL replace_from_next(nrbtreeNode_t** node);
-static BOOL replace_from_prev(nrbtreeNode_t** node);
 
 static void print_tab(int cnt);
 static void node_print_rc(nrbtreeNode_t* node,int order);
@@ -83,101 +83,18 @@ void cdsl_nrbtreeNodeInit(nrbtreeNode_t* node, rb_key_t key) {
 	node->key = key;
 }
 
-
-
 nrbtreeNode_t* cdsl_nrbtreeInsert(nrbtreeRoot_t* rootp,nrbtreeNode_t* item) {
-	if(!rootp || !item)
+	if(!rootp)
 		return NULL;
-	nrbtreeNode_t** cur_node = &rootp->entry;
-	nrbtreeNode_t** parent = NULL;
-	nrbtreeNode_t** gparent = NULL;
-	nrbtreeNode_t** ggp = NULL;
-	uint8_t dir_ctx = 0;
-	uint8_t color_ctx = 0;
-	if(!GET_PTR(*cur_node)) {
+	if(!rootp->entry)
+	{
 		rootp->entry = item;
 		return item;
 	}
 
-	while(*cur_node)
-		/*
-		 * leaf node is always null
-		 * so you don't need to mask out LSB of pointer (meaning GET_PTR() macro)
-		 */
-	{
-		if(GET_PTR(*cur_node)->key > item->key)
-		{
-			if(!GET_PTR(*cur_node)->left)
-			{
-				// add item here
-				GET_PTR(*cur_node)->left = item;
-				PAINT_RED(GET_PTR(*cur_node)->left);
-				// update context info
-				color_ctx |= RED;
-				dir_ctx |= CTX_LEFT;
-
-				if((color_ctx & PATTERN_WINDOW) == PATTERN_RED_RED)
-				{
-					goto RESOLVE_REDRED;
-				}
-				return item;
-			}
-			// go to left
-			ggp = gparent;
-			gparent = parent;
-			parent = cur_node;
-			cur_node = &(GET_PTR(*cur_node)->left);
-			color_ctx |= GET_COLOR(*cur_node);
-			dir_ctx |= CTX_LEFT;
-		}
-		else
-		{
-			if(!GET_PTR(*cur_node)->right)
-			{
-				GET_PTR(*cur_node)->right = item;
-				PAINT_RED(GET_PTR(*cur_node)->right);
-
-				color_ctx |= RED;
-				dir_ctx |= CTX_RIGHT;
-
-				if((color_ctx & PATTERN_WINDOW) == PATTERN_RED_RED)
-				{
-					goto RESOLVE_REDRED;
-				}
-				return item;
-			}
-			// go to right
-			ggp = gparent;
-			gparent = parent;
-			parent = cur_node;
-			cur_node = &(GET_PTR(*cur_node)->right);
-			color_ctx |= GET_COLOR(*cur_node);
-			dir_ctx |= CTX_RIGHT;
-		}
-		// shift ctx left
-		dir_ctx <<= 1;
-		color_ctx <<= 1;
-	}
-
-RESOLVE_REDRED:
-
-    /*
-     *  hierarchical order is like below
-     *  so grand parent of new item is 'parent'
-     *  gparent - parent - cur_node - item
-     */
-
-	*parent = resolve_red_red(*parent, color_ctx,dir_ctx);
-	color_ctx >>= 3;
-	color_ctx <<= 1;
-	color_ctx |= GET_COLOR(*parent);
-	dir_ctx >>= 2;
-
-	if((color_ctx & PATTERN_WINDOW) == PATTERN_RED_RED)
-	{
-		*ggp = resolve_red_red(*ggp, color_ctx,dir_ctx);
-	}
-	PAINT_BLACK(rootp->entry);
+	uint8_t dir = 0;
+	uint8_t color = 0;
+	rootp->entry = insert_rc(rootp->entry, item, &color , &dir);
 	return item;
 }
 
@@ -197,135 +114,17 @@ nrbtreeNode_t* cdsl_nrbtreeLookup(nrbtreeRoot_t* rootp, rb_key_t key) {
 	return NULL;
 }
 
-/*
- *  1> rmv node is leaf node
- *    gp
- *     \
- *      p
- *     / \
- *    s  rmv
- *   / \ / \
- *
- *
- */
-
 nrbtreeNode_t* cdsl_nrbtreeDelete(nrbtreeRoot_t* rootp, rb_key_t key)
 {
 	if(!rootp)
 		return NULL;
-	if(!GET_PTR(rootp->entry))
-		return NULL;
-	uint8_t color_ctx = 0;
-	uint8_t dir_ctx = 0;
-	uint32_t res = 0;
-	nrbtreeNode_t** cur_node = &rootp->entry;
-	nrbtreeNode_t** parent = NULL;
-	nrbtreeNode_t** gparent = NULL;
-
-	nrbtreeNode_t* rmv = NULL;
-
-	while(*cur_node)
-	{
-		if(GET_PTR(*cur_node)->key > key)
-		{
-			dir_ctx |= CTX_LEFT;
-			color_ctx |= GET_COLOR(*cur_node);
-			gparent = parent;
-			parent = cur_node;
-			cur_node = &GET_PTR(*cur_node)->left;
-		}
-		else if(GET_PTR(*cur_node)->key < key)
-		{
-			dir_ctx |= CTX_RIGHT;
-			color_ctx |= GET_COLOR(*cur_node);
-			gparent = parent;
-			parent = cur_node;
-			cur_node = &GET_PTR(*cur_node)->right;
-		}
-		else
-		{
-			/*
-			 *  matched node found
-			 */
-			if(!GET_PTR(GET_PTR(*cur_node)->left) && !GET_PTR(GET_PTR(*cur_node)->right))
-			{
-
-				rmv = *cur_node;
-				if(GET_COLOR(rmv) == RED)
-				{
-					*cur_node = NULL;
-					return GET_PTR(rmv);
-				}
-				else
-				{
-					/*
-					 *  try to resolve black black with sub-tree whose root is parent of black black
-					 *
-					 *           parent
-					 *           /    \
-					 *         cur    cur
-					 *
-					 *  relative direction of cur from parent(right / left) is checked in resolve_black_black routine
-	 				 */
-
-					res = PATTERN_BLACK_BLACK;
-					*cur_node = resolve_black_black(*parent, color_ctx, dir_ctx, &rmv);
-					if(!((uint64_t) *parent & BB_ALERT))
-					{
-						*parent = *cur_node;
-						*cur_node = NULL;
-						return GET_PTR(rmv);
-					}
-
-					/*
-					 *  if fail to resolve with sub-tree whose root is parent of black black
-					 *  retry with sub-tree whose root is grand parent of black-black's origin.
-					 *
-					 *           grand parent
-					 *           /          \
-					 *         parent     parent
-					 *
-					 */
-					*cur_node = resolve_black_black(*gparent, color_ctx >> 1, dir_ctx >> 1, &rmv);
-					if(!((uint64_t) rmv & BB_ALERT))
-					{
-						*gparent = *cur_node;
-						*cur_node = NULL;
-						return GET_PTR(rmv);
-					}
-					fprintf(stderr, "two step is maximum \n");
-					exit(1);
-				}
-
-			}
-			else if(GET_PTR(GET_PTR(*cur_node)->left))
-			{
-				/*
-				 * non-leaf node with left child
-				 * rightmost-end leaf is chosen as replacement for removed
-				 */
-				rmv = *cur_node;
-				GET_PTR(*cur_node)->left = up_from_rightmost_rc(rmv->left, cur_node);
-				GET_PTR(*cur_node)->right = GET_PTR(rmv)->right;
-				PAINT_COLOR(*cur_node,GET_COLOR(rmv));
-				return GET_PTR(rmv);
-			}
-			else
-			{
-				/*
-				 * non-leaf node with right child
-				 * leftmost-end is chosen as replacement for removed
-				 */
-				rmv = *cur_node;
-				GET_PTR(*cur_node)->right = up_from_leftmost_rc(rmv->right, cur_node);
-				GET_PTR(*cur_node)->left = GET_PTR(rmv)->left;
-				PAINT_COLOR(*cur_node,GET_COLOR(rmv));
-				return GET_PTR(rmv);
-			}
-		}
-	}
-	return NULL;
+	nrbtreeNode_t* del = NULL;
+	uint8_t ctx = 0;
+	rootp->entry = delete_rc(rootp->entry, key, &del, &ctx);
+	return GET_PTR(del);
 }
+
+
 
 
 #ifdef __DBG
@@ -337,70 +136,6 @@ void cdsl_nrbtreePrint_dev (nrbtreeRoot_t* root)
 
 }
 #endif
-
-static BOOL replace_from_next(nrbtreeNode_t** node)
-{
-	if(!node)
-		return FALSE;
-	if(!GET_PTR(*node))
-		return FALSE;
-	if(!GET_PTR(GET_PTR(*node)->right))
-		return FALSE;
-
-	nrbtreeNode_t** cur_node = &(GET_PTR(*node)->right);
-	nrbtreeNode_t** parent = node;
-	nrbtreeNode_t** gparent = NULL;
-
-	uint8_t color_ctx = GET_COLOR(*cur_node);
-	uint8_t dir_ctx = CTX_RIGHT;
-
-
-	while(GET_PTR(*cur_node))
-	{
-		color_ctx <<= 1;
-		dir_ctx <<= 1;
-
-		color_ctx |= GET_COLOR(*cur_node);
-		dir_ctx |= CTX_LEFT;
-
-		gparent = parent;
-		parent = cur_node;
-		cur_node = &GET_PTR(*cur_node)->left;
-	}
-	/*
-	 *  parent is actually the replacement itself
-	 *  cur_node is pointing null node
-	 */
-	if(parent == node) {
-		parent = (nrbtreeNode_t**) *node;
-		*node = NULL;
-		/*
-		 * don't need to update color
-		 * return false
-		 */
-		return FALSE;
-	}
-
-	switch(color_ctx & PATTERN_WINDOW)
-	{
-	case PATTERN_RED_RED:
-	case PATTERN_BLACK_RED:
-		PAINT_COLOR(*parent, GET_COLOR(*node));
-		GET_PTR(*parent)->left = GET_PTR(*node)->left;
-		GET_PTR(*parent)->right = GET_PTR(*node)->right;
-		*node = *parent;
-		return TRUE;
-	case PATTERN_BLACK_BLACK:
-		break;
-	case PATTERN_RED_BLACK:
-		break;
-	}
-}
-
-static BOOL replace_from_prev(nrbtreeNode_t** node)
-{
-
-}
 
 static void print_tab(int cnt){
 	while(cnt--)
@@ -417,6 +152,60 @@ static void node_print_rc(nrbtreeNode_t* node,int order) {
 	node_print_rc(GET_PTR(node)->right, order + 1);
 	print_tab(order); printf("%s node : %d / order %d \n", COLOR_STRING[GET_COLOR(node)], GET_PTR(node)->key, order);
 	node_print_rc(GET_PTR(node)->left, order + 1);
+}
+
+/*
+ *  *  ctx[0] = color
+ *  ctx[1] = dir
+ *  ctx[2] = is_bb
+ *  ctx[3] = res for future
+ */
+
+static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, rb_key_t key, nrbtreeNode_t** rm, uint8_t* ctx)
+{
+	if(!sub_root_c)
+	{
+		*rm = NULL;
+		return NULL;
+	}
+
+	if(GET_PTR(sub_root_c)->key < key)
+	{
+		GET_PTR(sub_root_c)->right = delete_rc(GET_PTR(sub_root_c)->right,key, rm, ctx);
+		if(*ctx & (1 << CTX_BB))
+		{
+			sub_root_c = resolve_black_black(sub_root_c, CTX_RIGHT, ctx);
+		}
+		return sub_root_c;
+	}
+	else if(GET_PTR(sub_root_c)->key > key)
+	{
+		GET_PTR(sub_root_c)->left = delete_rc(GET_PTR(sub_root_c)->left,key, rm, ctx);
+		if(*ctx & (1 << CTX_BB))
+		{
+			sub_root_c = resolve_black_black(sub_root_c, CTX_LEFT, ctx);
+		}
+		return sub_root_c;
+	}
+	*rm = sub_root_c;
+	if (GET_PTR(sub_root_c)->left) {
+		GET_PTR(sub_root_c)->left = up_from_rightmost_rc(GET_PTR(sub_root_c)->left, &sub_root_c,ctx);
+		GET_PTR(sub_root_c)->right = GET_PTR(*rm)->right;
+		if (*ctx & (1 << CTX_BB)) {
+			sub_root_c = resolve_black_black(sub_root_c, CTX_LEFT, ctx);
+		}
+		return sub_root_c;
+	} else if (GET_PTR(sub_root_c)->right) {
+		GET_PTR(sub_root_c)->right = up_from_leftmost_rc(GET_PTR(sub_root_c)->right, &sub_root_c,ctx);
+		GET_PTR(sub_root_c)->left = GET_PTR(*rm)->left;
+		if (*ctx & (1 << CTX_BB)) {
+			sub_root_c = resolve_black_black(sub_root_c, CTX_RIGHT, ctx);
+		}
+		return sub_root_c;
+	} else {
+		*ctx |= (1 << CTX_BB);
+		return NULL;
+	}
 }
 
 
@@ -551,6 +340,56 @@ static nrbtreeNode_t* resolve_red_red(nrbtreeNode_t* gparent_c,uint8_t color_ctx
 	return NULL;
 }
 
+#define RC_CTX_COLLISION       ((uint8_t) 0x80)
+#define RC_CTX_PATTERN         ((uint8_t) 0xC0)
+#define RC_CTX_PATTERN_REDRED  ((uint8_t) 0xC0)
+
+static nrbtreeNode_t* insert_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t* item,uint8_t* rc_color, uint8_t* rc_dir)
+{
+	if(!GET_PTR(sub_root_c))
+	{
+		PAINT_RED(item);
+		return item;
+	}
+	else
+	{
+		if(GET_PTR(sub_root_c)->key < GET_PTR(item)->key)
+		{
+			GET_PTR(sub_root_c)->right = insert_rc(GET_PTR(sub_root_c)->right, item, rc_color, rc_dir);
+
+			*rc_color >>= 1;
+			*rc_dir >>= 1;
+			*rc_color |= (GET_COLOR(GET_PTR(sub_root_c)->right) << 7);
+			*rc_dir |= (CTX_RIGHT << 7);
+
+
+			if((*rc_color & RC_CTX_PATTERN) == RC_CTX_PATTERN_REDRED)
+			{
+				sub_root_c = resolve_red_red(sub_root_c, (*rc_color) >> 6 , (*rc_dir) >> 6);
+			}
+			return sub_root_c;
+		}
+		else
+		{
+			GET_PTR(sub_root_c)->left = insert_rc(GET_PTR(sub_root_c)->left, item , rc_color, rc_dir);
+
+			*rc_color |= (GET_COLOR(GET_PTR(sub_root_c)->left) << 7);
+			*rc_dir |= (CTX_LEFT << 7);
+			*rc_color >>= 1;
+			*rc_dir >>= 1;
+
+			if((*rc_color & RC_CTX_PATTERN) == RC_CTX_PATTERN_REDRED)
+			{
+				sub_root_c = resolve_red_red(sub_root_c, (*rc_color) >> 6 , (*rc_dir) >> 6);
+			}
+			return sub_root_c;
+		}
+	}
+}
+
+
+
+
 /**
  *  try to resolve black-black situation
  *  in this context, parent_c is parent of double blacked node
@@ -561,21 +400,48 @@ static nrbtreeNode_t* resolve_red_red(nrbtreeNode_t* gparent_c,uint8_t color_ctx
  *
  *  by checking ctx, caller knows the result of resolving operation
  *
+ *  ctx bit pattern should place
+ *  [ ... |  2   |   1   |   0  ]
+ *                parent double black
  */
-static nrbtreeNode_t* resolve_black_black(nrbtreeNode_t* parent_c, uint8_t color_ctx, uint8_t dir_ctx, nrbtreeNode_t** ctx)
+static nrbtreeNode_t* resolve_black_black(nrbtreeNode_t* parent_c, uint8_t dir_ctx, uint8_t* ctx)
 {
 	if(!parent_c)
 		return NULL;
 	nrbtreeNode_t** sibling = NULL;
-	uint8_t sibling_dir_ctx = 0;
 
-	if(dir_ctx >> 1 == CTX_LEFT)
+	if(!GET_PTR(parent_c)->left || !GET_PTR(parent_c)->right)
+	{
+		/*
+		 * if this node is leaf it's one of below
+		 *        p                        p
+		 *      /   \          or        /   \          or
+		 *   nl(bb)  nl                 nl   nl(bb)
+		 *
+		 *
+		 *        p                        p
+		 *      /   \          or        /   \
+		 *   s0(bb)  nl                 nl   s0(bb)
+		 */
+		if(GET_COLOR(parent_c) == RED)
+		{
+			/*
+			 * just repaint p into black, if p is red luckily.
+			 * otherwise, just return and caller might be deal with double black
+			 */
+			PAINT_BLACK(parent_c);
+			*ctx = (1 << CTX_BB);
+			return parent_c;
+		}
+		*ctx &= ~(1 << CTX_BB);
+		return parent_c;
+	}
+
+	if((dir_ctx & 1) == CTX_LEFT)
 	{
 		/*
 		 *  check right sibling
 		 */
-		sibling_dir_ctx |= CTX_RIGHT;
-		sibling_dir_ctx <<= 1;
 		sibling = &GET_PTR(parent_c)->right;
 		if((GET_COLOR(GET_PTR(*sibling)->left) == BLACK) \
 				&& (GET_COLOR(GET_PTR(*sibling)->right) == BLACK))
@@ -584,7 +450,6 @@ static nrbtreeNode_t* resolve_black_black(nrbtreeNode_t* parent_c, uint8_t color
 			{
 				/*
 				 * black sibling with black children
-				 *
 				 * depend on parent color there are two option
 				 */
 				if(GET_COLOR(parent_c) == BLACK)
@@ -594,6 +459,7 @@ static nrbtreeNode_t* resolve_black_black(nrbtreeNode_t* parent_c, uint8_t color
 					 * then all the nodes in sub-tree are black
 					 * in this case, can't resolved within this sub-tree
 					 */
+					*ctx |= (1 << CTX_BB);
 					return parent_c;
 				}
 				else
@@ -605,7 +471,7 @@ static nrbtreeNode_t* resolve_black_black(nrbtreeNode_t* parent_c, uint8_t color
 
 					PAINT_BLACK(parent_c);
 					PAINT_COLOR(*sibling, RED);
-					PAINT_COLOR(*ctx, !BB_ALERT);
+					*ctx &= ~(1 << CTX_BB);
 					return parent_c;
 				}
 			}
@@ -617,7 +483,7 @@ static nrbtreeNode_t* resolve_black_black(nrbtreeNode_t* parent_c, uint8_t color
 				 * paint sibling black
 				 */
 				PAINT_BLACK(*sibling);
-				PAINT_COLOR(*ctx, !BB_ALERT);
+				*ctx &= ~(1 << CTX_BB);
 				return parent_c;
 			}
 		}
@@ -628,21 +494,41 @@ static nrbtreeNode_t* resolve_black_black(nrbtreeNode_t* parent_c, uint8_t color
 			 * obviously, the sibling is black because successive red
 			 * is not allowed in red black tree
 			 * so we assume sibling is black here
+			 *
 			 */
 
 			if(GET_COLOR(GET_PTR(*sibling)->right) == RED)
 			{
+				/* resolve double black like below
+				 *       p                    s1(r)
+				 *      /  \                 /   \
+				 *  s0(bb) s1(b)       -->  p(b)  c(b)
+				 *           \             /
+				 *           c(r)         s0(b)
+				 */
 				parent_c = rotate_left(parent_c);
+				PAINT_RED(parent_c);
+				PAINT_BLACK(GET_PTR(parent_c)->left);
 				PAINT_BLACK(GET_PTR(parent_c)->right);
-				PAINT_COLOR(*ctx, !BB_ALERT);
+
+				*ctx &= ~(1 << CTX_BB);
 				return parent_c;
 			}
 			else
 			{
+				/* resolve double black like below
+				 *       p                  p                  c(r)
+				 *      /  \              /   \               /    \
+				 *  s0(bb) s1(b)    --> s0(bb) c(r)    -->  p(b)   s1(b)
+				 *         /                     \          /
+				 *       c(r)                    s1(b)    s0(b)
+				 */
 				*sibling = rotate_right(*sibling);
 				parent_c = rotate_left(parent_c);
-				//TODO: check whether parent don't be required to be repaint into black
-				PAINT_COLOR(*ctx, !BB_ALERT);
+				PAINT_RED(parent_c);
+				PAINT_BLACK(GET_PTR(parent_c)->left);
+				PAINT_BLACK(GET_PTR(parent_c)->right);
+				*ctx &= ~(1 << CTX_BB);
 				return parent_c;
 			}
 		}
@@ -652,76 +538,51 @@ static nrbtreeNode_t* resolve_black_black(nrbtreeNode_t* parent_c, uint8_t color
 		/*
 		 *  check right sibling
 		 */
-		sibling_dir_ctx |= CTX_LEFT;
-		sibling_dir_ctx <<= 1;
 		sibling = &GET_PTR(parent_c)->left;
 		if((GET_COLOR(GET_PTR(*sibling)->left) == BLACK) \
 				&& (GET_COLOR(GET_PTR(*sibling)->right) == BLACK))
 		{
 			if(GET_COLOR(*sibling) == BLACK)
 			{
-				/*
-				 * black sibling with black children
-				 *
-				 * depend on parent color there are two option
-				 */
 				if(GET_COLOR(parent_c) == BLACK)
 				{
-					/*
-					 * parent is black
-					 * then all the nodes in sub-tree are black
-					 * in this case, can't resolved within this sub-tree
-					 */
 					PAINT_COLOR(*sibling, RED);
 					return parent_c;
 				}
 				else
 				{
-					/*
-					 * parent is red
-					 * then just repaint the sibling into red and black-black resolved
-					 */
-
 					PAINT_BLACK(parent_c);
 					PAINT_COLOR(*sibling, RED);
-					PAINT_COLOR(*ctx, !BB_ALERT);
+					*ctx &= ~(1 << CTX_BB);
 					return parent_c;
 				}
 			}
 			else
 			{
-				/*
-				 * red sibling with black children
-				 *
-				 * paint sibling blakc
-				 */
 				PAINT_BLACK(*sibling);
-				PAINT_COLOR(*ctx, !BB_ALERT);
+				*ctx &= ~(1 << CTX_BB);
 				return parent_c;
 			}
 		}
 		else
 		{
-			/*
-			 * one or more child of sibling(right) is red
-			 * obviously, the sibling is black because successive red
-			 * is not allowed in red black tree
-			 * so we assume sibling is black here
-			 */
-
 			if(GET_COLOR(GET_PTR(*sibling)->left) == RED)
 			{
 				parent_c = rotate_right(parent_c);
+				PAINT_RED(parent_c);
 				PAINT_BLACK(GET_PTR(parent_c)->left);
-				PAINT_COLOR(*ctx, !BB_ALERT);
+				PAINT_BLACK(GET_PTR(parent_c)->right);
+				*ctx &= ~(1 << CTX_BB);
 				return parent_c;
 			}
 			else
 			{
 				*sibling = rotate_left(*sibling);
 				parent_c = rotate_right(parent_c);
-				//TODO: check whether parent don't be required to be repaint into black
-				PAINT_COLOR(*ctx, !BB_ALERT);
+				PAINT_RED(parent_c);
+				PAINT_BLACK(GET_PTR(parent_c)->left);
+				PAINT_BLACK(GET_PTR(parent_c)->right);
+				*ctx &= ~(1 << CTX_BB);
 				return parent_c;
 			}
 		}
@@ -729,56 +590,211 @@ static nrbtreeNode_t* resolve_black_black(nrbtreeNode_t* parent_c, uint8_t color
 	return NULL;
 }
 
-static nrbtreeNode_t* up_from_rightmost_rc(nrbtreeNode_t* node,nrbtreeNode_t** rm)
+static nrbtreeNode_t* up_from_rightmost_rc(nrbtreeNode_t* node,nrbtreeNode_t** rm,uint8_t* ctx)
 {
+	/*
+	 *  1. if rightmost(RM) node has left child, replace RM node with left child
+	 *  and paint it black (no black black)
+	 *  1 > no double blakc
+	 *      p             p
+	 *       \             \
+	 *       rm(b)    ->   c(b)
+	 *       /
+	 *     c(r)
+	 *
+	 *  2 > no double black
+	 *      p             p
+	 *       \             \
+	 *       rm(r)    ->   c(b)
+	 *       /
+	 *    c(b)
+	 *
+	 *  2. if RM node has no child(leaf node), then replace it with null node.
+	 *   1 > double black
+	 *        p                p
+	 *         \                \
+	 *         rm(b)      ->   nl(bb)
+	 *         / \
+	 *      nl(b) nl(b)
+	 *  2 >  no double black
+	 *       p                 p
+	 *        \                 \
+	 *        rm(r)       ->    nl(b)
+	 *        / \
+	 *     nl(b) nl(b)
+	 *
+	 *
+	 */
+
+	if(!GET_PTR(GET_PTR(node)->right) && !GET_PTR(GET_PTR(node)->left))
+	{
+		/*
+		 *  current rightmost is leaf node
+		 */
+		if(GET_COLOR(node) == RED)
+		{
+			/*
+			 * fortunately current is red
+			 * so just replace it with null causing no double black
+			 */
+			*ctx &= ~(1 << CTX_BB);	// clear BB
+			*rm = node;
+		}
+		else
+		{
+			*ctx = (1 << CTX_BB); // set BB
+			*rm = node;
+		}
+		return NULL;
+	}
+	else
+	{
+		if(!GET_PTR(GET_PTR(node)->right))
+		{
+			/*
+			 * RM node with left child case
+			 */
+			*ctx &= ~(1 << CTX_BB);
+			*rm = node;
+			PAINT_BLACK(GET_PTR(node)->left);
+			return GET_PTR(node)->left;
+		}
+
+		/*
+		 * keep going right
+		 */
+		GET_PTR(node)->right = up_from_rightmost_rc(GET_PTR(node)->right, rm, ctx);
+		if(*ctx & (1 << CTX_BB))
+		{
+			node = resolve_black_black(node, CTX_RIGHT, ctx);
+		}
+		return node;
+	}
+
 	if(!GET_PTR(node)->right)
 	{
+
 		if(GET_COLOR(node) != RED)
 		{
 			/*
 			 *  black black case,
 			 *  set BB_ALERT in pointer and return
 			 */
-			*rm = (nrbtreeNode_t*) ((uint64_t)node | BB_ALERT);
+			if(GET_PTR(GET_PTR(node)->left))
+			{
+				/*
+				 * if there is left child of rightmost
+				 * and if it's not black
+				 */
+				if(GET_COLOR(GET_PTR(node)->left) == RED)
+				{
+					*ctx &= ~(1 << CTX_BB);
+					*rm = node;
+					return GET_PTR(GET_PTR(node)->left);
+				}
+			}
+			*ctx = (1 << CTX_BB);
+			*rm = node;
 		}
 		else
 		{
-			*rm = (nrbtreeNode_t*) ((uint64_t)node & ~BB_ALERT);
+			*ctx &= ~(1 << CTX_BB);
+			*rm = node;
 		}
 		return NULL;
 	}
 
-	GET_PTR(node)->right = up_from_rightmost_rc(GET_PTR(node)->right, rm);
-	if((uint64_t) *rm & BB_ALERT)
+	GET_PTR(node)->right = up_from_rightmost_rc(GET_PTR(node)->right, rm, ctx);
+	if(*ctx & (1 << CTX_BB))
 	{
-		node = resolve_black_black(node, (GET_COLOR(node) << 1),((CTX_RIGHT << 1) | CTX_RIGHT),rm);
+		node = resolve_black_black(node,CTX_RIGHT, ctx);
 	}
 	return node;
 }
 
-static nrbtreeNode_t* up_from_leftmost_rc(nrbtreeNode_t* node, nrbtreeNode_t** lm)
+static nrbtreeNode_t* up_from_leftmost_rc(nrbtreeNode_t* node, nrbtreeNode_t** lm,uint8_t* ctx)
 {
-	if(!GET_PTR(node)->left)
+	if(!GET_PTR(GET_PTR(node)->right) && !GET_PTR(GET_PTR(node)->left))
 	{
-		if(GET_COLOR(node) != RED)
+		/*
+		 *  current rightmost is leaf node
+		 */
+		if(GET_COLOR(node) == RED)
 		{
 			/*
-			 *  black black case
+			 * fortunately current is red
+			 * so just replace it with null causing no double black
 			 */
-			*lm = (nrbtreeNode_t*) ((uint64_t) node | BB_ALERT);
+			*ctx &= ~(1 << CTX_BB);	// clear BB
+			*lm = node;
 		}
 		else
 		{
-			*lm = (nrbtreeNode_t*) ((uint64_t) node & ~BB_ALERT);
+			*ctx = (1 << CTX_BB); // set BB
+			*lm = node;
+		}
+		return NULL;
+	}
+	else
+	{
+		if(!GET_PTR(GET_PTR(node)->left))
+		{
+			*ctx &= ~(1 << CTX_BB);
+			*lm = node;
+			PAINT_BLACK(GET_PTR(node)->right);
+			return GET_PTR(node)->right;
+		}
+
+		/*
+		 * keep going right
+		 */
+		GET_PTR(node)->left = up_from_leftmost_rc(GET_PTR(node)->left, lm, ctx);
+		if(*ctx & (1 << CTX_BB))
+		{
+			node = resolve_black_black(node, CTX_LEFT,  ctx);
+		}
+		return node;
+	}
+
+	if(!GET_PTR(node)->left)
+	{
+
+		if(GET_COLOR(node) != RED)
+		{
+			/*
+			 *  black black case,
+			 *  set BB_ALERT in pointer and return
+			 */
+			if(GET_PTR(GET_PTR(node)->right))
+			{
+				/*
+				 * if there is left child of rightmost
+				 * and if it's not black
+				 */
+				if(GET_COLOR(GET_PTR(node)->right) == RED)
+				{
+					*ctx &= ~(1 << CTX_BB);
+					*lm = node;
+					return GET_PTR(GET_PTR(node)->right);
+				}
+			}
+			*ctx = (1 << CTX_BB);
+			*lm = node;
+		}
+		else
+		{
+			*ctx &= ~(1 << CTX_BB);
+			*lm = node;
 		}
 		return NULL;
 	}
 
-	GET_PTR(node)->left = up_from_leftmost_rc(GET_PTR(node)->left, lm);
-	if((uint64_t) *lm & BB_ALERT)
+	GET_PTR(node)->left = up_from_leftmost_rc(GET_PTR(node)->left, lm, ctx);
+	if(*ctx & (1 << CTX_BB))
 	{
-		node = resolve_black_black(node, (GET_COLOR(node) << 1),((CTX_LEFT << 1) | CTX_LEFT),lm);
+		node = resolve_black_black(node,CTX_LEFT, ctx);
 	}
 	return node;
+
 }
 

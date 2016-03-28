@@ -13,19 +13,18 @@
 #include <stdlib.h>
 
 
+
+heapNode_t nodes[TEST_SIZE];
 BOOL cdsl_heapDoTest(void)
 {
 	heapRoot_t root;
-	heapNode_t nodes[100];
 	cdsl_heapRootInit(&root,MAX_HEAP);
 	int i;
 	int max = 0,min = 0;
-	for(i = 0; i < 100;i++)
+	for(i = 0; i < TEST_SIZE;i++)
 	{
 		cdsl_heapNodeInit(&nodes[i], rand());
 		cdsl_heapEnqueue(&root, &nodes[i]);
-		if(cdsl_heapSize(&root) != (i + 1))
-			return FALSE;
 	}
 
 	heapNode_t* node = NULL;
@@ -37,12 +36,10 @@ BOOL cdsl_heapDoTest(void)
 			max = node->key;
 	}
 	cdsl_heapRootInit(&root,MIN_HEAP);
-	for (i = 0;i < 10;i++)
+	for (i = 0;i < TEST_SIZE;i++)
 	{
 		cdsl_heapNodeInit(&nodes[i],rand());
 		cdsl_heapEnqueue(&root, &nodes[i]);
-		if(cdsl_heapSize(&root) != (i + 1))
-			return FALSE;
 	}
 	while((node = cdsl_heapDeqeue(&root)) != NULL)
 	{

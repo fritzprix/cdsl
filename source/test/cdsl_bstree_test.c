@@ -11,13 +11,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+static bstreeNode_t bst_nodepool[TEST_SIZE];
+static int keys[TEST_SIZE];
 
-static int bstree_cb(int order,void* bst);
 static int cb_count;
 BOOL cdsl_bstreeDoTest(void)
 {
-	bstreeNode_t bst_nodepool[TEST_SIZE];
-	int keys[TEST_SIZE];
+
 	bstreeRoot_t root;
 	cb_count = 0;
 	cdsl_bstreeRootInit(&root);
@@ -32,11 +32,8 @@ BOOL cdsl_bstreeDoTest(void)
 		keys[i] = rand() % TEST_SIZE;
 		cdsl_bstreeNodeInit(&bst_nodepool[i],keys[i]);
 		cdsl_bstreeInsert(&root,&bst_nodepool[i]);
-		depth_temp = cdsl_bstreeMaxDepth(&root);
-		if(depth < depth_temp){
-			depth = depth_temp;
-		}
 	}
+	depth = cdsl_bstreeMaxDepth(&root);
 	__dev_log("Max Depth of binary search Tree : %d @ N : %d\n",depth,i);
 
 	if(cdsl_bstreeSize(&root) != TEST_SIZE)
@@ -56,10 +53,6 @@ BOOL cdsl_bstreeDoTest(void)
 		cdsl_bstreeInsert(&root,delete_node);
 	}
 
-	cdsl_bstreeTraverse(&root,(base_tree_callback_t) bstree_cb,ORDER_INC);
-	if(cb_count != 2000)
-		return FALSE;
-
 	for(i = 0;i < TEST_SIZE;i++)
 	{
 		delete_node = NULL;
@@ -72,18 +65,7 @@ BOOL cdsl_bstreeDoTest(void)
 
 	if(cdsl_bstreeSize(&root) > 0)		// size should be zero
 		return FALSE;
-
 	return TRUE;
 }
 
-
-static int bstree_cb(int order,void* bst)
-{
-	cb_count++;
-	if(order == 2000)
-	{
-		return BREAK_TRAVERSE;
-	}
-	return (1 > 0);
-}
 
