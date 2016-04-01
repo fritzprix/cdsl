@@ -19,6 +19,8 @@ extern "C" {
 
 #define MSG_BREAK_TRAVERSE	(int) -1
 
+#define DECLARE_TRAVERSE_CALLBACK(fn) int fn(int order, base_treeNode_t* node)
+
 
 typedef struct base_tree_node base_treeNode_t;
 typedef struct base_tree_root base_treeRoot_t;
