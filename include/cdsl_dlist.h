@@ -68,6 +68,7 @@ extern void cdsl_dlistPutTail(dlistEntry_t* lentry,dlistNode_t* item);
 extern dlistNode_t* cdsl_dlistRemoveHead(dlistEntry_t* lentry);
 extern dlistNode_t* cdsl_dlistRemoveTail(dlistEntry_t* lentry);
 extern BOOL cdsl_dlistRemove(dlistNode_t* item);
+extern void cdsl_dlistReplace(dlistNode_t* old, dlistNode_t* nu);
 
 extern void cdsl_dlistIterRemove(listIter_t* iter);
 
