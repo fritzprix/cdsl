@@ -5,7 +5,6 @@
  *      Author: innocentevil
  */
 
-#include <stdlib.h>
 #include "cdsl_dlist.h"
 
 void cdsl_dlistNodeInit(dlistNode_t* node){

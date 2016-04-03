@@ -1,0 +1,20 @@
+{
+	"ARCH" : {
+		"type":"enum",
+		"enum":[
+			"arm",
+			"x86"
+		],
+		"default":0
+	},
+	"BAREMETAL":{
+		"type":"bool",
+		"default":"n",
+		"force":"y"
+	},
+	"ARCH_CONFIG":{
+		"type":"config",
+		"path":"./$ARCH/config.json"
+	}
+}
+

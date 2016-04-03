@@ -3,8 +3,19 @@
 		"type":"recipe",
 		"path":"recipe.mk"
 	},
+	"TEST":{
+		"type":"bool",
+		"default":"y"
+	},
 	"TEST_CONFIG":{
 		"type":"config",
+		"depend":{
+			"TEST":"y"
+		},
 		"path":"./test/config.json"
+	},
+	"ARCH_CONFIG":{
+		"type":"config",
+		"path":"./arch/config.json"
 	}
 }

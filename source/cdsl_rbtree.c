@@ -7,7 +7,6 @@
 
 #include "cdsl.h"
 #include "cdsl_rbtree.h"
-#include <stdio.h>
 
 
 
@@ -334,9 +333,9 @@ int cdsl_rbtreeSize(rb_treeNode_t** root){
 void cdsl_rbtreePrint(rb_treeNode_t** root){
 	if(!root)
 		return;
-	printf("\n");
+	PRINT("\n");
 	print_r(*root,0);
-	printf("\n");
+	PRINT("\n");
 }
 
 int cdsl_rbtreeMaxDepth(rb_treeNode_t** root){
@@ -442,19 +441,19 @@ static rb_treeNode_t* rotateRight(rb_treeNode_t* rot_pivot,BOOL paint){
 
 static void print_tab(int cnt){
 	while(cnt--)
-		printf("\t");
+		PRINT("\t");
 }
 
 
 static void print_r(rb_treeNode_t* current,int depth){
 
 	if(current == RB_NIL){
-		print_tab(depth); printf("NIL {Color : BLACK, Key: %d} @Depth %d \n",current->key,depth);
+		print_tab(depth); PRINT("NIL {Color : BLACK, Key: %d} @Depth %d \n",current->key,depth);
 		return;
 	}
-	printf("\n");
+	PRINT("\n");
 	print_r(current->right,depth + 1);
-	print_tab(depth); printf("{Color : %s, Key: %d} @Depth %d \n",current->color == BLACK? "BLACK" : "RED",current->key,depth);
+	print_tab(depth); PRINT("{Color : %s, Key: %d} @Depth %d \n",current->color == BLACK? "BLACK" : "RED",current->key,depth);
 	print_r(current->left,depth + 1);
-	printf("\n");
+	PRINT("\n");
 }

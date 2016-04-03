@@ -7,11 +7,10 @@
 
 #include "base_tree.h"
 #include "cdsl.h"
-#include <stdio.h>
+#include "arch.h"
 
 
-#define PRINT 	printf
-#define GET_PTR(ptr)           ((base_treeNode_t*) (((uint64_t) ptr) & ~1))
+#define GET_PTR(ptr)           ((base_treeNode_t*) (((uaddr_t) ptr) & ~1))
 
 static int calc_max_depth_rc(base_treeNode_t** root);
 static int calc_size_rc(base_treeNode_t** root);

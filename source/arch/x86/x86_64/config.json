@@ -1,0 +1,6 @@
+{
+	"x86_64_RECIPE":{
+		"type":"recipe",
+		"path":"recipe.mk"
+	}
+}

@@ -9,7 +9,6 @@
 #include "cdsl_bstree.h"
 #include "base_tree.h"
 #include "cdsl.h"
-#include <stdio.h>
 #include <stddef.h>
 
 

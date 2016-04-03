@@ -1,15 +1,14 @@
 # makefile for cdsl
 
-
-CC=clang-3.6
+CC=clang-3.6 
 CXX=clang++-3.6
-AR=ar
+AR=llvm-ar-3.6
 PYTHON=python
 PIP=pip
 MKDIR=mkdir
 
-DBG_CFLAG = -O0 -g3 -fmessage-length=0   -D__DBG
-REL_CFLAG = -O2 -g0 -fmessage-length=0
+DBG_CFLAG = -O0 -g3 -fmessage-length=0  $(CFLAG) -D__DBG
+REL_CFLAG = -O2 -g0 -fmessage-length=0  $(CFLAG)
 DYNAMIC_FLAG = -fPIC
 
 
@@ -43,6 +42,8 @@ REL_SH_OBJS=$(OBJ-y:%=$(REL_CACHE_DIR)/%.s.o)
 DBG_CACHE_DIR=Debug
 REL_CACHE_DIR=Release
 
+CONFIG_DIR=./source/arch/$(ARCH)/configs
+
 SILENT+= $(REL_STATIC_TARGET) $(REL_DYNAMIC_TARGET) $(DBG_OBJS)
 SILENT+= $(DBG_STATIC_TARGET) $(DBG_DYNAMIC_TARGET) $(REL_OBJS)
 SILENT+= $(DBG_SH_OBJS) $(REL_SH_OBJS)
@@ -59,56 +60,69 @@ debug : $(DBG_CACHE_DIR) $(DBG_STATIC_TARGET) $(DBG_DYNAMIC_TARGET)
 
 release : $(REL_CACHE_DIR) $(REL_STATIC_TARGET) $(REL_DYNAMIC_TARGET)
 
-test : $(REL_CACHE_DIR) $(DBG_CACHE_DIR) $(TEST_TARGET) $(DEV_TEST_TARGET) 
+test : $(REL_CACHE_DIR) $(DBG_CACHE_DIR) $(TEST_TARGET) $(DEV_TEST_TARGET)
 
+defconf : $(CONFIG_DIR)
+	cp -rf .config $(CONFIG_DIR)/$(SUB_ARCH)_config
+
+
+ifeq ($(DEFCONF),)
 config : $(CONFIG_PY)
 	$(PYTHON) $(CONFIG_PY) -c -i config.json
+else
+ifeq ($(ARCH),)
+config :
+	$(error "ARCH must be specified!!")	
+endif
+config : $(CONFIG_PY)
+	$(PYTHON) $(CONFIG_PY) -s -i $(CONFIG_DIR/$(DEFCONF)_config) -t config.json 
+endif
 
 $(CONFIG_PY):
 	$(PIP) install jconfigpy -t $(TOOL_DIR)
 
-$(DBG_CACHE_DIR) $(REL_CACHE_DIR) :
+$(DBG_CACHE_DIR) $(REL_CACHE_DIR) $(CONFIG_DIR) :
 	$(MKDIR) $@
 	
 $(DBG_STATIC_TARGET) : $(DBG_OBJS)
-	@echo 'Generating Archive File ....$@'
-	$(AR) rcs -o $@  $(DBG_OBJS)
+	@echo 'Generating Archive File for $(ARCH) ....$@'
+	$(AR) rcs  $@  $(DBG_OBJS)
 	
 $(DBG_DYNAMIC_TARGET) : $(DBG_SH_OBJS)
-	@echo 'Generating Share Library File .... $@'
+	@echo 'Generating Share Library File for $(ARCH) .... $@'
 	$(CC) -o $@ -shared $(DBG_CFLAG) $(DYNAMIC_FLAG) $(DBG_SH_OBJS)
 
 $(REL_STATIC_TARGET) : $(REL_OBJS)
-	@echo 'Generating Archive File ....$@'
-	$(AR) rcs -o $@ $(REL_OBJS)
+	@echo 'Generating Archive File for $(ARCH) ....$@'
+	$(AR) rcs  $@ $(REL_OBJS)
 	
 $(REL_DYNAMIC_TARGET) : $(REL_SH_OBJS)
-	@echo 'Generating Share Library File .... $@'
+	@echo 'Generating Share Library File for $(ARCH) .... $@'
 	$(CC) -o $@ -shared $(REL_CFLAG) $(DYNAMIC_FLAG) $(REL_SH_OBJS)
 	
 $(TEST_TARGET) : $(REL_CACHE_DIR)/main.o $(REL_OBJS) 
-	@echo 'Building unit-test executable... $@'
+	@echo 'Building unit-test executable... for $(ARCH) $@'
 	$(CC) -o $@ $(REL_CFLAG) $< $(REL_OBJS)
 	
 
 $(DEV_TEST_TARGET) : $(DBG_CACHE_DIR)/main.do $(DBG_OBJS) 
-	@echo 'Building unit-test executable... $@'
+	@echo 'Building unit-test executable... for $(ARCH) $@'
 	$(CC) -o $@ $(DBG_CFLAG) $< $(DBG_OBJS)
 	
 $(DBG_CACHE_DIR)/%.do : %.c
-	@echo 'compile...$@'
+	@echo '$(ARCH) compile...$@'
 	$(CC) -c -o $@ $(DBG_CFLAG)  $< $(INCS)
 	
 $(REL_CACHE_DIR)/%.o : %.c
-	@echo 'compile...$@'
+	@echo '$(ARCH) compile...$@'
 	$(CC) -c -o $@ $(REL_CFLAG)  $< $(INCS)
 	
 $(DBG_CACHE_DIR)/%.s.do : %.c
-	@echo 'compile...$@'
+	@echo '$(ARCH) compile...$@'
 	$(CC) -c -o $@ $(DBG_CFLAG)  $< $(INCS) $(DYNAMIC_FLAG)
 	
 $(REL_CACHE_DIR)/%.s.o : %.c
-	@echo 'compile...$@'
+	@echo '$(ARCH) compile...$@'
 	$(CC) -c -o $@ $(REL_CFLAG)  $< $(INCS) $(DYNAMIC_FLAG)
 	
 PHONY += clean

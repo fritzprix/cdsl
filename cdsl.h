@@ -8,6 +8,7 @@
 #ifndef CDSL_H_
 #define CDSL_H_
 
+#include "autogen.h"
 #include <stdint.h>
 #include <stddef.h>
 
@@ -17,13 +18,24 @@ extern "C" {
 #endif
 
 #ifndef TEST_SIZE
-#define TEST_SIZE 5000
+#define TEST_SIZE 50
 #endif
 
 #ifdef __DBG
 #define __dev_log(...) 	printf(__VA_ARGS__)
 #else
 #define __dev_log(...)
+#endif
+
+
+/*
+ *  baremetal environment assume libc doesn't exist
+ *  so PRINT do nothing till any target specific printf equivalent
+ */
+#ifdef BAREMETAL
+#define PRINT(...)
+#else
+#define PRINT(...)           printf(__VA_ARGS__)
 #endif
 
 #define container_of(ptr, type, elem) 	((type*) ((size_t) ptr - offsetof(type, elem)))

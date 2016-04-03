@@ -10,15 +10,14 @@
 
 #include "base_tree.h"
 #include "cdsl.h"
+#include "arch.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 
-#ifndef rb_key_t
-#define rb_key_t     uint32_t
-#endif
+typedef uaddr_t rb_key_t;
 
 #define cdsl_nrbtreeMaxDepth(root)                 tree_max_depth((base_treeRoot_t*) root)
 #define cdsl_nrbtreeTraverse(root, cb, order)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order)

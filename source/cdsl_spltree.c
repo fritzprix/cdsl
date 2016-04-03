@@ -5,7 +5,6 @@
  *      Author: innocentevil
  */
 
-#include <stdio.h>
 #include "cdsl.h"
 #include "cdsl_spltree.h"
 
