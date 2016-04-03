@@ -53,11 +53,11 @@ BOOL cdsl_nrbtreeDoTest(void)
 			__dev_log("key corrupted !!\n");
 			return FALSE;
 		}
-//		keys[i] = rand() % TEST_SIZE;
-//		cdsl_nrbtreeNodeInit(delete_node,keys[i]);
-//		cdsl_nrbtreeInsert(&root,delete_node);
+		keys[i] = rand() % TEST_SIZE;
+		cdsl_nrbtreeNodeInit(delete_node,keys[i]);
+		cdsl_nrbtreeInsert(&root,delete_node);
 	}
-/*
+
 	for(i = 0;i < TEST_SIZE;i++){
 		delete_node = NULL;
 		delete_node = cdsl_nrbtreeDelete(&root,keys[i]);
@@ -65,7 +65,7 @@ BOOL cdsl_nrbtreeDoTest(void)
 			return FALSE;
 		if(delete_node->key != keys[i])
 			return FALSE;
-	}*/
+	}
 	if(cdsl_nrbtreeSize(&root) > 0)
 		return FALSE;
 
