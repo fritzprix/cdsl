@@ -1,6 +1,6 @@
 {
 	"name":"cdsl",
-	"include":["./include","./"],
+	"include":["./include","./","./include/arch/arm"],
 	"output":["libcdsl.a"],
 	"version":"0.1",
 	"buildcmd":[
