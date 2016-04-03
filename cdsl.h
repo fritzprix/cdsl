@@ -18,11 +18,11 @@ extern "C" {
 #endif
 
 #ifndef TEST_SIZE
-#define TEST_SIZE 50
+#define TEST_SIZE 10000
 #endif
 
 #ifdef __DBG
-#define __dev_log(...) 	printf(__VA_ARGS__)
+#define __dev_log(...) 	PRINT(__VA_ARGS__)
 #else
 #define __dev_log(...)
 #endif
@@ -35,6 +35,7 @@ extern "C" {
 #ifdef BAREMETAL
 #define PRINT(...)
 #else
+#include <stdio.h>
 #define PRINT(...)           printf(__VA_ARGS__)
 #endif
 

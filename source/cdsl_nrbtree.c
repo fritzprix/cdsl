@@ -148,7 +148,7 @@ static void node_print_rc(nrbtreeNode_t* node,int order) {
 		return;
 	}
 	node_print_rc(GET_PTR(node)->right, order + 1);
-	print_tab(order); PRINT("%s node : %d / order %d \n", COLOR_STRING[GET_COLOR(node)], GET_PTR(node)->key, order);
+	print_tab(order); PRINT("%s node : %lu / order %d \n", COLOR_STRING[GET_COLOR(node)], GET_PTR(node)->key, order);
 	node_print_rc(GET_PTR(node)->left, order + 1);
 }
 
