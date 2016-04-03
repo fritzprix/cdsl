@@ -19,6 +19,8 @@ extern "C" {
 #define cdsl_traverse(root, cb, order)             tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order)
 #define cdsl_spltreeSize(root)                     tree_size((base_treeRoot_t*) root)
 #define cdsl_spltreePrint(root, print)             tree_print((base_treeRoot_t*) root, print)
+#define cdsl_spltreeIsEmpty(root)                  tree_is_empty((base_treeRoot_t*) root)
+
 
 typedef struct spltree_node spltreeNode_t;
 typedef struct spltree_root spltreeRoot_t;

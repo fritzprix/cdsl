@@ -23,6 +23,7 @@ typedef struct bs_treeroot bstreeRoot_t;
 #define cdsl_bstreeTraverse(root, cb, order)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order)
 #define cdsl_bstreeSize(root)                     tree_size((base_treeRoot_t*) root)
 #define cdsl_bstreePrint(root, print)             tree_print((base_treeRoot_t*) root, print)
+#define cdsl_bstreeIsEmpty(root)                  tree_is_empty((base_treeRoot_t*) root)
 
 #define ORDER_INC			(int) 0
 #define ORDER_DEC			(int) 1

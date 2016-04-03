@@ -38,6 +38,7 @@ extern void tree_traverse(base_treeRoot_t* rootp, base_tree_callback_t cb,int or
 extern int tree_size(base_treeRoot_t* rootp);
 extern void tree_print(base_treeRoot_t* rootp,cdsl_generic_printer_t prt);
 extern int tree_max_depth(base_treeRoot_t* rootp);
+extern BOOL tree_is_empty(base_treeRoot_t* rootp);
 
 
 #if defined(__cplusplus)

@@ -23,6 +23,8 @@ typedef __cdsl_uaddr_t rb_key_t;
 #define cdsl_nrbtreeTraverse(root, cb, order)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order)
 #define cdsl_nrbtreeSize(root)                     tree_size((base_treeRoot_t*) root)
 #define cdsl_nrbtreePrint(root, print)             tree_print((base_treeRoot_t*) root, print)
+#define cdsl_nrbTreeIsEmpty(root)                  tree_is_empty((base_treeRoot_t*) root)
+
 
 typedef struct cdsl_nrbtree nrbtreeNode_t;
 typedef struct cdsl_nrbroot {
