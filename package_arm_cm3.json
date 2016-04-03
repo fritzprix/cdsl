@@ -1,0 +1,10 @@
+{
+	"name":"cdsl",
+	"include":["./include","./","./include/arch/arm"],
+	"output":["libcdsl.a"],
+	"version":"0.1",
+	"buildcmd":[
+		"make config ARCH=arm DEFCONF=cortex-m3",
+		"make release"
+	]
+}
