@@ -146,6 +146,20 @@ BOOL cdsl_dlistRemove(dlistNode_t* item){
 	return TRUE;
 }
 
+void cdsl_dlistReplace(dlistNode_t* old, dlistNode_t* nu)
+{
+	if(!old || !nu)
+		return;
+	nu->next = old->next;
+	nu->prev = old->prev;
+	if(nu->next)
+		nu->next->prev = nu;
+	if(nu->prev)
+		nu->prev->next = nu;
+	old->next = old->prev = NULL;
+}
+
+
 void cdsl_dlistIterRemove(listIter_t* iter)
 {
 	if(!iter)

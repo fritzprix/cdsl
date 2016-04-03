@@ -14,7 +14,7 @@
 extern "C" {
 #endif
 
-typedef uint64_t uaddr_t;
+typedef uint64_t __cdsl_uaddr_t;
 
 
 #ifdef __cplusplus

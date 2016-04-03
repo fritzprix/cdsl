@@ -17,7 +17,7 @@ extern "C" {
 #endif
 
 
-typedef uaddr_t rb_key_t;
+typedef __cdsl_uaddr_t rb_key_t;
 
 #define cdsl_nrbtreeMaxDepth(root)                 tree_max_depth((base_treeRoot_t*) root)
 #define cdsl_nrbtreeTraverse(root, cb, order)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order)

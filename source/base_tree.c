@@ -10,7 +10,7 @@
 #include "arch.h"
 
 
-#define GET_PTR(ptr)           ((base_treeNode_t*) (((uaddr_t) ptr) & ~1))
+#define GET_PTR(ptr)           ((base_treeNode_t*) (((__cdsl_uaddr_t) ptr) & ~1))
 
 static int calc_max_depth_rc(base_treeNode_t** root);
 static int calc_size_rc(base_treeNode_t** root);

@@ -9,24 +9,24 @@
 #include "cdsl_nrbtree.h"
 
 
-#define GET_PTR(node)                         ((nrbtreeNode_t*)(((uint64_t) node) & ~1))
+#define GET_PTR(node)                         ((nrbtreeNode_t*)(((__cdsl_uaddr_t) node) & ~1))
 #define RED                                   ((uint8_t) 1)
 #define BLACK                                 ((uint8_t) 0)
 #define PAINT_RED(node) do {\
-	node =  (nrbtreeNode_t*) ((uint64_t) node | RED);\
+	node =  (nrbtreeNode_t*) ((__cdsl_uaddr_t) node | RED);\
 }while(0)
 
 #define PAINT_BLACK(node) do {\
-		node =  (nrbtreeNode_t*) ((uint64_t) node & ~RED);\
+		node =  (nrbtreeNode_t*) ((__cdsl_uaddr_t) node & ~RED);\
 }while(0)
 
 #define PAINT_COLOR(node, color) do {\
 	PAINT_BLACK(node);\
-	node = (nrbtreeNode_t*) ((uint64_t) node | color);\
+	node = (nrbtreeNode_t*) ((__cdsl_uaddr_t) node | color);\
 }while(0)
 
-#define GET_COLOR(node)						  ((uint64_t)(node) & 1)
-#define GET_DIR(node)                         ((uint64_t)(node) & 1)
+#define GET_COLOR(node)						  ((__cdsl_uaddr_t)(node) & 1)
+#define GET_DIR(node)                         ((__cdsl_uaddr_t)(node) & 1)
 
 #define CTX_BB                                ((uint8_t) 2)
 #define CTX_RIGHT                             ((uint8_t) 1)
@@ -255,11 +255,11 @@ static nrbtreeNode_t* update_color(nrbtreeNode_t* node_c)
 
 	if((GET_COLOR(GET_PTR(node_c)->left) == BLACK) && (GET_COLOR(GET_PTR(node_c)->right) == BLACK))
 	{
-		return (nrbtreeNode_t*) ((uint64_t)node_c | RED);
+		return (nrbtreeNode_t*) ((__cdsl_uaddr_t)node_c | RED);
 	}
 	else
 	{
-		return (nrbtreeNode_t*) ((uint64_t)node_c & ~RED);
+		return (nrbtreeNode_t*) ((__cdsl_uaddr_t)node_c & ~RED);
 	}
 	return node_c;
 }
