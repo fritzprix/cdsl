@@ -51,6 +51,13 @@ int tree_max_depth(base_treeRoot_t* rootp)
 	return calc_max_depth_rc(&rootp->entry);
 }
 
+BOOL tree_is_empty(base_treeRoot_t* rootp){
+	if(!rootp)
+		return TRUE;
+	return (rootp->entry == NULL);
+}
+
+
 
 static int calc_size_rc(base_treeNode_t** root)
 {
