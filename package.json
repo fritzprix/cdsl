@@ -1,10 +1,10 @@
 {
 	"name":"cdsl",
 	"include":["./include","./"],
-	"output":["libcdsl.a","libcdsl.so"],
+	"output":["libcdsl.a"],
 	"version":"0.1",
 	"buildcmd":[
-		"make config",
+		"make config DEFCONF=cortex-m4",
 		"make release"
 	]
 }
