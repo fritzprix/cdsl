@@ -31,6 +31,7 @@ typedef struct {
 extern void cdsl_iterInit(listEntry_t* lentry, listIter_t* iter);
 extern BOOL cdsl_iterHasNext(listIter_t* iter);
 extern listNode_t* cdsl_iterNext(listIter_t* iter);
+extern listNode_t* cdsl_iterRemove(listIter_t* iter);
 
 
 extern int cdsl_listSize(listEntry_t* lentry);
