@@ -80,6 +80,24 @@ rb_treeNode_t* cdsl_rbtreeDelete(rb_treeNode_t** root,int key)
 	return del_node;
 }
 
+rb_treeNode_t* cdsl_rbtreeLookup(rb_treeNode_t** root,int key)
+{
+	if(!root || !(*root))
+		return NULL;
+	rb_treeNode_t* cur = *root;
+	while(cur) {
+		if(cur->key > key) {
+			cur = cur->left;
+		} else if(cur->key < key) {
+			cur = cur->right;
+		} else {
+			return cur;
+		}
+	}
+	return NULL;
+}
+
+
 rb_treeNode_t* cdsl_rbtreeDeleteMin(rb_treeNode_t** root)
 {
 	if(!root || !(*root))
