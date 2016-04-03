@@ -20,6 +20,8 @@ extern "C" {
 #define cdsl_heapSize(root)                     tree_size((base_treeRoot_t*) root)
 #define cdsl_heapPrint(root, print)             tree_print((base_treeRoot_t*) root, print)
 #define cdsl_heapIsEmpty(root)                  tree_is_empty((base_treeRoot_t*) root)
+#define cdsl_heapGoLeft(cur)                    (heapNode_t*) tree_go_left((base_treeNode_t*) cur)
+#define cdsl_heapGoRight(cur)                   (heapNode_t*) tree_go_right((base_treeNode_t*) cur)
 
 typedef struct heap_node heapNode_t;
 typedef struct heap_root heapRoot_t;

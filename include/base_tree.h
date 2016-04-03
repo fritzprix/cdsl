@@ -35,6 +35,8 @@ struct base_tree_node {
 };
 
 extern void tree_traverse(base_treeRoot_t* rootp, base_tree_callback_t cb,int order);
+extern base_treeNode_t* tree_go_left(base_treeNode_t* cur);
+extern base_treeNode_t* tree_go_right(base_treeNode_t* cur);
 extern int tree_size(base_treeRoot_t* rootp);
 extern void tree_print(base_treeRoot_t* rootp,cdsl_generic_printer_t prt);
 extern int tree_max_depth(base_treeRoot_t* rootp);
