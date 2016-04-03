@@ -30,6 +30,18 @@ void tree_traverse(base_treeRoot_t* rootp, base_tree_callback_t cb,int order)
 		traverse_incremental_rc(rootp->entry,&i,cb);
 }
 
+base_treeNode_t* tree_go_left(base_treeNode_t* cur) {
+	if(!cur)
+		return NULL;
+	return GET_PTR(GET_PTR(cur)->left);
+}
+
+base_treeNode_t* tree_go_right(base_treeNode_t* cur) {
+	if(!cur)
+		return NULL;
+	return GET_PTR(GET_PTR(cur)->right);
+}
+
 int tree_size(base_treeRoot_t* rootp)
 {
 	if(rootp == NULL)
