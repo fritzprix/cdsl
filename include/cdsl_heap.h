@@ -22,7 +22,11 @@ extern "C" {
 
 typedef struct heap_node heapNode_t;
 typedef struct heap_root heapRoot_t;
-typedef enum { MAX_HEAP, MIN_HEAP } heapType_t;
+
+#define MAX_HEAP      ((char) 0)
+#define MIN_HEAP      ((char) 1)
+typedef char heapType_t;
+
 typedef heapNode_t* (*heapEvaluate)(heapNode_t* a, heapNode_t* b);
 
 struct heap_node {

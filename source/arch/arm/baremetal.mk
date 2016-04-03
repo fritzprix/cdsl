@@ -1,1 +1,2 @@
 CFLAG+= -ffreestanding
+BAREMETAL:=y
