@@ -18,8 +18,8 @@
 #define FOUND		((uint8_t) 6)
 
 static spltreeNode_t* insert_r(spltreeNode_t* current,spltreeNode_t* item,uint8_t* context);
-static spltreeNode_t* lookup_r(spltreeNode_t* current,int key,uint8_t* context,BOOL splay);
-static spltreeNode_t* delete_r(spltreeNode_t* current,int key,uint8_t* context,spltreeNode_t** found);
+static spltreeNode_t* lookup_r(spltreeNode_t* current,trkey_t key,uint8_t* context,BOOL splay);
+static spltreeNode_t* delete_r(spltreeNode_t* current,trkey_t key,uint8_t* context,spltreeNode_t** found);
 static spltreeNode_t* largest_r(spltreeNode_t* current,uint8_t* context,BOOL splay,BOOL delete);
 static spltreeNode_t* smallest_r(spltreeNode_t* current,uint8_t* context,BOOL splay,BOOL delete);
 static spltreeNode_t* rotateLeft(spltreeNode_t* parent);
@@ -34,7 +34,7 @@ void cdsl_spltreeRootInit(spltreeRoot_t* root)
 }
 
 
-void cdsl_spltreeNodeInit(spltreeNode_t* node,int key){
+void cdsl_spltreeNodeInit(spltreeNode_t* node,trkey_t key){
 	node->key = key;
 	node->left = node->right = NULL;
 }
@@ -51,7 +51,7 @@ void cdsl_spltreeInsert(spltreeRoot_t* root,spltreeNode_t* item){
 	root->entry = insert_r(root->entry,item,&context);
 }
 
-spltreeNode_t* cdsl_spltreeLookup(spltreeRoot_t* root,int key,BOOL splay){
+spltreeNode_t* cdsl_spltreeLookup(spltreeRoot_t* root,trkey_t key,BOOL splay){
 	if(!root)
 		return NULL;
 	uint8_t context;
@@ -73,7 +73,7 @@ spltreeNode_t* cdsl_spltreeLookupSmallest(spltreeRoot_t* root,BOOL splay){
 	return (root->entry = smallest_r(root->entry,&context,splay,FALSE));
 }
 
-spltreeNode_t* cdsl_spltreeDelete(spltreeRoot_t* root,int key){
+spltreeNode_t* cdsl_spltreeDelete(spltreeRoot_t* root,trkey_t key){
 	if(!root)
 		return NULL;
 	uint8_t context = ROOT;
@@ -134,7 +134,7 @@ static spltreeNode_t* insert_r(spltreeNode_t* current,spltreeNode_t* item,uint8_
 	}
 }
 
-static spltreeNode_t* lookup_r(spltreeNode_t* current,int key,uint8_t* context,BOOL splay){
+static spltreeNode_t* lookup_r(spltreeNode_t* current,trkey_t key,uint8_t* context,BOOL splay){
 	if(!current){
 		*context = NOT_FOUND;
 		return NULL;
@@ -196,7 +196,7 @@ static spltreeNode_t* lookup_r(spltreeNode_t* current,int key,uint8_t* context,B
 	return NULL;
 }
 
-static spltreeNode_t* delete_r(spltreeNode_t* current,int key,uint8_t* context,spltreeNode_t** found){
+static spltreeNode_t* delete_r(spltreeNode_t* current,trkey_t key,uint8_t* context,spltreeNode_t** found){
 	if(!current){
 		*context = NOT_FOUND;
 		*found = NULL;

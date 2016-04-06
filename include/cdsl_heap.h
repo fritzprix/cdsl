@@ -36,10 +36,10 @@ struct heap_node {
 	union {
 		struct {
 			heapNode_t*	left, *right;
+			trkey_t       key;
 		};
 		base_treeNode_t node;
 	};
-	uint32_t 	key;
 };
 
 struct heap_root {
@@ -52,7 +52,7 @@ struct heap_root {
 };
 
 extern void cdsl_heapRootInit(heapRoot_t* rootp,heapType_t type);
-extern void cdsl_heapNodeInit(heapNode_t* node,int key);
+extern void cdsl_heapNodeInit(heapNode_t* node,trkey_t key);
 extern int cdsl_heapEnqueue(heapRoot_t* rootp,heapNode_t* item);
 extern heapNode_t* cdsl_heapDeqeue(heapRoot_t* rootp);
 

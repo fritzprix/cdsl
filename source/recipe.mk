@@ -7,7 +7,6 @@ OBJ-y+= base_list\
 		cdsl_dlist\
 		cdsl_hash\
 		cdsl_heap\
-		cdsl_rbtree\
 		cdsl_slist\
 		cdsl_spltree\
 		cdsl_nrbtree

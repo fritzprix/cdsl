@@ -22,6 +22,9 @@ extern "C" {
 #define cdsl_spltreeIsEmpty(root)                  tree_is_empty((base_treeRoot_t*) root)
 #define cdsl_spltreeGoLeft(cur)                    (spltreeNode_t*) tree_go_left((base_treeNode_t*) cur)
 #define cdsl_spltreeGoRight(cur)                   (spltreeNode_t*) tree_go_right((base_treeNode_t*) cur)
+#define cdsl_spltreeMin(root)                      (spltreeNode_t*) tree_min((base_treeRoot_t*) root)
+#define cdsl_spltreeMax(root)                      (spltreeNode_t*) tree_max((base_treeRoot_t*) root)
+#define cdsl_spltreeUpdate(root,nitem)             (spltreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
 
 
 typedef struct spltree_node spltreeNode_t;
@@ -39,19 +42,19 @@ struct spltree_node {
 		base_treeNode_t node_base;
 		struct {
 			spltreeNode_t* left,*right;
+			trkey_t          key;
 		};
 	};
-	int key;
 };
 
 
 extern void cdsl_spltreeRootInit(spltreeRoot_t* root);
-extern void cdsl_spltreeNodeInit(spltreeNode_t* node,int key);
+extern void cdsl_spltreeNodeInit(spltreeNode_t* node,trkey_t key);
 extern void cdsl_spltreeInsert(spltreeRoot_t* root,spltreeNode_t* item);
-extern spltreeNode_t* cdsl_spltreeLookup(spltreeRoot_t* root,int key,BOOL splay);
+extern spltreeNode_t* cdsl_spltreeLookup(spltreeRoot_t* root,trkey_t key,BOOL splay);
 extern spltreeNode_t* cdsl_spltreeLookupLargest(spltreeRoot_t* root,BOOL splay);
 extern spltreeNode_t* cdsl_spltreeLookupSmallest(spltreeRoot_t* root,BOOL splay);
-extern spltreeNode_t* cdsl_spltreeDelete(spltreeRoot_t* root,int key);
+extern spltreeNode_t* cdsl_spltreeDelete(spltreeRoot_t* root,trkey_t key);
 
 
 

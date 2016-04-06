@@ -23,7 +23,7 @@ void cdsl_bstreeRootInit(bstreeRoot_t* rootp)
 }
 
 
-void cdsl_bstreeNodeInit(bstreeNode_t* node,int key)
+void cdsl_bstreeNodeInit(bstreeNode_t* node,trkey_t key)
 {
 	if(node == NULL)
 		return;
@@ -73,22 +73,24 @@ bstreeNode_t* cdsl_bstreeInsert(bstreeRoot_t* rootp,bstreeNode_t* item){
 	return NULL;
 }
 
-bstreeNode_t* cdsl_bstreeLookup(bstreeRoot_t* rootp,int key)
+bstreeNode_t* cdsl_bstreeLookup(bstreeRoot_t* rootp,trkey_t key)
 {
 	if(rootp == NULL)
 		return NULL;
 	bstreeNode_t* current = rootp->entry;
-	while(current == NULL && (current->key != key))
+	while(current)
 	{
 		if(current->key < key)
 			current = current->right;
-		else
+		else if(current->key > key)
 			current = current->left;
+		else
+			return current;
 	}
-	return current;
+	return NULL;
 }
 
-bstreeNode_t* cdsl_bstreeDelete(bstreeRoot_t* rootp,int key)
+bstreeNode_t* cdsl_bstreeDelete(bstreeRoot_t* rootp,trkey_t key)
 {
 	bstreeNode_t* todelete = NULL;
 	if((rootp == NULL) || (rootp->entry == NULL))
@@ -129,6 +131,7 @@ bstreeNode_t* cdsl_bstreeDelete(bstreeRoot_t* rootp,int key)
 	}
 	return todelete;
 }
+
 
 
 static bstreeNode_t* move_up_rightmost_rc(bstreeNode_t* node)

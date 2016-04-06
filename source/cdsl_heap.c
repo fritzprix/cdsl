@@ -31,7 +31,7 @@ void cdsl_heapRootInit(heapRoot_t* rootp, heapType_t type)
 	rootp->dir = DIR_LEFT;
 }
 
-void cdsl_heapNodeInit(heapNode_t* node, int key)
+void cdsl_heapNodeInit(heapNode_t* node, trkey_t key)
 {
 	if(node == NULL)
 		return;

@@ -26,6 +26,9 @@ typedef struct bs_treeroot bstreeRoot_t;
 #define cdsl_bstreeIsEmpty(root)                  tree_is_empty((base_treeRoot_t*) root)
 #define cdsl_bstreeGoLeft(cur)                    (bstreeNode_t*) tree_go_left((base_treeNode_t*) cur)
 #define cdsl_bstreeGoRight(cur)                   (bstreeNode_t*) tree_go_right((base_treeNode_t*) cur)
+#define cdsl_bstreeMin(root)                      (bstreeNode_t*) tree_min((base_treeRoot_t*) root)
+#define cdsl_bstreeMax(root)                      (bstreeNode_t*) tree_max((base_treeRoot_t*) root)
+#define cdsl_bstreeUpdate(root,nitem)             (bstreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
 
 
 #define ORDER_INC			(int) 0
@@ -39,10 +42,10 @@ struct bs_treenode {
 	union {
 		struct {
 			bstreeNode_t *left, *right;
+			trkey_t        key;
 		};
 		base_treeNode_t node;
 	};
-	int key;
 };
 
 struct bs_treeroot {
@@ -54,10 +57,10 @@ struct bs_treeroot {
 
 
 extern void cdsl_bstreeRootInit(bstreeRoot_t* rootp);
-extern void cdsl_bstreeNodeInit(bstreeNode_t* node,int key);
+extern void cdsl_bstreeNodeInit(bstreeNode_t* node,trkey_t key);
 extern bstreeNode_t* cdsl_bstreeInsert(bstreeRoot_t* rootp,bstreeNode_t* item);
-extern bstreeNode_t* cdsl_bstreeLookup(bstreeRoot_t* rootp,int key);
-extern bstreeNode_t* cdsl_bstreeDelete(bstreeRoot_t* rootp,int key);
+extern bstreeNode_t* cdsl_bstreeLookup(bstreeRoot_t* rootp,trkey_t key);
+extern bstreeNode_t* cdsl_bstreeDelete(bstreeRoot_t* rootp,trkey_t key);
 
 
 #if defined(__cplusplus)

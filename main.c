@@ -41,11 +41,6 @@ int main(void){
 	{
 		exit(-1);
 	}
-	printf("Red Black Tree Test Result : %s\n",RESULT_STRING[result = cdsl_rbtreeDoTest()]);
-	if(result == FALSE)
-	{
-		exit(-1);
-	}
 	printf("Singly-Linked List Test Result : %s\n",RESULT_STRING[result = cdsl_slistDoTest()]);
 	if(result == FALSE)
 	{
@@ -57,7 +52,7 @@ int main(void){
 	{
 		exit(-1);
 	}
-	printf("New Red Black Tree Test Result : %s\n",RESULT_STRING[result = cdsl_nrbtreeDoTest()]);
+	printf("Red Black Tree Test Result : %s\n",RESULT_STRING[result = cdsl_nrbtreeDoTest()]);
 	if(result == FALSE)
 	{
 		exit(-1);

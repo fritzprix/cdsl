@@ -17,8 +17,6 @@ extern "C" {
 #endif
 
 
-typedef __cdsl_uaddr_t rb_key_t;
-
 #define cdsl_nrbtreeMaxDepth(root)                 tree_max_depth((base_treeRoot_t*) root)
 #define cdsl_nrbtreeTraverse(root, cb, order)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order)
 #define cdsl_nrbtreeSize(root)                     tree_size((base_treeRoot_t*) root)
@@ -26,6 +24,9 @@ typedef __cdsl_uaddr_t rb_key_t;
 #define cdsl_nrbtreeIsEmpty(root)                  tree_is_empty((base_treeRoot_t*) root)
 #define cdsl_nrbtreeGoLeft(cur)                    (nrbtreeNode_t*) tree_go_left((base_treeNode_t*) cur)
 #define cdsl_nrbtreeGoRight(cur)                   (nrbtreeNode_t*) tree_go_right((base_treeNode_t*) cur)
+#define cdsl_nrbtreeMin(root)                      (nrbtreeNode_t*) tree_min((base_treeRoot_t*) root)
+#define cdsl_nrbtreeMax(root)                      (nrbtreeNode_t*) tree_max((base_treeRoot_t*) root)
+#define cdsl_nrbtreeUpdate(root,nitem)             (nrbtreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
 
 
 typedef struct cdsl_nrbtree nrbtreeNode_t;
@@ -42,19 +43,19 @@ struct cdsl_nrbtree {
 		struct {
 			nrbtreeNode_t* left;
 			nrbtreeNode_t* right;
+			trkey_t          key;
 		};
 
 	};
-	rb_key_t key;
 };
 
 
 
 extern void cdsl_nrbtreeRootInit(nrbtreeRoot_t* rootp);
-extern void cdsl_nrbtreeNodeInit(nrbtreeNode_t* node, rb_key_t key);
+extern void cdsl_nrbtreeNodeInit(nrbtreeNode_t* node, trkey_t key);
 extern nrbtreeNode_t* cdsl_nrbtreeInsert(nrbtreeRoot_t* rootp,nrbtreeNode_t* item);
-extern nrbtreeNode_t* cdsl_nrbtreeLookup(nrbtreeRoot_t* rootp,rb_key_t key);
-extern nrbtreeNode_t* cdsl_nrbtreeDelete(nrbtreeRoot_t* rootp,rb_key_t key);
+extern nrbtreeNode_t* cdsl_nrbtreeLookup(nrbtreeRoot_t* rootp,trkey_t key);
+extern nrbtreeNode_t* cdsl_nrbtreeDelete(nrbtreeRoot_t* rootp,trkey_t key);
 
 #ifdef __DBG
 extern void cdsl_nrbtreePrint_dev(nrbtreeRoot_t* root);

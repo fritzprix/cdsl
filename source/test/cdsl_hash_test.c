@@ -5,9 +5,9 @@
  *      Author: innocentevil
  */
 
-#include "cdsl_rbtree.h"
 #include "cdsl_hash_test.h"
 #include "cdsl_hash.h"
+#include "cdsl_nrbtree.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
@@ -16,17 +16,16 @@
 #define HASH_TEST_FILE			"hash_inputsample.txt"
 #endif
 
-static rb_treeNode_t* root;
+static nrbtreeRoot_t root;
 struct hash_result {
-	rb_treeNode_t	rbnode;
+	nrbtreeNode_t	rbnode;
 	unsigned long hash;
 	char input[20];
 };
 
 extern BOOL cdsl_hashDoTest(void){
 	FILE* fp = fopen(HASH_TEST_FILE,"r");
-
-	root = NULL;
+	cdsl_nrbtreeRootInit(&root);
 	struct hash_result* result;
 	int collisionCnt = 0;
 	while(!feof(fp)){
@@ -34,11 +33,9 @@ extern BOOL cdsl_hashDoTest(void){
 		if(fscanf(fp,"%s\n",result->input) < 0)
 			exit(-1);
 		result->hash = sbdm_hash((unsigned char*)result->input);
-		cdsl_rbtreeNodeInit(&result->rbnode,result->hash);
-		cdsl_rbtreeInsert(&root,&result->rbnode);
+		cdsl_nrbtreeNodeInit(&result->rbnode,result->hash);
+		cdsl_nrbtreeInsert(&root,&result->rbnode);
 	}
-
-
 
 
 

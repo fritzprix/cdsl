@@ -12,7 +12,9 @@
 #include <stdlib.h>
 
 static bstreeNode_t bst_nodepool[TEST_SIZE];
-static int keys[TEST_SIZE];
+static bstreeNode_t replace;
+static trkey_t repl_key;
+static trkey_t keys[TEST_SIZE];
 
 static int cb_count;
 BOOL cdsl_bstreeDoTest(void)
@@ -27,12 +29,20 @@ BOOL cdsl_bstreeDoTest(void)
 	depth = 0;
 	depth_temp = 0;
 
+	keys[TEST_SIZE - 1] = repl_key =TEST_SIZE + 10;
+	cdsl_bstreeNodeInit(&replace, keys[TEST_SIZE - 1]);
+
 	for(i = 0;i < TEST_SIZE;i++)
 	{
-		keys[i] = rand() % TEST_SIZE;
+		if(i != (TEST_SIZE - 1))
+			keys[i] = rand() % TEST_SIZE;
 		cdsl_bstreeNodeInit(&bst_nodepool[i],keys[i]);
 		cdsl_bstreeInsert(&root,&bst_nodepool[i]);
 	}
+	cdsl_bstreeUpdate(&root, &replace);
+	if(cdsl_bstreeLookup(&root,repl_key) != &replace)
+		return FALSE;
+
 	depth = cdsl_bstreeMaxDepth(&root);
 	__dev_log("Max Depth of binary search Tree : %d @ N : %d\n",depth,i);
 
@@ -52,6 +62,7 @@ BOOL cdsl_bstreeDoTest(void)
 		cdsl_bstreeNodeInit(delete_node,keys[i]);
 		cdsl_bstreeInsert(&root,delete_node);
 	}
+
 
 	for(i = 0;i < TEST_SIZE;i++)
 	{

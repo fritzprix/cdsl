@@ -8,6 +8,7 @@
 #ifndef BASE_TREE_H_
 #define BASE_TREE_H_
 
+#include "arch.h"
 #include "cdsl.h"
 
 #if defined(__cplusplus)
@@ -21,7 +22,7 @@ extern "C" {
 
 #define DECLARE_TRAVERSE_CALLBACK(fn) int fn(int order, base_treeNode_t* node)
 
-
+typedef __cdsl_uaddr_t  trkey_t;
 typedef struct base_tree_node base_treeNode_t;
 typedef struct base_tree_root base_treeRoot_t;
 typedef int (*base_tree_callback_t)(int order,base_treeNode_t* node);
@@ -32,6 +33,7 @@ struct base_tree_root {
 
 struct base_tree_node {
 	base_treeNode_t *left,*right;
+	trkey_t          key;
 };
 
 extern void tree_traverse(base_treeRoot_t* rootp, base_tree_callback_t cb,int order);
@@ -41,6 +43,9 @@ extern int tree_size(base_treeRoot_t* rootp);
 extern void tree_print(base_treeRoot_t* rootp,cdsl_generic_printer_t prt);
 extern int tree_max_depth(base_treeRoot_t* rootp);
 extern BOOL tree_is_empty(base_treeRoot_t* rootp);
+extern base_treeNode_t* tree_min(base_treeRoot_t* rootp);
+extern base_treeNode_t* tree_max(base_treeRoot_t* rootp);
+extern base_treeNode_t* tree_update(base_treeRoot_t* rootp, base_treeNode_t* nitem);
 
 
 #if defined(__cplusplus)

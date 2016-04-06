@@ -53,7 +53,7 @@ const char* COLOR_STRING[] = {
 
 static int max_depth_rc(nrbtreeNode_t* node);
 static nrbtreeNode_t* insert_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t* item, uint8_t* rc_color, uint8_t* rc_dir);
-static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, rb_key_t key, nrbtreeNode_t** rm, uint8_t* ctx);
+static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeNode_t** rm, uint8_t* ctx);
 static nrbtreeNode_t* rotate_left(nrbtreeNode_t* gparent_c);
 static nrbtreeNode_t* rotate_right(nrbtreeNode_t* gparent_c);
 static nrbtreeNode_t* update_color(nrbtreeNode_t* node_c);
@@ -74,7 +74,7 @@ void cdsl_nrbtreeRootInit(nrbtreeRoot_t* rootp) {
 	rootp->entry = NULL;
 }
 
-void cdsl_nrbtreeNodeInit(nrbtreeNode_t* node, rb_key_t key) {
+void cdsl_nrbtreeNodeInit(nrbtreeNode_t* node, trkey_t key) {
 	if(node == NULL)
 		return;
 	node->left = node->right = NULL;
@@ -96,7 +96,7 @@ nrbtreeNode_t* cdsl_nrbtreeInsert(nrbtreeRoot_t* rootp,nrbtreeNode_t* item) {
 	return item;
 }
 
-nrbtreeNode_t* cdsl_nrbtreeLookup(nrbtreeRoot_t* rootp, rb_key_t key) {
+nrbtreeNode_t* cdsl_nrbtreeLookup(nrbtreeRoot_t* rootp, trkey_t key) {
 	if(!rootp)
 		return NULL;
 	nrbtreeNode_t* cur_node = rootp->entry;		// always black so don't need to use GET_PTR() macro
@@ -112,7 +112,7 @@ nrbtreeNode_t* cdsl_nrbtreeLookup(nrbtreeRoot_t* rootp, rb_key_t key) {
 	return NULL;
 }
 
-nrbtreeNode_t* cdsl_nrbtreeDelete(nrbtreeRoot_t* rootp, rb_key_t key)
+nrbtreeNode_t* cdsl_nrbtreeDelete(nrbtreeRoot_t* rootp, trkey_t key)
 {
 	if(!rootp)
 		return NULL;
@@ -159,7 +159,7 @@ static void node_print_rc(nrbtreeNode_t* node,int order) {
  *  ctx[3] = res for future
  */
 
-static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, rb_key_t key, nrbtreeNode_t** rm, uint8_t* ctx)
+static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeNode_t** rm, uint8_t* ctx)
 {
 	if(!sub_root_c)
 	{
