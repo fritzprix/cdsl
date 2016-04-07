@@ -15,24 +15,29 @@
 
 
 static nrbtreeNode_t node_pool[TEST_SIZE];
+static nrbtreeNode_t replace;
 static int keys[TEST_SIZE];
 
 BOOL cdsl_nrbtreeDoTest(void)
 {
 	nrbtreeRoot_t root;
 	cdsl_nrbtreeRootInit(&root);
+	keys[TEST_SIZE - 1]  = TEST_SIZE + 1;
+	cdsl_nrbtreeNodeInit(&replace, keys[TEST_SIZE -1]);
 	int i = 0;
-	int depth,depth_temp;
+	int depth;
 	depth = 0;
-	depth_temp = 0;
 	for(i = 0;i < TEST_SIZE;i++){
-		keys[i] = rand() % TEST_SIZE;
-		keys[i] = i;
+		if(i != TEST_SIZE - 1)
+			keys[i] = i;
 		cdsl_nrbtreeNodeInit(&node_pool[i],keys[i]);
 		cdsl_nrbtreeInsert(&root,&node_pool[i]);
 	}
 	depth = cdsl_nrbtreeMaxDepth(&root);
 	__dev_log("Max Depth of New Red-Black Tree : %d @ N : %d\n",depth,i);
+	cdsl_nrbtreeUpdate(&root,&replace);
+	if(cdsl_nrbtreeLookup(&root, keys[TEST_SIZE - 1]) != &replace)
+		return FALSE;
 	if(cdsl_nrbtreeSize(&root) != TEST_SIZE)
 		return FALSE;
 	cdsl_nrbtreePrint_dev(&root);

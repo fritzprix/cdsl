@@ -19,7 +19,6 @@ static trkey_t keys[TEST_SIZE];
 static int cb_count;
 BOOL cdsl_bstreeDoTest(void)
 {
-
 	bstreeRoot_t root;
 	cb_count = 0;
 	cdsl_bstreeRootInit(&root);

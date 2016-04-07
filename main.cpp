@@ -14,8 +14,9 @@
 #include "cdsl_slist_test.h"
 #include "cdsl_bstree_test.h"
 #include "cdsl_spltree_test.h"
-#include "cdsl_rbtree_test.h"
 #include "cdsl_hash_test.h"
+
+#include "nrbtree_benchmark.h"
 
 const char* RESULT_STRING[] = {
 		"FAIL",
@@ -57,6 +58,7 @@ int main(void){
 	{
 		exit(-1);
 	}
+
 
 	return 0;
 }

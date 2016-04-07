@@ -14,6 +14,7 @@
 
 static spltreeNode_t nodes[TEST_SIZE];
 static int keys[TEST_SIZE];
+static spltreeNode_t replace;
 static spltreeRoot_t root;
 
 BOOL cdsl_spltreeDoTest(void){
@@ -24,8 +25,12 @@ BOOL cdsl_spltreeDoTest(void){
 
 	cdsl_spltreeRootInit(&root);
 
+	keys[TEST_SIZE - 1] = TEST_SIZE + 1;
+	cdsl_spltreeNodeInit(&replace, keys[TEST_SIZE - 1]);
+
 	for(;i < TEST_SIZE;i++){
-		keys[i] = rand() % TEST_SIZE;
+		if(i != TEST_SIZE - 1)
+			keys[i] = rand() % TEST_SIZE;
 		cdsl_spltreeNodeInit(&nodes[i],keys[i]);
 		cdsl_spltreeInsert(&root,&nodes[i]);
 
@@ -33,8 +38,13 @@ BOOL cdsl_spltreeDoTest(void){
 	depth = cdsl_spltreeMaxDepth(&root);
 	__dev_log("Max Depth of Splay Tree : %d @ N : %d\n",depth,i);
 
+	cdsl_spltreeUpdate(&root, &replace);
+	if(cdsl_spltreeLookup(&root,keys[TEST_SIZE - 1], FALSE) != &replace)
+		return FALSE;
+
 	if(cdsl_spltreeSize(&root) != TEST_SIZE)
 		return FALSE;
+
 
 	spltreeNode_t* del = NULL;
 	for(i = 0;i < TEST_SIZE;i++){

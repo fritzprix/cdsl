@@ -8,6 +8,7 @@
 #ifndef INCLUDE_CDSL_HASHTREE_H_
 #define INCLUDE_CDSL_HASHTREE_H_
 
+#include "cdsl_nrbtree.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -18,7 +19,7 @@ typedef struct hashtree_node hashNode_t;
 
 struct hashtree_node {
 	union {
-		base_treeNode_t    _base;
+		nrbtreeNode_t     _base;
 		struct {
 			hashNode_t*    next;
 			hashNode_t*    prev;
@@ -30,7 +31,7 @@ struct hashtree_node {
 
 typedef struct hashtree_root {
 	union {
-		base_treeRoot_t    _base;
+		nrbtreeRoot_t      _base;
 		hashNode_t*        entry;
 	};
 }hashRoot_t;

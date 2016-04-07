@@ -1,7 +1,7 @@
 # makefile for cdsl
 
 CC=clang-3.6 
-CXX=clang++-3.6
+CXX=g++
 AR=llvm-ar-3.6
 PYTHON=python
 PIP=pip
@@ -115,12 +115,12 @@ endif
 	
 $(TEST_TARGET) : $(REL_CACHE_DIR)/main.o $(REL_OBJS) 
 	@echo 'Building unit-test executable... for $(ARCH) $@'
-	$(CC) -o $@ $(REL_CFLAG) $< $(REL_OBJS)
+	$(CXX) -o $@ $(REL_CFLAG) $< $(REL_OBJS)
 	
 
 $(DEV_TEST_TARGET) : $(DBG_CACHE_DIR)/main.do $(DBG_OBJS) 
 	@echo 'Building unit-test executable... for $(ARCH) $@'
-	$(CC) -o $@ $(DBG_CFLAG) $< $(DBG_OBJS)
+	$(CXX) -o $@ $(DBG_CFLAG) $< $(DBG_OBJS)
 	
 $(DBG_CACHE_DIR)/%.do : %.c
 	@echo '$(ARCH) compile...$@'
@@ -137,6 +137,22 @@ $(DBG_CACHE_DIR)/%.s.do : %.c
 $(REL_CACHE_DIR)/%.s.o : %.c
 	@echo '$(ARCH) compile...$@'
 	$(CC) -c -o $@ $(REL_CFLAG)  $< $(INCS) $(DYNAMIC_FLAG)
+	
+$(DBG_CACHE_DIR)/%.do : %.cpp
+	@echo '$(ARCH) compile...$@'
+	$(CXX) -c -o $@ $(DBG_CFLAG)  $< $(INCS)
+	
+$(REL_CACHE_DIR)/%.o : %.cpp
+	@echo '$(ARCH) compile...$@'
+	$(CXX) -c -o $@ $(REL_CFLAG)  $< $(INCS)
+	
+$(DBG_CACHE_DIR)/%.s.do : %.cpp
+	@echo '$(ARCH) compile...$@'
+	$(CXX) -c -o $@ $(DBG_CFLAG)  $< $(INCS) $(DYNAMIC_FLAG)
+	
+$(REL_CACHE_DIR)/%.s.o : %.cpp
+	@echo '$(ARCH) compile...$@'
+	$(CXX) -c -o $@ $(REL_CFLAG)  $< $(INCS) $(DYNAMIC_FLAG)
 	
 PHONY += clean
 
