@@ -67,6 +67,9 @@ static nrbtreeNode_t* up_from_leftmost_rc(nrbtreeNode_t* node, nrbtreeNode_t** l
 static void print_tab(int cnt);
 static void node_print_rc(nrbtreeNode_t* node,int order);
 
+static volatile __cdsl_uaddr_t stack_top;
+static volatile __cdsl_uaddr_t stack_bottom;
+
 
 void cdsl_nrbtreeRootInit(nrbtreeRoot_t* rootp) {
 	if(rootp == NULL)
@@ -89,10 +92,12 @@ nrbtreeNode_t* cdsl_nrbtreeInsert(nrbtreeRoot_t* rootp,nrbtreeNode_t* item) {
 		rootp->entry = item;
 		return item;
 	}
+	stack_top = (__cdsl_uaddr_t) &rootp;
 
 	uint8_t dir = 0;
 	uint8_t color = 0;
 	rootp->entry = insert_rc(rootp->entry, item, &color , &dir);
+	__dev_log("stack usage : %lu\n",stack_top - stack_bottom);
 	return item;
 }
 
@@ -347,6 +352,7 @@ static nrbtreeNode_t* insert_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t* item,u
 	if(!GET_PTR(sub_root_c))
 	{
 		PAINT_RED(item);
+		stack_bottom = (__cdsl_uaddr_t) &sub_root_c;
 		return item;
 	}
 	else
