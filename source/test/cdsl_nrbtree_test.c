@@ -40,14 +40,12 @@ BOOL cdsl_nrbtreeDoTest(void)
 		return FALSE;
 	if(cdsl_nrbtreeSize(&root) != TEST_SIZE)
 		return FALSE;
-	cdsl_nrbtreePrint_dev(&root);
 	nrbtreeNode_t* delete_node;
 	for(i = 0;i < TEST_SIZE;i++)
 	{
 		delete_node = NULL;
 		__dev_log("\nkey : %d will be deleted!! \n\n",keys[i]);
 		delete_node = cdsl_nrbtreeDelete(&root,keys[i]);
-		cdsl_nrbtreePrint_dev(&root);
 		if(!delete_node)
 		{
 			__dev_log("null node detected !!\n");
