@@ -1,22 +1,16 @@
 # cdsl 
 	Data Structure library for C / C++.   
 	
-	
 ## About
-	light-weight implementation of various data structures, including sigle / double linked list, 
+	simple C implementations of various data structures, including sigle / double linked list,
 	binary search tree, some balanced tree (red-black tree, splay tree), binary heap.
 
 ## Note
-    Recursion is used for some of the balanced tree implementations to minimize the size of node 
-    type (no pointer to parent node is required). it's my design choice to use this in my own 
-    developed kernel where the kernel has fair amount of stack (order of a few killobytes) compared 
-    to the stack usage when handling 2,000,000 nodes in red-black tree. (it is 2kbytes at maximum in my 
-    64 bit desktop) I think it's insignificant memory compared to modern computer with a few gigabytes 
-    of RAM.
-    
-    all the trees in cdsl depends on recursion somehow because all of them inherits same base implementaion
-    (base_tree) which depends on recursion. 
-    
+    all the tree implementations depends on recursion which is typically considered impractical 
+    due to its stack usage. however, many balanced tree keeps recursion depth in reasonable level 
+    so recursion can be practical for those types of data structures. 
+    for example, red black tree requires 2kbytes maximum when handling 2,000,000 nodes.    
+     
     trees heavily depends on recursion
     - splay tree (spltree)
     - red black tree (nrbtree)
@@ -28,9 +22,7 @@
     
     there is no recursion usage in list family
     
-    
-	 
-## build requirement 
+## Build requirement 
 	GNU toolchain / clang / python / pip   
 			 
 ## How-to-build (Ubuntu)
