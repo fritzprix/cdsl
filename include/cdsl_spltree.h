@@ -55,6 +55,8 @@ extern spltreeNode_t* cdsl_spltreeLookup(spltreeRoot_t* root,trkey_t key,BOOL sp
 extern spltreeNode_t* cdsl_spltreeLookupLargest(spltreeRoot_t* root,BOOL splay);
 extern spltreeNode_t* cdsl_spltreeLookupSmallest(spltreeRoot_t* root,BOOL splay);
 extern spltreeNode_t* cdsl_spltreeDelete(spltreeRoot_t* root,trkey_t key);
+extern spltreeNode_t* cdsl_spltreeDeleteMin(spltreeRoot_t* root);
+extern spltreeNode_t* cdsl_spltreeDeleteMax(spltreeRoot_t* root);
 
 
 

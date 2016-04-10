@@ -61,13 +61,22 @@ BOOL cdsl_nrbtreeDoTest(void)
 		cdsl_nrbtreeInsert(&root,delete_node);
 	}
 
-	for(i = 0;i < TEST_SIZE;i++){
+	trkey_t key = 0;
+	for(i = 0;i < TEST_SIZE;i++)
+	{
 		delete_node = NULL;
-		delete_node = cdsl_nrbtreeDelete(&root,keys[i]);
+		delete_node = cdsl_nrbtreeDeleteMin(&root);
+		if(key > delete_node->key)
+		{
+			__dev_log("not increasing order\n");
+			return FALSE;
+		}
+		key = delete_node->key;
 		if(!delete_node)
+		{
+			__dev_log("null node detected !!\n");
 			return FALSE;
-		if(delete_node->key != keys[i])
-			return FALSE;
+		}
 	}
 	if(cdsl_nrbtreeSize(&root) > 0)
 		return FALSE;

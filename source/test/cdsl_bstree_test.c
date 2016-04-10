@@ -62,14 +62,15 @@ BOOL cdsl_bstreeDoTest(void)
 		cdsl_bstreeInsert(&root,delete_node);
 	}
 
-
+	trkey_t key = 0;
 	for(i = 0;i < TEST_SIZE;i++)
 	{
 		delete_node = NULL;
-		delete_node = cdsl_bstreeDelete(&root,keys[i]);
-		if(!delete_node)
+		delete_node = cdsl_bstreeDeleteMin(&root);
+		if(key > delete_node->key)
 			return FALSE;
-		if(delete_node->key != keys[i])
+		key = delete_node->key;
+		if(!delete_node)
 			return FALSE;
 	}
 

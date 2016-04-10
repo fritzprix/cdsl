@@ -61,6 +61,8 @@ extern void cdsl_bstreeNodeInit(bstreeNode_t* node,trkey_t key);
 extern bstreeNode_t* cdsl_bstreeInsert(bstreeRoot_t* rootp,bstreeNode_t* item);
 extern bstreeNode_t* cdsl_bstreeLookup(bstreeRoot_t* rootp,trkey_t key);
 extern bstreeNode_t* cdsl_bstreeDelete(bstreeRoot_t* rootp,trkey_t key);
+extern bstreeNode_t* cdsl_bstreeDeleteMin(bstreeRoot_t* rootp);
+extern bstreeNode_t* cdsl_bstreeDeleteMax(bstreeRoot_t* rootp);
 
 
 #if defined(__cplusplus)

@@ -23,6 +23,7 @@ const char* RESULT_STRING[] = {
 		"PASS"
 };
 
+
 int main(void){
 	setbuf(stdout,NULL);
 	BOOL result;

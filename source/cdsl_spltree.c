@@ -20,8 +20,10 @@
 static spltreeNode_t* insert_r(spltreeNode_t* current,spltreeNode_t* item,uint8_t* context);
 static spltreeNode_t* lookup_r(spltreeNode_t* current,trkey_t key,uint8_t* context,BOOL splay);
 static spltreeNode_t* delete_r(spltreeNode_t* current,trkey_t key,uint8_t* context,spltreeNode_t** found);
-static spltreeNode_t* largest_r(spltreeNode_t* current,uint8_t* context,BOOL splay,BOOL delete);
-static spltreeNode_t* smallest_r(spltreeNode_t* current,uint8_t* context,BOOL splay,BOOL delete);
+static spltreeNode_t* delete_lm_r(spltreeNode_t* current,uint8_t* context, spltreeNode_t** del);
+static spltreeNode_t* delete_rm_r(spltreeNode_t* current,uint8_t* context, spltreeNode_t** del);
+static spltreeNode_t* largest_r(spltreeNode_t* current,uint8_t* context,BOOL splay,BOOL del);
+static spltreeNode_t* smallest_r(spltreeNode_t* current,uint8_t* context,BOOL splay,BOOL del);
 static spltreeNode_t* rotateLeft(spltreeNode_t* parent);
 static spltreeNode_t* rotateRight(spltreeNode_t* parent);
 
@@ -80,6 +82,14 @@ spltreeNode_t* cdsl_spltreeDelete(spltreeRoot_t* root,trkey_t key){
 	spltreeNode_t* delNode = NULL;
 	root->entry = delete_r(root->entry,key,&context,&delNode);
 	return delNode;
+}
+
+spltreeNode_t* cdsl_spltreeDeleteMin(spltreeRoot_t* root) {
+
+}
+
+spltreeNode_t* cdsl_spltreeDeleteMax(spltreeRoot_t* root) {
+
 }
 
 
@@ -233,13 +243,14 @@ static spltreeNode_t* delete_r(spltreeNode_t* current,trkey_t key,uint8_t* conte
 		current->right = delete_r(current->right,key,context,found);
 		if(!current->right)
 			return current;
-		if(*context == NOT_FOUND)
+
+		switch(*context) {
+		case NOT_FOUND:
 			return current;
-		if(*context == ZIGZIG_STEP){
+		case ZIGZIG_STEP:
 			*context = FOUND;
 			return rotateLeft(rotateLeft(current));
-		}
-		if(*context == ZIGZAG_STEP){
+		case ZIGZAG_STEP:
 			*context = FOUND;
 			current->right = rotateRight(current->right);
 			return rotateLeft(current);
@@ -255,13 +266,14 @@ static spltreeNode_t* delete_r(spltreeNode_t* current,trkey_t key,uint8_t* conte
 		current->left = delete_r(current->left,key,context,found);
 		if(!current->left)
 			return current;
-		if(*context == NOT_FOUND)
+
+		switch(*context) {
+		case NOT_FOUND:
 			return current;
-		if(*context == ZIGZIG_STEP){
+		case ZIGZIG_STEP:
 			*context = FOUND;
 			return rotateRight(rotateRight(current));
-		}
-		if(*context == ZIGZAG_STEP){
+		case ZIGZAG_STEP:
 			*context = FOUND;
 			current->left = rotateLeft(current->left);
 			return rotateRight(current);
@@ -276,13 +288,21 @@ static spltreeNode_t* delete_r(spltreeNode_t* current,trkey_t key,uint8_t* conte
 	return NULL;
 }
 
-static spltreeNode_t* largest_r(spltreeNode_t* current,uint8_t* context,BOOL splay,BOOL delete){
+static spltreeNode_t* delete_lm_r(spltreeNode_t* current,uint8_t* context, spltreeNode_t** del) {
+
+}
+
+static spltreeNode_t* delete_rm_r(spltreeNode_t* current,uint8_t* context, spltreeNode_t** del) {
+
+}
+
+static spltreeNode_t* largest_r(spltreeNode_t* current,uint8_t* context,BOOL splay,BOOL del){
 	if(current->right == NULL){
 		*context = FOUND;
 		return current;
 	}
 	if (splay) {
-		current->right = largest_r(current->right, context, splay,delete);
+		current->right = largest_r(current->right, context, splay,del);
 		if ((*context) == FOUND) {
 			*context = ZIGZIG_STEP;
 			return current;
@@ -292,7 +312,7 @@ static spltreeNode_t* largest_r(spltreeNode_t* current,uint8_t* context,BOOL spl
 			return current;
 		}
 	}else{
-		spltreeNode_t* largest = largest_r(current->right,context,splay,delete);
+		spltreeNode_t* largest = largest_r(current->right,context,splay,del);
 		if(current->right == largest) {
 			current->right = largest->left;
 		}
@@ -301,13 +321,13 @@ static spltreeNode_t* largest_r(spltreeNode_t* current,uint8_t* context,BOOL spl
 	return NULL;
 }
 
-static spltreeNode_t* smallest_r(spltreeNode_t* current,uint8_t* context,BOOL splay,BOOL delete){
+static spltreeNode_t* smallest_r(spltreeNode_t* current,uint8_t* context,BOOL splay,BOOL del){
 	if(current->left == NULL){
 		*context = FOUND;
 		return current;
 	}
 	if (splay) {
-		current->left = smallest_r(current->left, context, splay,delete);
+		current->left = smallest_r(current->left, context, splay,del);
 		if ((*context) == FOUND) {
 			*context = ZIGZIG_STEP;
 			return current;
@@ -318,7 +338,7 @@ static spltreeNode_t* smallest_r(spltreeNode_t* current,uint8_t* context,BOOL sp
 		}
 	}
 	else{
-		spltreeNode_t* smallest = smallest_r(current->left,context,splay,delete);
+		spltreeNode_t* smallest = smallest_r(current->left,context,splay,del);
 		if(current->left == smallest) {
 			current->left = smallest->right;
 		}

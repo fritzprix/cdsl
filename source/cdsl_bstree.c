@@ -132,6 +132,42 @@ bstreeNode_t* cdsl_bstreeDelete(bstreeRoot_t* rootp,trkey_t key)
 	return todelete;
 }
 
+bstreeNode_t* cdsl_bstreeDeleteMin(bstreeRoot_t* rootp) {
+	if(!rootp)
+		return NULL;
+
+	bstreeNode_t* lm = rootp->entry;
+	bstreeNode_t** lmp = &rootp->entry;
+
+	while(lm->left) {
+		lmp = &lm->left;
+		lm = lm->left;
+	}
+	if(lm->right) {
+		*lmp = move_up_leftmost_rc(lm->right);
+	} else {
+		*lmp = NULL;
+	}
+	return lm;
+}
+
+bstreeNode_t* cdsl_bstreeDeleteMax(bstreeRoot_t* rootp) {
+	if(!rootp)
+		return NULL;
+	bstreeNode_t* rm = rootp->entry;
+	bstreeNode_t** rmp = &rootp->entry;
+
+	while(rm->right) {
+		rmp = &rm->right;
+		rm = rm->right;
+	}
+	if(rm->left) {
+		*rmp = move_up_rightmost_rc(rm->left);
+	} else {
+		*rmp = NULL;
+	}
+	return rm;
+}
 
 
 static bstreeNode_t* move_up_rightmost_rc(bstreeNode_t* node)

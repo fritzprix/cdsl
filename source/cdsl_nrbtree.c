@@ -54,6 +54,8 @@ const char* COLOR_STRING[] = {
 static int max_depth_rc(nrbtreeNode_t* node);
 static nrbtreeNode_t* insert_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t* item, uint8_t* rc_color, uint8_t* rc_dir);
 static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeNode_t** rm, uint8_t* ctx);
+static nrbtreeNode_t* delete_lm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx);
+static nrbtreeNode_t* delete_rm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx);
 static nrbtreeNode_t* rotate_left(nrbtreeNode_t* gparent_c);
 static nrbtreeNode_t* rotate_right(nrbtreeNode_t* gparent_c);
 static nrbtreeNode_t* update_color(nrbtreeNode_t* node_c);
@@ -127,6 +129,26 @@ nrbtreeNode_t* cdsl_nrbtreeDelete(nrbtreeRoot_t* rootp, trkey_t key)
 	return GET_PTR(del);
 }
 
+
+nrbtreeNode_t* cdsl_nrbtreeDeleteMin(nrbtreeRoot_t* rootp)
+{
+	if(!rootp)
+		return NULL;
+	nrbtreeNode_t* del = NULL;
+	uint8_t ctx = 0;
+	rootp->entry = delete_lm_rc(rootp->entry, &del, &ctx);
+	return GET_PTR(del);
+}
+
+nrbtreeNode_t* cdsl_nrbtreeDeleteMax(nrbtreeRoot_t* rootp)
+{
+	if(!rootp)
+		return NULL;
+	nrbtreeNode_t* del = NULL;
+	uint8_t ctx = 0;
+	rootp->entry = delete_rm_rc(rootp->entry, &del, &ctx);
+	return GET_PTR(del);
+}
 
 
 
@@ -209,6 +231,52 @@ static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeN
 		*ctx |= (1 << CTX_BB);
 		return NULL;
 	}
+}
+
+static nrbtreeNode_t* delete_lm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx)
+{
+	if(!GET_PTR(sub_root_c)->left)
+	{
+		*rm = sub_root_c;
+		if(GET_PTR(sub_root_c)->right) {
+			GET_PTR(sub_root_c)->right = up_from_leftmost_rc(GET_PTR(sub_root_c)->right, &sub_root_c, ctx);
+			GET_PTR(sub_root_c)->left = GET_PTR(*rm)->left;
+			if(*ctx & (1 << CTX_BB)) {
+				sub_root_c = resolve_black_black(sub_root_c, CTX_RIGHT, ctx);
+			}
+			return sub_root_c;
+		}
+		return NULL;
+	}
+	GET_PTR(sub_root_c)->left = delete_lm_rc(GET_PTR(sub_root_c)->left, rm, ctx);
+	if(*ctx & (1 << CTX_BB))
+	{
+		sub_root_c = resolve_black_black(sub_root_c, CTX_LEFT, ctx);
+	}
+	return sub_root_c;
+}
+
+static nrbtreeNode_t* delete_rm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx)
+{
+	if(!GET_PTR(sub_root_c)->right)
+	{
+		*rm = sub_root_c;
+		if(GET_PTR(sub_root_c)->left) {
+			GET_PTR(sub_root_c)->left = up_from_rightmost_rc(GET_PTR(sub_root_c)->left, &sub_root_c, ctx);
+			GET_PTR(sub_root_c)->right = GET_PTR(*rm)->right;
+			if(*ctx & (1 << CTX_BB)) {
+				sub_root_c = resolve_black_black(sub_root_c, CTX_LEFT, ctx);
+			}
+			return sub_root_c;
+		}
+		return NULL;
+	}
+	GET_PTR(sub_root_c)->right = delete_rm_rc(GET_PTR(sub_root_c)->right, rm, ctx);
+	if(*ctx & (1 << CTX_BB))
+	{
+		sub_root_c = resolve_black_black(sub_root_c, CTX_RIGHT, ctx);
+	}
+	return sub_root_c;
 }
 
 

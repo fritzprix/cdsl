@@ -46,3 +46,12 @@ hashNode_t* cdsl_hashtreeRemove(hashRoot_t* root, const char* key) {
 	}
 	return node;
 }
+
+hashNode_t* cdsl_hashtreeRemoveRandom(hashRoot_t* root) {
+	hashNode_t* node = (hashNode_t*) cdsl_nrbtreeDeleteMin(&root->_base);
+	if(node) {
+		node = container_of(node, hashNode_t, _base);
+	}
+	return node;
+}
+

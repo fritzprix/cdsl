@@ -56,6 +56,8 @@ extern void cdsl_nrbtreeNodeInit(nrbtreeNode_t* node, trkey_t key);
 extern nrbtreeNode_t* cdsl_nrbtreeInsert(nrbtreeRoot_t* rootp,nrbtreeNode_t* item);
 extern nrbtreeNode_t* cdsl_nrbtreeLookup(nrbtreeRoot_t* rootp,trkey_t key);
 extern nrbtreeNode_t* cdsl_nrbtreeDelete(nrbtreeRoot_t* rootp,trkey_t key);
+extern nrbtreeNode_t* cdsl_nrbtreeDeleteMin(nrbtreeRoot_t* rootp);
+extern nrbtreeNode_t* cdsl_nrbtreeDeleteMax(nrbtreeRoot_t* rootp);
 
 #ifdef __DBG
 extern void cdsl_nrbtreePrint_dev(nrbtreeRoot_t* root);
