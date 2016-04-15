@@ -66,6 +66,7 @@ int main(void){
 		exit(-1);
 	}
 
+	perform_nrbtree_benchmark();
 	return 0;
 }
 
