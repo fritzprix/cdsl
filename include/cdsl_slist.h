@@ -35,13 +35,16 @@ struct cdsl_slnode {
 };
 
 struct cdsl_slentry {
-	slistNode_t* next;
+	union {
+		slistNode_t* head;     // head
+		listEntry_t  __base;
+	};
 };
 
 extern void cdsl_slistEntryInit(slistEntry_t* entry);
 extern void cdsl_slistNodeInit(slistNode_t* node);
 
-
+extern void cdsl_slistMerge(slistEntry_t* to, slistEntry_t* from);
 extern void cdsl_slistEnqueuePriority(slistEntry_t* lentry,slistNode_t* item,cdsl_generic_compare_t rule);
 extern void cdsl_slistInsertAfter(slistNode_t* ahead,slistNode_t* item);
 extern slistNode_t* cdsl_slistDequeue(slistEntry_t* lentry);
@@ -50,9 +53,8 @@ extern int cdsl_slistPutHead(slistEntry_t* lentry,slistNode_t* item);
 extern int cdsl_slistPutTail(slistEntry_t* lentry,slistNode_t* item);
 extern slistNode_t* cdsl_slistRemoveHead(slistEntry_t* lentry);
 extern slistNode_t* cdsl_slistRemoveTail(slistEntry_t* lentry);
-extern slistNode_t* cdsl_slistRemoveAt(slistEntry_t* entry,int idx);
+extern slistNode_t* cdsl_slistRemoveAt(slistEntry_t* entry,int pos);
 extern BOOL cdsl_slistRemove(slistEntry_t* lentry,slistNode_t* item);
-
 extern void cdsl_slistIterRemove(listIter_t* iter);
 
 

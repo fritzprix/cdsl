@@ -19,8 +19,6 @@ extern "C" {
 #endif
 
 
-
-
 #define cdsl_dlistIsEmpty(lhead) 			(((dlistEntry_t*) lhead)->head== NULL)
 
 #define cdsl_dlistSize(lentry)				cdsl_listSize((listEntry_t*) lentry)
@@ -37,7 +35,7 @@ typedef struct cdsl_dlentry dlistEntry_t;
 
 struct cdsl_dlnode {
 	union {
-		listNode_t	 base_node;
+		listNode_t	 __base;
 		dlistNode_t* next;
 	};
 	dlistNode_t* prev;
@@ -50,26 +48,20 @@ struct cdsl_dlentry {
 	};
 	dlistNode_t* tail;
 };
-extern void cdsl_dlistNodeInit(dlistNode_t* node);
+
 extern void cdsl_dlistEntryInit(dlistEntry_t* lentry);
-/**
- *  Queue like interface
- */
+extern void cdsl_dlistNodeInit(dlistNode_t* node);
+
 extern void cdsl_dlistEnqueuePriority(dlistEntry_t* lentry,dlistNode_t* item,cdsl_generic_compare_t rule);
 extern void cdsl_dlistInsertAfter(dlistNode_t* ahead,dlistNode_t* item);
 extern dlistNode_t* cdsl_dlistDequeue(dlistEntry_t* lentry);
 
-/**
- *  Stack like interface
- */
 extern void cdsl_dlistPutHead(dlistEntry_t* lentry,dlistNode_t* item);
 extern void cdsl_dlistPutTail(dlistEntry_t* lentry,dlistNode_t* item);
-
 extern dlistNode_t* cdsl_dlistRemoveHead(dlistEntry_t* lentry);
 extern dlistNode_t* cdsl_dlistRemoveTail(dlistEntry_t* lentry);
 extern BOOL cdsl_dlistRemove(dlistNode_t* item);
 extern void cdsl_dlistReplace(dlistNode_t* old, dlistNode_t* nu);
-
 extern void cdsl_dlistIterRemove(listIter_t* iter);
 
 

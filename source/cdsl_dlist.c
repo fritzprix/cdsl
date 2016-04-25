@@ -179,7 +179,7 @@ void cdsl_dlistIterRemove(listIter_t* iter)
 		return;
 	}
 	dlistNode_t* tobrmv = (dlistNode_t*) iter->prev->next;
-	iter->prev->next = &tobrmv->base_node;
+	iter->prev->next = &tobrmv->__base;
 	tobrmv->prev = (dlistNode_t*) iter->prev;
 }
 

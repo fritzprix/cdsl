@@ -14,7 +14,7 @@ void cdsl_slistEntryInit(slistEntry_t* entry)
 {
 	if(!entry)
 		return;
-	entry->next = NULL;
+	entry->head = NULL;
 }
 
 
@@ -23,6 +23,20 @@ void cdsl_slistNodeInit(slistNode_t* item)
 	if(!item)
 		return;
 	item->next = NULL;
+}
+
+
+void cdsl_slistMerge(slistEntry_t* to, slistEntry_t* from)
+{
+	if(!to || !from)
+		return;
+	slistNode_t* tail = to->head;
+	while(tail->next)
+	{
+		tail = tail->next;
+	}
+	tail->next = from->head;
+	from->head = NULL;
 }
 
 
@@ -56,9 +70,9 @@ slistNode_t* cdsl_slistDequeue(slistEntry_t* lentry)
 {
 	if(!lentry)
 		return NULL;
-	slistNode_t* head = lentry->next;
+	slistNode_t* head = lentry->head;
 	if(head)
-		lentry->next = head->next;
+		lentry->head = head->next;
 	return head;
 }
 
@@ -67,11 +81,11 @@ int cdsl_slistPutHead(slistEntry_t* lentry,slistNode_t* item)
 {
 	if(!lentry || !item)
 		return -1;
-	if(lentry->next)
-		item->next = lentry->next->next;
+	if(lentry->head)
+		item->next = lentry->head->next;
 	else
 		item->next = NULL;
-	lentry->next = item;
+	lentry->head = item;
 	return 0;
 }
 
@@ -81,13 +95,13 @@ int cdsl_slistPutTail(slistEntry_t* lentry,slistNode_t* item)
 		return -1;
 	int idx = 0;
 	item->next = NULL;
-	slistNode_t* cnode = (slistNode_t*)lentry;
-	while(cnode->next != NULL)
+	slistNode_t* node = (slistNode_t*) lentry;
+	while(node->next)
 	{
-		cnode = cnode->next;
+		node = node->next;
 		idx++;
 	}
-	cnode->next = item;
+	node->next = item;
 	return idx;
 }
 
@@ -100,10 +114,10 @@ slistNode_t* cdsl_slistRemoveTail(slistEntry_t* lentry)
 {
 	if(!lentry)
 		return NULL;
-	if(!lentry->next)
+	if(!lentry->head)
 		return NULL;
-	slistNode_t* tail = NULL;
 	slistNode_t** cnode = (slistNode_t**)&lentry;
+	slistNode_t* tail = NULL;
 	while((*cnode)->next != NULL){
 		cnode = &(*cnode)->next;
 	}
@@ -116,7 +130,7 @@ BOOL cdsl_slistRemove(slistEntry_t* lentry,slistNode_t* item)
 {
 	if(!lentry || !item)
 		return FALSE;
-	if(!lentry->next)
+	if(!lentry->head)
 		return FALSE;
 	slistNode_t* cnode = (slistNode_t*) lentry;
 	while(cnode->next != NULL){
@@ -133,11 +147,11 @@ slistNode_t* cdsl_slistRemoveAt(slistEntry_t* entry, int idx)
 {
 	if(!entry)
 		return NULL;
-	if(!entry->next)
+	if(!entry->head)
 		return NULL;
 	slistNode_t* cnode = (slistNode_t*)entry;
 	slistNode_t* found = cnode;
-	while(idx)
+	while(idx--)
 	{
 		cnode = cnode->next;
 	}
