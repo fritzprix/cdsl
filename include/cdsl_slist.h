@@ -16,7 +16,7 @@ extern "C" {
 #endif
 
 
-#define cdsl_slistIsEmpty(node)				(((slistEntry_t*) node)->next == NULL)
+#define cdsl_slistIsEmpty(node)				(((slistEntry_t*) node)->head == NULL)
 
 #define cdsl_slistSize(lentry)				cdsl_listSize((listEntry_t*) lentry)
 #define cdsl_slistContain(lentry, item)		cdsl_listContain((listEntry_t*) lentry, (listNode_t*) item)
