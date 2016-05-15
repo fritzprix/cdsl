@@ -34,12 +34,28 @@ BOOL cdsl_slistDoTest(void){
 	}
 	card_t* card = NULL;
 	int last_num = TEST_SIZE;
+	if(TEST_SIZE != cdsl_slistSize(&listEntry))
+		return FALSE;
 	for(i = 0;i < TEST_SIZE;i++)
 	{
 		card = (card_t*) cdsl_slistDequeue(&listEntry);
 		if(last_num < card->card_num)
 			return FALSE;
 		last_num = card->card_num;
+	}
+
+	for(i = 0;i < TEST_SIZE;i++){
+		Cards[i].card_num = i;
+		cdsl_slistNodeInit(&Cards[i].list_head);
+		cdsl_slistPutHead(&listEntry, &Cards[i].list_head);
+	}
+	if(TEST_SIZE != cdsl_slistSize(&listEntry))
+		return FALSE;
+	for(i = 0;i < TEST_SIZE;i++)
+	{
+		card = (card_t*) cdsl_slistDequeue(&listEntry);
+		if(!card)
+			return FALSE;
 	}
 	return TRUE;
 }

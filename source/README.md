@@ -10,7 +10,7 @@ cdsl_hashtree.h : hash tree
 ```
 
 ## How-To
-> All the data type in cdsl is used by inserting its type into the struct you define. this kind of approach is used to exploit inheritance mechanism in C. for C++, data type can be simply inheritted to the class 
+> for C project,  data types in cdsl can be used by inserting it into the struct you define. this kind of approach is often used to exploit inheritance mechanism in C. for C++, data type can be simply inheritted to the class. 
 
 #### Singly-linked list (C example)
 ```C

@@ -82,7 +82,7 @@ int cdsl_slistPutHead(slistEntry_t* lentry,slistNode_t* item)
 	if(!lentry || !item)
 		return -1;
 	if(lentry->head)
-		item->next = lentry->head->next;
+		item->next = lentry->head;
 	else
 		item->next = NULL;
 	lentry->head = item;
