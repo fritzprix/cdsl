@@ -10,13 +10,25 @@
 #include "cdsl_bstree_test.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <pthread.h>
+
+struct compete_req {
+	bstreeRoot_t* root;
+	trkey_t        base;
+	pthread_mutex_t* lock;
+};
+
 
 static bstreeNode_t bst_nodepool[TEST_SIZE];
 static bstreeNode_t replace;
 static trkey_t repl_key;
 static trkey_t keys[TEST_SIZE];
+static pthread_t threads[100];
 
 static int cb_count;
+static void* compete_rbtree(void* com_req);
+
+
 BOOL cdsl_bstreeDoTest(void)
 {
 	bstreeRoot_t root;
@@ -76,7 +88,47 @@ BOOL cdsl_bstreeDoTest(void)
 
 	if(cdsl_bstreeSize(&root) > 0)		// size should be zero
 		return FALSE;
+
+
+	pthread_mutex_t lock;
+	pthread_mutex_init(&lock, NULL);
+	int idx;
+	struct compete_req* req = NULL;
+	for(idx = 0;idx < 100; idx++) {
+		req = malloc(sizeof(struct compete_req));
+		req->base = idx * 100;
+		req->root = &root;
+		req->lock = &lock;
+		pthread_create(&threads[idx], NULL, compete_rbtree, req);
+	}
+
+	for(idx = 0;idx < 100; idx++) {
+		pthread_join(threads[idx], (void**) &req);
+		free(req);
+	}
 	return TRUE;
 }
 
-
+static void* compete_rbtree(void* com_req) {
+	struct compete_req* req = (struct compete_req*) com_req;
+	printf("Start Job : %lu \n", req->base);
+	trkey_t end = req->base + 100;
+	trkey_t start = req->base;
+	bstreeNode_t* node = NULL;
+	for(; start < end; start++) {
+		cdsl_bstreeNodeInit(&bst_nodepool[start],start);
+		cdsl_bstreeInsert(req->root, &bst_nodepool[start]);
+	}
+	for(start = req->base; start < end; start++) {
+		node = cdsl_bstreeDelete(req->root, start);
+		if(!node) {
+			fprintf(stderr, "Reentrant Test Delete Fail %lu / %lu\n",start,req->base);
+			exit(-1);
+		}
+		if((node->key < req->base) || (node->key >= end)) {
+			fprintf(stderr, "Reentrant Test Fail\n");
+			exit(-1);
+		}
+	}
+	return com_req;
+}

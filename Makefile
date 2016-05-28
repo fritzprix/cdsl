@@ -32,6 +32,7 @@ REL_DYNAMIC_TARGET=libcdsl.so
 
 VPATH=$(SRC-y)
 INCS=$(INC-y:%=-I%)
+LIBS=$(LIB-y:%=-l%)
 
 DBG_OBJS=$(OBJ-y:%=$(DBG_CACHE_DIR)/%.do)
 REL_OBJS=$(OBJ-y:%=$(REL_CACHE_DIR)/%.o)
@@ -115,16 +116,16 @@ endif
 	
 $(TEST_TARGET) : $(REL_CACHE_DIR)/main.o $(REL_OBJS) 
 	@echo 'Building unit-test executable... for $(ARCH) $@'
-	$(CXX) -o $@ $(REL_CFLAG) $< $(REL_OBJS)
+	$(CXX) -o $@ $(REL_CFLAG) $< $(REL_OBJS) $(LIBS)
 	
 
 $(DEV_TEST_TARGET) : $(DBG_CACHE_DIR)/main.do $(DBG_OBJS) 
 	@echo 'Building unit-test executable... for $(ARCH) $@'
-	$(CXX) -o $@ $(DBG_CFLAG) $< $(DBG_OBJS)
+	$(CXX) -o $@ $(DBG_CFLAG) $< $(DBG_OBJS) $(LIBS)
 	
 $(DBG_CACHE_DIR)/%.do : %.c
 	@echo '$(ARCH) compile...$@'
-	$(CC) -c -o $@ $(DBG_CFLAG)  $< $(INCS)
+	$(CC) -c -o $@ $(DBG_CFLAG)  $< $(INCS) 
 	
 $(REL_CACHE_DIR)/%.o : %.c
 	@echo '$(ARCH) compile...$@'

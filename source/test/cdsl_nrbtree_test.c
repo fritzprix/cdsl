@@ -12,11 +12,22 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <pthread.h>
 
 
 static nrbtreeNode_t node_pool[TEST_SIZE];
 static nrbtreeNode_t replace;
 static int keys[TEST_SIZE];
+static pthread_t threads[100];
+
+struct compete_req {
+	nrbtreeRoot_t* root;
+	trkey_t        base;
+	pthread_mutex_t* lock;
+};
+
+
+static void* compete_rbtree(void* com_req);
 
 BOOL cdsl_nrbtreeDoTest(void)
 {
@@ -78,8 +89,55 @@ BOOL cdsl_nrbtreeDoTest(void)
 			return FALSE;
 		}
 	}
+
+
 	if(cdsl_nrbtreeSize(&root) > 0)
 		return FALSE;
 
+	pthread_mutex_t lock;
+	pthread_mutex_init(&lock, NULL);
+	int idx;
+	struct compete_req* req = NULL;
+	for(idx = 0;idx < 100; idx++) {
+		req = malloc(sizeof(struct compete_req));
+		req->base = idx * 100;
+		req->root = &root;
+		req->lock = &lock;
+		pthread_create(&threads[idx], NULL, compete_rbtree, req);
+	}
+
+	for(idx = 0;idx < 100; idx++) {
+		pthread_join(threads[idx], (void**) &req);
+		free(req);
+	}
+
 	return TRUE;
+}
+
+static void* compete_rbtree(void* com_req) {
+	struct compete_req* req = (struct compete_req*) com_req;
+	printf("Start Job : %lu \n", req->base);
+	trkey_t end = req->base + 100;
+	trkey_t start = req->base;
+	nrbtreeNode_t* node = NULL;
+	for(; start < end; start++) {
+		cdsl_nrbtreeNodeInit(&node_pool[start],start);
+		pthread_mutex_lock(req->lock);
+		cdsl_nrbtreeInsert(req->root, &node_pool[start]);
+		pthread_mutex_unlock(req->lock);
+	}
+	for(start = req->base; start < end; start++) {
+		pthread_mutex_lock(req->lock);
+		node = cdsl_nrbtreeDelete(req->root, start);
+		pthread_mutex_unlock(req->lock);
+		if(!node) {
+			fprintf(stderr, "Reentrant Test Delete Fail %lu / %lu\n",start,req->base);
+			exit(-1);
+		}
+		if((node->key < req->base) || (node->key >= end)) {
+			fprintf(stderr, "Reentrant Test Fail\n");
+			exit(-1);
+		}
+	}
+	return com_req;
 }

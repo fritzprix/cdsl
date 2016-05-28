@@ -1,4 +1,5 @@
 INC-y+=./include/test
+LIB-y+=pthread
 SRC-y+=./source/test
 OBJ-y+=cdsl_bstree_test\
 		cdsl_hash_test\
