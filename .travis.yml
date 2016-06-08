@@ -1,0 +1,13 @@
+sudo: required
+
+language: c
+
+services:
+	- docker
+
+install:
+	- docker build -t cdsl_test .
+
+script:
+	- docker run cdsl_test
+
