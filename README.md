@@ -1,4 +1,6 @@
 # cdsl 
+[![Build Status](https://travis-ci.org/fritzprix/cdsl.svg?branch=master)](https://travis-ci.org/fritzprix/cdsl)
+
 	Data Structure library for C / C++.   
 	
 ## About
