@@ -1,6 +1,10 @@
 # makefile for cdsl
 
-CC=clang-3.6 
+ifeq ($(CLANG),)
+CLANG:=clang-3.6
+endif
+
+CC=$(CLANG)
 CXX=g++
 AR=llvm-ar-3.6
 PYTHON=python
