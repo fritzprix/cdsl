@@ -8,5 +8,6 @@ WORKDIR	cdsl
 RUN		make config ARCH=x86 DEFCONF=x86_64
 RUN		make release
 RUN		make all
-CMD		make test & ./cdsl
+RUN		make test 
+CMD		./cdsl & ./cdsl_dev
 
