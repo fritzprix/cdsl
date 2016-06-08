@@ -9,5 +9,5 @@ RUN		make config ARCH=x86 DEFCONF=x86_64
 RUN		make release
 RUN		make all
 RUN		make test 
-CMD		./cdsl & ./cdsl_dev
+CMD		./cdsl
 
