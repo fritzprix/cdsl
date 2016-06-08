@@ -3,11 +3,11 @@ sudo: required
 language: c
 
 services:
-	- docker
+     - docker
 
 install:
-	- docker build -t cdsl_test .
+     - docker build -t cdsl_test .
 
 script:
-	- docker run cdsl_test
+     - docker run cdsl_test
 
