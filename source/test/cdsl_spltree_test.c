@@ -15,14 +15,15 @@
 static spltreeNode_t nodes[TEST_SIZE];
 static int keys[TEST_SIZE];
 static spltreeNode_t replace;
-static spltreeRoot_t root;
 
 BOOL cdsl_spltreeDoTest(void){
+	static spltreeRoot_t aroot,root;
 	int i = 0;
 	int depth,depth_temp;
 	depth = 0;
 	depth_temp = 0;
 
+	cdsl_spltreeRootInit(&aroot);
 	cdsl_spltreeRootInit(&root);
 
 	keys[TEST_SIZE - 1] = TEST_SIZE + 1;
@@ -66,8 +67,58 @@ BOOL cdsl_spltreeDoTest(void){
 			return FALSE;
 		if(del->key != keys[i])
 			return FALSE;
+		keys[i] = rand() % TEST_SIZE;
+		cdsl_spltreeNodeInit(del, keys[i]);
+		cdsl_spltreeInsert(&root, del);
 	}
-	if(cdsl_spltreeSize(&root) > 0)
+
+	if(cdsl_spltreeSize(&root) != TEST_SIZE) {
+		__dev_log("some node is lost in insert op\n");
 		return FALSE;
+	}
+
+	trkey_t key = 0;
+	for (i = 0; i < TEST_SIZE; i++) {
+		del = NULL;
+		del = cdsl_spltreeDeleteMin(&root);
+		if (!del) {
+			__dev_log("null node detected !!\n");\
+			return FALSE;
+		}
+		if (key > del->key) {
+			__dev_log("not increasing order\n");
+			return FALSE;
+		}
+		key = del->key;
+		cdsl_spltreeNodeInit(del,key);
+		cdsl_spltreeInsert(&aroot, del);
+	}
+
+	if (cdsl_spltreeSize(&aroot) != TEST_SIZE) {
+		__dev_log("some node is missed\n");
+		return FALSE;
+	}
+
+	key = 0xffffffff;
+	for (i = 0; i < TEST_SIZE; i++) {
+		del = NULL;
+		del = cdsl_spltreeDeleteMax(&aroot);
+		if(!del) {
+			__dev_log("null node detected !! \n");
+			return FALSE;
+		}
+		if(key < del->key) {
+			__dev_log("not decreasing order\n");
+			return FALSE;
+		}
+		key = del->key;
+	}
+
+	if(cdsl_spltreeTop(&aroot) != NULL)
+		return FALSE;
+
+	if (cdsl_spltreeSize(&root) > 0)
+		return FALSE;
+
 	return TRUE;
 }

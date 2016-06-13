@@ -134,6 +134,8 @@ nrbtreeNode_t* cdsl_nrbtreeDeleteMin(nrbtreeRoot_t* rootp)
 {
 	if(!rootp)
 		return NULL;
+	if(!GET_PTR(rootp->entry))
+		return NULL;
 	nrbtreeNode_t* del = NULL;
 	uint8_t ctx = 0;
 	rootp->entry = delete_lm_rc(rootp->entry, &del, &ctx);
@@ -143,6 +145,8 @@ nrbtreeNode_t* cdsl_nrbtreeDeleteMin(nrbtreeRoot_t* rootp)
 nrbtreeNode_t* cdsl_nrbtreeDeleteMax(nrbtreeRoot_t* rootp)
 {
 	if(!rootp)
+		return NULL;
+	if(!GET_PTR(rootp->entry))
 		return NULL;
 	nrbtreeNode_t* del = NULL;
 	uint8_t ctx = 0;
