@@ -20,6 +20,7 @@ extern "C" {
 #define cdsl_spltreeSize(root)                     tree_size((base_treeRoot_t*) root)
 #define cdsl_spltreePrint(root, print)             tree_print((base_treeRoot_t*) root, print)
 #define cdsl_spltreeIsEmpty(root)                  tree_is_empty((base_treeRoot_t*) root)
+#define cdsl_spltreeTop(root)                      (spltreeNode_t*) tree_top((base_treeRoot_t*) root)
 #define cdsl_spltreeGoLeft(cur)                    (spltreeNode_t*) tree_go_left((base_treeNode_t*) cur)
 #define cdsl_spltreeGoRight(cur)                   (spltreeNode_t*) tree_go_right((base_treeNode_t*) cur)
 #define cdsl_spltreeMin(root)                      (spltreeNode_t*) tree_min((base_treeRoot_t*) root)

@@ -23,17 +23,17 @@ static bstreeNode_t bst_nodepool[TEST_SIZE];
 static bstreeNode_t replace;
 static trkey_t repl_key;
 static trkey_t keys[TEST_SIZE];
-static pthread_t threads[100];
 
 static int cb_count;
-static void* compete_rbtree(void* com_req);
 
 
 BOOL cdsl_bstreeDoTest(void)
 {
 	bstreeRoot_t root;
+	bstreeRoot_t aroot;
 	cb_count = 0;
 	cdsl_bstreeRootInit(&root);
+	cdsl_bstreeRootInit(&aroot);
 
 	int i = 0;
 	int depth,depth_temp;
@@ -79,15 +79,31 @@ BOOL cdsl_bstreeDoTest(void)
 	{
 		delete_node = NULL;
 		delete_node = cdsl_bstreeDeleteMin(&root);
+		if(!delete_node)
+			return FALSE;
 		if(key > delete_node->key)
 			return FALSE;
 		key = delete_node->key;
-		if(!delete_node)
-			return FALSE;
+		cdsl_bstreeInsert(&aroot, delete_node);
 	}
 
 	if(cdsl_bstreeSize(&root) > 0)		// size should be zero
 		return FALSE;
+	if(cdsl_bstreeSize(&aroot) != TEST_SIZE)
+		return FALSE;
 
+	key = 0xffffffff;
+	for(i = 0;i < TEST_SIZE;i++)
+	{
+		delete_node = NULL;
+		delete_node = cdsl_bstreeDeleteMax(&aroot);
+		if(!delete_node)
+			return FALSE;
+		if(key < delete_node->key)
+			return FALSE;
+		key = delete_node->key;
+	}
+	if(cdsl_bstreeTop(&aroot) != NULL)
+		return FALSE;
 	return TRUE;
 }
