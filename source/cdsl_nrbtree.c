@@ -156,15 +156,17 @@ nrbtreeNode_t* cdsl_nrbtreeDeleteMax(nrbtreeRoot_t* rootp)
 
 
 
-#ifdef __DBG
+//#ifdef __DBG
 void cdsl_nrbtreePrint_dev (nrbtreeRoot_t* root)
 {
 	if(!root)
 		return;
+	printf("\n");
 	node_print_rc(root->entry, 0);
+	printf("\n");
 
 }
-#endif
+//#endif
 
 static void print_tab(int cnt){
 	while(cnt--)
@@ -449,10 +451,11 @@ static nrbtreeNode_t* insert_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t* item,u
 		{
 			GET_PTR(sub_root_c)->left = insert_rc(GET_PTR(sub_root_c)->left, item , rc_color, rc_dir);
 
-			*rc_color |= (GET_COLOR(GET_PTR(sub_root_c)->left) << 7);
-			*rc_dir |= (CTX_LEFT << 7);
 			*rc_color >>= 1;
 			*rc_dir >>= 1;
+			*rc_color |= (GET_COLOR(GET_PTR(sub_root_c)->left) << 7);
+			*rc_dir |= (CTX_LEFT << 7);
+
 
 			if((*rc_color & RC_CTX_PATTERN) == RC_CTX_PATTERN_REDRED)
 			{

@@ -23,6 +23,7 @@ struct compete_req {
 	pthread_mutex_t* lock;
 };
 
+
 BOOL cdsl_nrbtreeDoTest(void) {
 	nrbtreeRoot_t root, aroot;
 	cdsl_nrbtreeRootInit(&root);
@@ -91,7 +92,7 @@ BOOL cdsl_nrbtreeDoTest(void) {
 		delete_node = NULL;
 		delete_node = cdsl_nrbtreeDeleteMax(&aroot);
 		if(!delete_node) {
-			__dev_log("null node detected !! \n");
+			__dev_log("unexptected null node !! \n");
 			return FALSE;
 		}
 		if(key < delete_node->key) {
@@ -107,5 +108,20 @@ BOOL cdsl_nrbtreeDoTest(void) {
 	if (cdsl_nrbtreeSize(&root) > 0)
 		return FALSE;
 
+	for (i = 0;i < 10; i++) {
+		cdsl_nrbtreeNodeInit(&node_pool[i],rand());
+		cdsl_nrbtreeInsert(&root, &node_pool[i]);
+		cdsl_nrbtreePrint_dev(&root);
+	}
+
+	for (i = 0;i < 10; i++) {
+		delete_node = cdsl_nrbtreeDeleteMin(&root);
+		if(!delete_node) {
+			fprintf(stderr, "unexpected null node\n");
+			exit(-1);
+		}
+	}
+
 	return TRUE;
 }
+
