@@ -185,7 +185,7 @@ static int traverse_incremental_rc(base_treeNode_t* current, int* current_order,
 	if(traverse_incremental_rc(GET_PTR(current)->left,current_order,cb) == MSG_BREAK_TRAVERSE)
 		return MSG_BREAK_TRAVERSE;
 	*current_order += 1;
-	if(cb(*current_order,current) == MSG_BREAK_TRAVERSE)
+	if(cb(*current_order,GET_PTR(current)) == MSG_BREAK_TRAVERSE)
 		return MSG_BREAK_TRAVERSE;
 	return traverse_incremental_rc(GET_PTR(current)->right,current_order,cb);
 }
