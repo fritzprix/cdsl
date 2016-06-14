@@ -105,22 +105,28 @@ BOOL cdsl_nrbtreeDoTest(void) {
 	if(cdsl_nrbtreeTop(&aroot) != NULL)
 		return FALSE;
 
-	if (cdsl_nrbtreeSize(&root) > 0)
-		return FALSE;
 
-	for (i = 0;i < 10; i++) {
+
+	for (i = 0;i < TEST_SIZE; i++) {
 		cdsl_nrbtreeNodeInit(&node_pool[i],rand());
 		cdsl_nrbtreeInsert(&root, &node_pool[i]);
 		cdsl_nrbtreePrint_dev(&root);
 	}
+	if (cdsl_nrbtreeMaxDepth(&root) > 25) {
+		fprintf(stderr,"abnormal balancing failure %d\n",cdsl_nrbtreeMaxDepth(&root));
+		return FALSE;
+	}
 
-	for (i = 0;i < 10; i++) {
+	for (i = 0;i < TEST_SIZE; i++) {
 		delete_node = cdsl_nrbtreeDeleteMin(&root);
 		if(!delete_node) {
 			fprintf(stderr, "unexpected null node\n");
 			exit(-1);
 		}
 	}
+
+	if (cdsl_nrbtreeSize(&root) > 0)
+		return FALSE;
 
 	return TRUE;
 }

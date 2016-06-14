@@ -156,7 +156,7 @@ nrbtreeNode_t* cdsl_nrbtreeDeleteMax(nrbtreeRoot_t* rootp)
 
 
 
-//#ifdef __DBG
+#ifdef __DBG
 void cdsl_nrbtreePrint_dev (nrbtreeRoot_t* root)
 {
 	if(!root)
@@ -166,7 +166,7 @@ void cdsl_nrbtreePrint_dev (nrbtreeRoot_t* root)
 	printf("\n");
 
 }
-//#endif
+#endif
 
 static void print_tab(int cnt){
 	while(cnt--)
@@ -417,7 +417,6 @@ static nrbtreeNode_t* resolve_red_red(nrbtreeNode_t* gparent_c,uint8_t color_ctx
 	return NULL;
 }
 
-#define RC_CTX_COLLISION       ((uint8_t) 0x80)
 #define RC_CTX_PATTERN         ((uint8_t) 0xC0)
 #define RC_CTX_PATTERN_REDRED  ((uint8_t) 0xC0)
 
@@ -444,6 +443,7 @@ static nrbtreeNode_t* insert_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t* item,u
 			if((*rc_color & RC_CTX_PATTERN) == RC_CTX_PATTERN_REDRED)
 			{
 				sub_root_c = resolve_red_red(sub_root_c, (*rc_color) >> 6 , (*rc_dir) >> 6);
+				*rc_color = 0;
 			}
 			return sub_root_c;
 		}
@@ -457,9 +457,11 @@ static nrbtreeNode_t* insert_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t* item,u
 			*rc_dir |= (CTX_LEFT << 7);
 
 
+
 			if((*rc_color & RC_CTX_PATTERN) == RC_CTX_PATTERN_REDRED)
 			{
 				sub_root_c = resolve_red_red(sub_root_c, (*rc_color) >> 6 , (*rc_dir) >> 6);
+				*rc_color = 0;
 			}
 			return sub_root_c;
 		}
