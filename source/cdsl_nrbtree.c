@@ -82,6 +82,9 @@ void cdsl_nrbtreeRootInit(nrbtreeRoot_t* rootp) {
 void cdsl_nrbtreeNodeInit(nrbtreeNode_t* node, trkey_t key) {
 	if(node == NULL)
 		return;
+	if((size_t) node & 1) {
+		PRINT("unaligned pointer!!\n");
+	}
 	node->left = node->right = NULL;
 	node->key = key;
 }
