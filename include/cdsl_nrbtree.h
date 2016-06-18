@@ -20,6 +20,7 @@ extern "C" {
 
 #define cdsl_nrbtreeMaxDepth(root)                 tree_max_depth((base_treeRoot_t*) root)
 #define cdsl_nrbtreeTraverse(root, cb, order)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order)
+#define cdsl_nrbtreeTraverseTarget(root,cb,key)    tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, key)
 #define cdsl_nrbtreeSize(root)                     tree_size((base_treeRoot_t*) root)
 #define cdsl_nrbtreePrint(root, print)             tree_print((base_treeRoot_t*) root, print)
 #define cdsl_nrbtreeIsEmpty(root)                  tree_is_empty((base_treeRoot_t*) root)
@@ -60,6 +61,7 @@ extern nrbtreeNode_t* cdsl_nrbtreeLookup(nrbtreeRoot_t* rootp,trkey_t key);
 extern nrbtreeNode_t* cdsl_nrbtreeDelete(nrbtreeRoot_t* rootp,trkey_t key);
 extern nrbtreeNode_t* cdsl_nrbtreeDeleteMin(nrbtreeRoot_t* rootp);
 extern nrbtreeNode_t* cdsl_nrbtreeDeleteMax(nrbtreeRoot_t* rootp);
+
 
 #ifdef __DBG
 extern void cdsl_nrbtreePrint_dev(nrbtreeRoot_t* root);

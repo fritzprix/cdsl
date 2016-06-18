@@ -18,14 +18,15 @@ extern "C" {
 #define ORDER_INC			(int) 0
 #define ORDER_DEC			(int) 1
 
-#define MSG_BREAK_TRAVERSE	(int) -1
+#define TRAVERSE_OK         (int) 0
+#define TRAVERSE_BREAK      (int) 1
 
 #define DECLARE_TRAVERSE_CALLBACK(fn) int fn(int order, base_treeNode_t* node)
 
 typedef __cdsl_uaddr_t  trkey_t;
 typedef struct base_tree_node base_treeNode_t;
 typedef struct base_tree_root base_treeRoot_t;
-typedef int (*base_tree_callback_t)(int order,base_treeNode_t* node);
+typedef int (*base_tree_callback_t)(int,base_treeNode_t*);
 
 struct base_tree_root {
 	base_treeNode_t* entry;
@@ -37,6 +38,7 @@ struct base_tree_node {
 };
 
 extern void tree_traverse(base_treeRoot_t* rootp, base_tree_callback_t cb,int order);
+extern void tree_traverse_target(base_treeRoot_t* rootp, base_tree_callback_t cb, trkey_t key);
 extern base_treeNode_t* tree_go_left(base_treeNode_t* cur);
 extern base_treeNode_t* tree_go_right(base_treeNode_t* cur);
 extern base_treeNode_t* tree_top(base_treeRoot_t* rootp);

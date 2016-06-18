@@ -16,7 +16,8 @@ extern "C" {
 
 
 #define cdsl_spltreeMaxDepth(root)                 tree_max_depth((base_treeRoot_t*) root)
-#define cdsl_traverse(root, cb, order)             tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order)
+#define cdsl_spltreeTraverse(root, cb, order)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order)
+#define cdsl_spltreeTraverseTarget(root, cb, key)  tree_traverse_target((base_treeRoot_t*) root, (base_tree_callback_t) cb, key)
 #define cdsl_spltreeSize(root)                     tree_size((base_treeRoot_t*) root)
 #define cdsl_spltreePrint(root, print)             tree_print((base_treeRoot_t*) root, print)
 #define cdsl_spltreeIsEmpty(root)                  tree_is_empty((base_treeRoot_t*) root)

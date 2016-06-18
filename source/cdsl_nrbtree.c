@@ -67,7 +67,7 @@ static nrbtreeNode_t* up_from_leftmost_rc(nrbtreeNode_t* node, nrbtreeNode_t** l
 
 
 static void print_tab(int cnt);
-static void node_print_rc(nrbtreeNode_t* node,int order);
+static void node_print_rc(nrbtreeNode_t* node, int level);
 
 static volatile __cdsl_uaddr_t stack_top;
 static volatile __cdsl_uaddr_t stack_bottom;
@@ -159,6 +159,8 @@ nrbtreeNode_t* cdsl_nrbtreeDeleteMax(nrbtreeRoot_t* rootp)
 
 
 
+
+
 #ifdef __DBG
 void cdsl_nrbtreePrint_dev (nrbtreeRoot_t* root)
 {
@@ -176,16 +178,16 @@ static void print_tab(int cnt){
 		PRINT("\t");
 }
 
-static void node_print_rc(nrbtreeNode_t* node,int order) {
+static void node_print_rc(nrbtreeNode_t* node, int level) {
 	if(!GET_PTR(node))
 	{
-		print_tab(order);
+		print_tab(level);
 		PRINT("NIL(black) \n");
 		return;
 	}
-	node_print_rc(GET_PTR(node)->right, order + 1);
-	print_tab(order); PRINT("%s node : %lu / order %d \n", COLOR_STRING[GET_COLOR(node)], GET_PTR(node)->key, order);
-	node_print_rc(GET_PTR(node)->left, order + 1);
+	node_print_rc(GET_PTR(node)->right, level + 1);
+	print_tab(level); PRINT("%s node : %lu / order %d \n", COLOR_STRING[GET_COLOR(node)], GET_PTR(node)->key, level);
+	node_print_rc(GET_PTR(node)->left, level + 1);
 }
 
 /*
@@ -199,7 +201,8 @@ static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeN
 {
 	if(!sub_root_c)
 	{
-		*rm = NULL;
+		if(rm)
+			*rm = NULL;
 		return NULL;
 	}
 
@@ -221,7 +224,8 @@ static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeN
 		}
 		return sub_root_c;
 	}
-	*rm = sub_root_c;
+	if(rm)
+		*rm = sub_root_c;
 	if (GET_PTR(sub_root_c)->left) {
 		GET_PTR(sub_root_c)->left = up_from_rightmost_rc(GET_PTR(sub_root_c)->left, &sub_root_c,ctx);
 		GET_PTR(sub_root_c)->right = GET_PTR(*rm)->right;
@@ -241,6 +245,8 @@ static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeN
 		return NULL;
 	}
 }
+
+
 
 static nrbtreeNode_t* delete_lm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx)
 {
@@ -287,7 +293,6 @@ static nrbtreeNode_t* delete_rm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm
 	}
 	return sub_root_c;
 }
-
 
 static nrbtreeNode_t* rotate_left(nrbtreeNode_t* gparent_c)
 {
