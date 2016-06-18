@@ -228,7 +228,7 @@ static base_treeNode_t* traverse_target_rc(base_treeNode_t* current, int* order,
 	} else if(GET_PTR(current)->key < key) {
 		GET_PTR(current)->right = traverse_target_rc(GET_PTR(current)->right, order, key, cb,arg);
 	}
-	switch(cb((*order)++, GET_PTR(current))) {
+	switch(cb((*order)++, GET_PTR(current),arg)) {
 	case TRAVERSE_BREAK:
 		/**
 		 *  currently, this switch block has not much to do
