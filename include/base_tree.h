@@ -26,7 +26,7 @@ extern "C" {
 typedef __cdsl_uaddr_t  trkey_t;
 typedef struct base_tree_node base_treeNode_t;
 typedef struct base_tree_root base_treeRoot_t;
-typedef int (*base_tree_callback_t)(int,base_treeNode_t*);
+typedef int (*base_tree_callback_t)(int,base_treeNode_t*,void*);
 
 struct base_tree_root {
 	base_treeNode_t* entry;
@@ -37,8 +37,8 @@ struct base_tree_node {
 	trkey_t          key;
 };
 
-extern void tree_traverse(base_treeRoot_t* rootp, base_tree_callback_t cb,int order);
-extern void tree_traverse_target(base_treeRoot_t* rootp, base_tree_callback_t cb, trkey_t key);
+extern void tree_traverse(base_treeRoot_t* rootp, base_tree_callback_t cb,int order, void* arg);
+extern void tree_traverse_target(base_treeRoot_t* rootp, base_tree_callback_t cb, trkey_t key,void* arg);
 extern base_treeNode_t* tree_go_left(base_treeNode_t* cur);
 extern base_treeNode_t* tree_go_right(base_treeNode_t* cur);
 extern base_treeNode_t* tree_top(base_treeRoot_t* rootp);

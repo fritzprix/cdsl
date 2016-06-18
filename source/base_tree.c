@@ -19,26 +19,27 @@
 static int calc_max_depth_rc(base_treeNode_t** root);
 static int calc_size_rc(base_treeNode_t** root);
 static void print_rc(base_treeNode_t* current,cdsl_generic_printer_t prt,int depth);
-static int traverse_incremental_rc(base_treeNode_t* current,int* current_order,base_tree_callback_t cb);
-static int traverse_decremental_rc(base_treeNode_t* current,int* current_order,base_tree_callback_t cb);
-static base_treeNode_t* travese_target_rc(base_treeNode_t* current, int* order, trkey_t key, base_tree_callback_t cb);
+static int traverse_incremental_rc(base_treeNode_t* current,int* current_order,base_tree_callback_t cb, void* arg);
+static int traverse_decremental_rc(base_treeNode_t* current,int* current_order,base_tree_callback_t cb, void* arg);
+static base_treeNode_t* traverse_target_rc(base_treeNode_t* current, int* order, trkey_t key, base_tree_callback_t cb,void* arg);
 static void print_tab(int cnt);
 
-void tree_traverse(base_treeRoot_t* rootp, base_tree_callback_t cb,int order)
+void tree_traverse(base_treeRoot_t* rootp, base_tree_callback_t cb,int order, void* arg)
 {
 	if((cb == NULL) || (rootp == NULL) || (GET_PTR(rootp->entry) == NULL))
 		return;
 	int i = 0;
 	if(order == ORDER_DEC)
-		traverse_decremental_rc(rootp->entry,&i,cb);
+		traverse_decremental_rc(rootp->entry,&i,cb,arg);
 	else
-		traverse_incremental_rc(rootp->entry,&i,cb);
+		traverse_incremental_rc(rootp->entry,&i,cb,arg);
 }
 
-void tree_traverse_target(base_treeRoot_t* rootp, base_tree_callback_t cb, trkey_t key) {
+void tree_traverse_target(base_treeRoot_t* rootp, base_tree_callback_t cb, trkey_t key, void* arg) {
 	if((cb == NULL) || (rootp == NULL) || (GET_PTR(rootp->entry) == NULL))
 		return;
-
+	int i = 0;
+	rootp->entry = traverse_target_rc(rootp->entry, &i, key, cb, arg);
 }
 
 
@@ -186,46 +187,46 @@ static void print_tab(int cnt)
 		PRINT("\t");
 }
 
-static int traverse_incremental_rc(base_treeNode_t* current, int* current_order, base_tree_callback_t cb)
+static int traverse_incremental_rc(base_treeNode_t* current, int* current_order, base_tree_callback_t cb, void* arg)
 {
 	if(GET_PTR(current) == NULL)
 		return 0;
-	switch(traverse_incremental_rc(GET_PTR(current)->left,current_order,cb)) {
+	switch(traverse_incremental_rc(GET_PTR(current)->left,current_order,cb,arg)) {
 	case TRAVERSE_BREAK:
 		return TRAVERSE_BREAK;
 	}
 	*current_order += 1;
-	switch(cb(*current_order, GET_PTR(current))) {
+	switch(cb(*current_order, GET_PTR(current),arg)) {
 	case TRAVERSE_BREAK:
 		return TRAVERSE_BREAK;
 	}
-	return traverse_incremental_rc(GET_PTR(current)->right,current_order,cb);
+	return traverse_incremental_rc(GET_PTR(current)->right,current_order,cb,arg);
 }
 
-static int traverse_decremental_rc(base_treeNode_t* current, int* current_order, base_tree_callback_t cb)
+static int traverse_decremental_rc(base_treeNode_t* current, int* current_order, base_tree_callback_t cb, void* arg)
 {
 	if(GET_PTR(current) == NULL)
 		return 0;
-	switch(traverse_decremental_rc(GET_PTR(current)->right,current_order,cb)) {
+	switch(traverse_decremental_rc(GET_PTR(current)->right,current_order,cb, arg)) {
 	case TRAVERSE_BREAK:
 		return TRAVERSE_BREAK;
 	}
 	*current_order += 1;
-	switch(cb(*current_order,GET_PTR(current))) {
+	switch(cb(*current_order,GET_PTR(current), arg)) {
 	case TRAVERSE_BREAK:
 		return TRAVERSE_BREAK;
 	}
-	return traverse_decremental_rc(GET_PTR(current)->left,current_order,cb);
+	return traverse_decremental_rc(GET_PTR(current)->left,current_order,cb, arg);
 }
 
 
-static base_treeNode_t* travese_target_rc(base_treeNode_t* current, int* order, trkey_t key, base_tree_callback_t cb) {
+static base_treeNode_t* traverse_target_rc(base_treeNode_t* current, int* order, trkey_t key, base_tree_callback_t cb, void* arg) {
 	if(GET_PTR(current) == NULL)
 		return NULL;
 	if(GET_PTR(current)->key > key) {
-		GET_PTR(current)->left = travese_target_rc(GET_PTR(current)->left, order, key, cb);
+		GET_PTR(current)->left = traverse_target_rc(GET_PTR(current)->left, order, key, cb,arg);
 	} else if(GET_PTR(current)->key < key) {
-		GET_PTR(current)->right = travese_target_rc(GET_PTR(current)->right, order, key, cb);
+		GET_PTR(current)->right = traverse_target_rc(GET_PTR(current)->right, order, key, cb,arg);
 	}
 	switch(cb((*order)++, GET_PTR(current))) {
 	case TRAVERSE_BREAK:
