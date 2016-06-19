@@ -26,6 +26,8 @@ static trkey_t keys[TEST_SIZE];
 
 static int cb_count;
 
+static DECLARE_TRAVERSE_CALLBACK(onTreeNode);
+
 
 BOOL cdsl_bstreeDoTest(void)
 {
@@ -93,6 +95,11 @@ BOOL cdsl_bstreeDoTest(void)
 	if(cdsl_bstreeSize(&aroot) != TEST_SIZE)
 		return FALSE;
 
+	int traverse_count = 0;
+	cdsl_bstreeTraverse(&aroot, onTreeNode,ORDER_INC, &traverse_count);
+	if(traverse_count != TEST_SIZE)
+		return FALSE;
+
 	key = 0xffffffff;
 	for(i = 0;i < TEST_SIZE;i++)
 	{
@@ -106,5 +113,16 @@ BOOL cdsl_bstreeDoTest(void)
 	}
 	if(cdsl_bstreeTop(&aroot) != NULL)
 		return FALSE;
+
 	return TRUE;
+}
+
+
+static DECLARE_TRAVERSE_CALLBACK(onTreeNode) {
+	int* cnt = (int*) arg;
+	if(!node) {
+		*cnt = 0;
+	}
+	(*cnt)++;
+	return TRAVERSE_OK;
 }

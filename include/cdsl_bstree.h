@@ -19,18 +19,18 @@ extern "C"{
 typedef struct bs_treenode bstreeNode_t;
 typedef struct bs_treeroot bstreeRoot_t;
 
-#define cdsl_bstreeMaxDepth(root)                 tree_max_depth((base_treeRoot_t*) root)
-#define cdsl_bstreeTraverse(root, cb, order)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order)
-#define cdsl_bstreeTraverseTarget(root, cb, key)  tree_traverse_target((baes_treeRoot_t*) root, (base_tree_callback_t) cb, order)
-#define cdsl_bstreeSize(root)                     tree_size((base_treeRoot_t*) root)
-#define cdsl_bstreePrint(root, print)             tree_print((base_treeRoot_t*) root, print)
-#define cdsl_bstreeIsEmpty(root)                  tree_is_empty((base_treeRoot_t*) root)
-#define cdsl_bstreeTop(root)                      (bstreeNode_t*) tree_top((base_treeRoot_t*) root)
-#define cdsl_bstreeGoLeft(cur)                    (bstreeNode_t*) tree_go_left((base_treeNode_t*) cur)
-#define cdsl_bstreeGoRight(cur)                   (bstreeNode_t*) tree_go_right((base_treeNode_t*) cur)
-#define cdsl_bstreeMin(root)                      (bstreeNode_t*) tree_min((base_treeRoot_t*) root)
-#define cdsl_bstreeMax(root)                      (bstreeNode_t*) tree_max((base_treeRoot_t*) root)
-#define cdsl_bstreeUpdate(root,nitem)             (bstreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
+#define cdsl_bstreeMaxDepth(root)                     tree_max_depth((base_treeRoot_t*) root)
+#define cdsl_bstreeTraverse(root, cb, order,arg)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order,arg)
+#define cdsl_bstreeTraverseTarget(root, cb, key,arg)  tree_traverse_target((baes_treeRoot_t*) root, (base_tree_callback_t) cb, order,arg)
+#define cdsl_bstreeSize(root)                         tree_size((base_treeRoot_t*) root)
+#define cdsl_bstreePrint(root, print)                 tree_print((base_treeRoot_t*) root, print)
+#define cdsl_bstreeIsEmpty(root)                      tree_is_empty((base_treeRoot_t*) root)
+#define cdsl_bstreeTop(root)                          (bstreeNode_t*) tree_top((base_treeRoot_t*) root)
+#define cdsl_bstreeGoLeft(cur)                        (bstreeNode_t*) tree_go_left((base_treeNode_t*) cur)
+#define cdsl_bstreeGoRight(cur)                       (bstreeNode_t*) tree_go_right((base_treeNode_t*) cur)
+#define cdsl_bstreeMin(root)                          (bstreeNode_t*) tree_min((base_treeRoot_t*) root)
+#define cdsl_bstreeMax(root)                          (bstreeNode_t*) tree_max((base_treeRoot_t*) root)
+#define cdsl_bstreeUpdate(root,nitem)                 (bstreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
 
 
 #define ORDER_INC			(int) 0

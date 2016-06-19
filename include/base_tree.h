@@ -21,7 +21,7 @@ extern "C" {
 #define TRAVERSE_OK         (int) 0
 #define TRAVERSE_BREAK      (int) 1
 
-#define DECLARE_TRAVERSE_CALLBACK(fn) int fn(int order, base_treeNode_t* node)
+#define DECLARE_TRAVERSE_CALLBACK(fn) int fn(int order, base_treeNode_t* node,void* arg)
 
 typedef __cdsl_uaddr_t  trkey_t;
 typedef struct base_tree_node base_treeNode_t;

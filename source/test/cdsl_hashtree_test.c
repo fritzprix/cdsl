@@ -25,7 +25,6 @@ BOOL cdsl_hashtreeDoTest(void) {
 
 	person_t* p;
 	hashRoot_t root;
-	hashNode_t node;
 
 	cdsl_hashtreeRootInit(&root);
 

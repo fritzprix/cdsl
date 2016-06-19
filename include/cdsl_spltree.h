@@ -15,18 +15,18 @@ extern "C" {
 #endif
 
 
-#define cdsl_spltreeMaxDepth(root)                 tree_max_depth((base_treeRoot_t*) root)
-#define cdsl_spltreeTraverse(root, cb, order)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order)
-#define cdsl_spltreeTraverseTarget(root, cb, key)  tree_traverse_target((base_treeRoot_t*) root, (base_tree_callback_t) cb, key)
-#define cdsl_spltreeSize(root)                     tree_size((base_treeRoot_t*) root)
-#define cdsl_spltreePrint(root, print)             tree_print((base_treeRoot_t*) root, print)
-#define cdsl_spltreeIsEmpty(root)                  tree_is_empty((base_treeRoot_t*) root)
-#define cdsl_spltreeTop(root)                      (spltreeNode_t*) tree_top((base_treeRoot_t*) root)
-#define cdsl_spltreeGoLeft(cur)                    (spltreeNode_t*) tree_go_left((base_treeNode_t*) cur)
-#define cdsl_spltreeGoRight(cur)                   (spltreeNode_t*) tree_go_right((base_treeNode_t*) cur)
-#define cdsl_spltreeMin(root)                      (spltreeNode_t*) tree_min((base_treeRoot_t*) root)
-#define cdsl_spltreeMax(root)                      (spltreeNode_t*) tree_max((base_treeRoot_t*) root)
-#define cdsl_spltreeUpdate(root,nitem)             (spltreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
+#define cdsl_spltreeMaxDepth(root)                      tree_max_depth((base_treeRoot_t*) root)
+#define cdsl_spltreeTraverse(root, cb, order, arg)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order)
+#define cdsl_spltreeTraverseTarget(root, cb, key, arg)  tree_traverse_target((base_treeRoot_t*) root, (base_tree_callback_t) cb, key)
+#define cdsl_spltreeSize(root)                          tree_size((base_treeRoot_t*) root)
+#define cdsl_spltreePrint(root, print)                  tree_print((base_treeRoot_t*) root, print)
+#define cdsl_spltreeIsEmpty(root)                       tree_is_empty((base_treeRoot_t*) root)
+#define cdsl_spltreeTop(root)                           (spltreeNode_t*) tree_top((base_treeRoot_t*) root)
+#define cdsl_spltreeGoLeft(cur)                         (spltreeNode_t*) tree_go_left((base_treeNode_t*) cur)
+#define cdsl_spltreeGoRight(cur)                        (spltreeNode_t*) tree_go_right((base_treeNode_t*) cur)
+#define cdsl_spltreeMin(root)                           (spltreeNode_t*) tree_min((base_treeRoot_t*) root)
+#define cdsl_spltreeMax(root)                           (spltreeNode_t*) tree_max((base_treeRoot_t*) root)
+#define cdsl_spltreeUpdate(root,nitem)                  (spltreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
 
 
 typedef struct spltree_node spltreeNode_t;

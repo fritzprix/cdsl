@@ -18,18 +18,18 @@ extern "C" {
 
 
 
-#define cdsl_nrbtreeMaxDepth(root)                 tree_max_depth((base_treeRoot_t*) root)
-#define cdsl_nrbtreeTraverse(root, cb, order)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order)
-#define cdsl_nrbtreeTraverseTarget(root,cb,key)    tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, key)
-#define cdsl_nrbtreeSize(root)                     tree_size((base_treeRoot_t*) root)
-#define cdsl_nrbtreePrint(root, print)             tree_print((base_treeRoot_t*) root, print)
-#define cdsl_nrbtreeIsEmpty(root)                  tree_is_empty((base_treeRoot_t*) root)
-#define cdsl_nrbtreeTop(root)                      (nrbtreeNode_t*) tree_top((base_treeRoot_t*) root)
-#define cdsl_nrbtreeGoLeft(cur)                    (nrbtreeNode_t*) tree_go_left((base_treeNode_t*) cur)
-#define cdsl_nrbtreeGoRight(cur)                   (nrbtreeNode_t*) tree_go_right((base_treeNode_t*) cur)
-#define cdsl_nrbtreeMin(root)                      (nrbtreeNode_t*) tree_min((base_treeRoot_t*) root)
-#define cdsl_nrbtreeMax(root)                      (nrbtreeNode_t*) tree_max((base_treeRoot_t*) root)
-#define cdsl_nrbtreeUpdate(root,nitem)             (nrbtreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
+#define cdsl_nrbtreeMaxDepth(root)                      tree_max_depth((base_treeRoot_t*) root)
+#define cdsl_nrbtreeTraverse(root, cb, order, arg)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order, arg)
+#define cdsl_nrbtreeTraverseTarget(root,cb,key, arg)    tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, key, arg)
+#define cdsl_nrbtreeSize(root)                          tree_size((base_treeRoot_t*) root)
+#define cdsl_nrbtreePrint(root, print)                  tree_print((base_treeRoot_t*) root, print)
+#define cdsl_nrbtreeIsEmpty(root)                       tree_is_empty((base_treeRoot_t*) root)
+#define cdsl_nrbtreeTop(root)                           (nrbtreeNode_t*) tree_top((base_treeRoot_t*) root)
+#define cdsl_nrbtreeGoLeft(cur)                         (nrbtreeNode_t*) tree_go_left((base_treeNode_t*) cur)
+#define cdsl_nrbtreeGoRight(cur)                        (nrbtreeNode_t*) tree_go_right((base_treeNode_t*) cur)
+#define cdsl_nrbtreeMin(root)                           (nrbtreeNode_t*) tree_min((base_treeRoot_t*) root)
+#define cdsl_nrbtreeMax(root)                           (nrbtreeNode_t*) tree_max((base_treeRoot_t*) root)
+#define cdsl_nrbtreeUpdate(root,nitem)                  (nrbtreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
 
 
 typedef struct cdsl_nrbtree nrbtreeNode_t;
