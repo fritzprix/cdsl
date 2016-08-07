@@ -225,8 +225,10 @@ static void traverse_target_rc(base_treeNode_t* current, int* order, trkey_t key
 		return;
 	if(GET_PTR(current)->key > key) {
 		traverse_target_rc(GET_PTR(current)->left, order, key, cb,arg);
+		return;
 	} else if(GET_PTR(current)->key < key) {
 		traverse_target_rc(GET_PTR(current)->right, order, key, cb,arg);
+		return;
 	}
 	switch(cb((*order)++, GET_PTR(current),arg)) {
 	case TRAVERSE_BREAK:
