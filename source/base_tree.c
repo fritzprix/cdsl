@@ -21,7 +21,7 @@ static int calc_size_rc(base_treeNode_t** root);
 static void print_rc(base_treeNode_t* current,cdsl_generic_printer_t prt,int depth);
 static int traverse_incremental_rc(base_treeNode_t* current,int* current_order,base_tree_callback_t cb, void* arg);
 static int traverse_decremental_rc(base_treeNode_t* current,int* current_order,base_tree_callback_t cb, void* arg);
-static base_treeNode_t* traverse_target_rc(base_treeNode_t* current, int* order, trkey_t key, base_tree_callback_t cb,void* arg);
+static void traverse_target_rc(base_treeNode_t* current, int* order, trkey_t key, base_tree_callback_t cb,void* arg);
 static void print_tab(int cnt);
 
 void tree_traverse(base_treeRoot_t* rootp, base_tree_callback_t cb,int order, void* arg)
@@ -39,7 +39,7 @@ void tree_traverse_target(base_treeRoot_t* rootp, base_tree_callback_t cb, trkey
 	if((cb == NULL) || (rootp == NULL) || (GET_PTR(rootp->entry) == NULL))
 		return;
 	int i = 0;
-	rootp->entry = traverse_target_rc(rootp->entry, &i, key, cb, arg);
+	traverse_target_rc(rootp->entry, &i, key, cb, arg);
 }
 
 
@@ -220,13 +220,13 @@ static int traverse_decremental_rc(base_treeNode_t* current, int* current_order,
 }
 
 
-static base_treeNode_t* traverse_target_rc(base_treeNode_t* current, int* order, trkey_t key, base_tree_callback_t cb, void* arg) {
+static void traverse_target_rc(base_treeNode_t* current, int* order, trkey_t key, base_tree_callback_t cb, void* arg) {
 	if(GET_PTR(current) == NULL)
-		return NULL;
+		return;
 	if(GET_PTR(current)->key > key) {
-		GET_PTR(current)->left = traverse_target_rc(GET_PTR(current)->left, order, key, cb,arg);
+		traverse_target_rc(GET_PTR(current)->left, order, key, cb,arg);
 	} else if(GET_PTR(current)->key < key) {
-		GET_PTR(current)->right = traverse_target_rc(GET_PTR(current)->right, order, key, cb,arg);
+		traverse_target_rc(GET_PTR(current)->right, order, key, cb,arg);
 	}
 	switch(cb((*order)++, GET_PTR(current),arg)) {
 	case TRAVERSE_BREAK:
@@ -235,5 +235,4 @@ static base_treeNode_t* traverse_target_rc(base_treeNode_t* current, int* order,
 		 */
 		break;
 	}
-	return current;
 }
