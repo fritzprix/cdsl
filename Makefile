@@ -15,6 +15,8 @@ DBG_CFLAG = -O0 -g3 -fmessage-length=0  $(CFLAG) -D__DBG
 REL_CFLAG = -O2 -g0 -fmessage-length=0  $(CFLAG)
 DYNAMIC_FLAG = -fPIC
 
+LIBDIR=/usr/local/lib
+INCDIR=/usr/local/include/cdsl
 
 PROJECT_ROOT_DIR=$(CURDIR)
 HEADER_ROOT=$(PROJECT_ROOT_DIR)/include
@@ -158,6 +160,26 @@ $(DBG_CACHE_DIR)/%.s.do : %.cpp
 $(REL_CACHE_DIR)/%.s.o : %.cpp
 	@echo '$(ARCH) compile...$@'
 	$(CXX) -c -o $@ $(REL_CFLAG)  $< $(INCS) $(DYNAMIC_FLAG)
+	
+install : install_include install_lib
+	
+install_include : 
+	install -d $(INCDIR) 
+	install ./include/*.* $(INCDIR)
+	install ./cdsl.h $(INCDIR)
+	install ./include/arch/$(shell uname -m)/arch.h $(INCDIR)
+
+install_lib :
+	install $(REL_STATIC_TARGET) $(LIBDIR)
+	
+uninstall : uninstall_lib uninstall_include
+
+uninstall_lib :
+	rm $(LIBDIR)/$(REL_STATIC_TARGET)
+	
+uninstall_include:
+	rm -rf $(INCDIR)
+ 
 	
 PHONY += clean
 

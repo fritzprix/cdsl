@@ -8,7 +8,6 @@
 #ifndef CDSL_H_
 #define CDSL_H_
 
-#include "autogen.h"
 #include <stdint.h>
 #include <stddef.h>
 
