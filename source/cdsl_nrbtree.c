@@ -166,9 +166,9 @@ void cdsl_nrbtreePrint_dev (nrbtreeRoot_t* root)
 {
 	if(!root)
 		return;
-	printf("\n");
+	PRINT("\n");
 	node_print_rc(root->entry, 0);
-	printf("\n");
+	PRINT("\n");
 
 }
 #endif

@@ -49,6 +49,12 @@ REL_SH_OBJS=$(OBJ-y:%=$(REL_CACHE_DIR)/%.s.o)
 DBG_CACHE_DIR=Debug
 REL_CACHE_DIR=Release
 
+DEF-y+=$(DEF)
+DEFS=$(DEF-y:%=-D%)
+
+DBG_CFLAG+=$(DEFS)
+REL_CFLAG+=$(DEFS)
+
 CONFIG_DIR=./source/arch/$(ARCH)/configs
 
 SILENT+= $(REL_STATIC_TARGET) $(REL_DYNAMIC_TARGET) $(DBG_OBJS)
