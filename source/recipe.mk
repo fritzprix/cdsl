@@ -10,6 +10,7 @@ OBJ-y+= base_list\
 		cdsl_slist\
 		cdsl_spltree\
 		cdsl_nrbtree\
-		cdsl_hashtree
+		cdsl_hashtree\
+		baremetal
 
 		
