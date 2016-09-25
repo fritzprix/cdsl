@@ -56,11 +56,16 @@ struct cdsl_nrbtree {
 
 extern void cdsl_nrbtreeRootInit(nrbtreeRoot_t* rootp);
 extern void cdsl_nrbtreeNodeInit(nrbtreeNode_t* node, trkey_t key);
-extern nrbtreeNode_t* cdsl_nrbtreeInsert(nrbtreeRoot_t* rootp,nrbtreeNode_t* item);
+
+/*!
+ * insert element to tree
+ *
+ */
+extern nrbtreeNode_t* cdsl_nrbtreeInsert(nrbtreeRoot_t* rootp,nrbtreeNode_t* item, BOOL is_set);
 extern nrbtreeNode_t* cdsl_nrbtreeLookup(nrbtreeRoot_t* rootp,trkey_t key);
-extern nrbtreeNode_t* cdsl_nrbtreeDelete(nrbtreeRoot_t* rootp,trkey_t key);
-extern nrbtreeNode_t* cdsl_nrbtreeDeleteMin(nrbtreeRoot_t* rootp);
-extern nrbtreeNode_t* cdsl_nrbtreeDeleteMax(nrbtreeRoot_t* rootp);
+extern nrbtreeNode_t* cdsl_nrbtreeDelete(nrbtreeRoot_t* rootp,trkey_t key, base_tree_replacer_t replacer);
+extern nrbtreeNode_t* cdsl_nrbtreeDeleteMin(nrbtreeRoot_t* rootp, base_tree_replacer_t replacer);
+extern nrbtreeNode_t* cdsl_nrbtreeDeleteMax(nrbtreeRoot_t* rootp, base_tree_replacer_t replacer);
 
 
 #ifdef __DBG

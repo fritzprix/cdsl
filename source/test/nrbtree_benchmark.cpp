@@ -89,7 +89,7 @@ bool perform_nrbtree_benchmark(void){
 			for(key = 0;key < TEST_CNT;key++) {
 				dp = new data_t();
 				cdsl_nrbtreeNodeInit(&dp->node, key);
-				cdsl_nrbtreeInsert(&root, &dp->node);
+				cdsl_nrbtreeInsert(&root, &dp->node, FALSE);
 			}
 			end = clock();
 			insert_avg += (double)((end - start)) / CLOCKS_PER_SEC;
@@ -104,7 +104,7 @@ bool perform_nrbtree_benchmark(void){
 
 			start = clock();
 			for(key = 0;key < TEST_CNT;key++) {
-				dp = (data_t*) cdsl_nrbtreeDelete(&root,key);
+				dp = (data_t*) cdsl_nrbtreeDelete(&root,key, NULL);
 				if(!dp)
 					return false;
 				delete dp;

@@ -38,7 +38,7 @@ BOOL cdsl_nrbtreeDoTest(void) {
 		if (i != TEST_SIZE - 1)
 			keys[i] = i;
 		cdsl_nrbtreeNodeInit(&node_pool[i], keys[i]);
-		cdsl_nrbtreeInsert(&root, &node_pool[i]);
+		cdsl_nrbtreeInsert(&root, &node_pool[i],FALSE);
 	}
 	depth = cdsl_nrbtreeMaxDepth(&root);
 	__dev_log("Max Depth of New Red-Black Tree : %d @ N : %d\n",depth,i);
@@ -51,7 +51,7 @@ BOOL cdsl_nrbtreeDoTest(void) {
 	for (i = 0; i < TEST_SIZE; i++) {
 		delete_node = NULL;
 		__dev_log("\nkey : %d will be deleted!! \n\n",keys[i]);
-		delete_node = cdsl_nrbtreeDelete(&root, keys[i]);
+		delete_node = cdsl_nrbtreeDelete(&root, keys[i], NULL);
 		if (!delete_node) {
 			__dev_log("null node detected !!\n");
 			return FALSE;
@@ -62,13 +62,13 @@ BOOL cdsl_nrbtreeDoTest(void) {
 		}
 		keys[i] = rand() % TEST_SIZE;
 		cdsl_nrbtreeNodeInit(delete_node, keys[i]);
-		cdsl_nrbtreeInsert(&root, delete_node);
+		cdsl_nrbtreeInsert(&root, delete_node,FALSE);
 	}
 
 	trkey_t key = 0;
 	for (i = 0; i < TEST_SIZE; i++) {
 		delete_node = NULL;
-		delete_node = cdsl_nrbtreeDeleteMin(&root);
+		delete_node = cdsl_nrbtreeDeleteMin(&root, NULL);
 		if (!delete_node) {
 			__dev_log("null node detected !!\n");
 			return FALSE;
@@ -78,8 +78,8 @@ BOOL cdsl_nrbtreeDoTest(void) {
 			return FALSE;
 		}
 		key = delete_node->key;
-		cdsl_nrbtreeNodeInit(delete_node,key);
-		cdsl_nrbtreeInsert(&aroot, delete_node);
+		cdsl_nrbtreeNodeInit(delete_node, key);
+		cdsl_nrbtreeInsert(&aroot, delete_node, FALSE);
 	}
 
 	if (cdsl_nrbtreeSize(&aroot) != TEST_SIZE) {
@@ -90,7 +90,7 @@ BOOL cdsl_nrbtreeDoTest(void) {
 	key = 0xffffffff;
 	for (i = 0; i < TEST_SIZE; i++) {
 		delete_node = NULL;
-		delete_node = cdsl_nrbtreeDeleteMax(&aroot);
+		delete_node = cdsl_nrbtreeDeleteMax(&aroot, NULL);
 		if(!delete_node) {
 			__dev_log("unexptected null node !! \n");
 			return FALSE;
@@ -108,25 +108,45 @@ BOOL cdsl_nrbtreeDoTest(void) {
 
 
 	for (i = 0;i < TEST_SIZE; i++) {
-		cdsl_nrbtreeNodeInit(&node_pool[i],rand());
-		cdsl_nrbtreeInsert(&root, &node_pool[i]);
-		cdsl_nrbtreePrint_dev(&root);
+		cdsl_nrbtreeNodeInit(&node_pool[i], rand());
+		cdsl_nrbtreeInsert(&root, &node_pool[i], FALSE);
 	}
 	if (cdsl_nrbtreeMaxDepth(&root) > 25) {
-		fprintf(stderr,"abnormal balancing failure %d\n",cdsl_nrbtreeMaxDepth(&root));
+		PRINT_ERR("abnormal balancing failure %d\n", cdsl_nrbtreeMaxDepth(&root));
 		return FALSE;
 	}
 
+
+
 	for (i = 0;i < TEST_SIZE; i++) {
-		delete_node = cdsl_nrbtreeDeleteMin(&root);
+		delete_node = cdsl_nrbtreeDeleteMin(&root, NULL);
 		if(!delete_node) {
-			fprintf(stderr, "unexpected null node\n");
-			exit(-1);
+			PRINT_ERR("unexpected null node\n");
+			return FALSE;
 		}
 	}
 
-	if (cdsl_nrbtreeSize(&root) > 0)
+	if (cdsl_nrbtreeSize(&root) > 0) {
+		PRINT_ERR("unexpected non-empty tree\n");
 		return FALSE;
+	}
+
+	// key collision test
+	nrbtreeNode_t* replace = NULL;
+	cdsl_nrbtreeNodeInit(&node_pool[0], 1);
+	cdsl_nrbtreeNodeInit(&node_pool[1], 1);
+	if((replace = cdsl_nrbtreeInsert(&root, &node_pool[0], TRUE))) {
+		PRINT_ERR("unexpected replacement in set operation\n");
+		return FALSE;
+	}
+	if(!(replace = cdsl_nrbtreeInsert(&root, &node_pool[1], TRUE))) {
+		PRINT_ERR("no replacement happens\n");
+		return FALSE;
+	}
+	if(replace != &node_pool[0]) {
+		PRINT_ERR("wrong replacement\n");
+		return FALSE;
+	}
 
 	return TRUE;
 }

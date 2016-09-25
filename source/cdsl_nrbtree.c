@@ -52,10 +52,10 @@ const char* COLOR_STRING[] = {
 
 
 static int max_depth_rc(nrbtreeNode_t* node);
-static nrbtreeNode_t* insert_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t* item, uint8_t* rc_color, uint8_t* rc_dir);
-static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeNode_t** rm, uint8_t* ctx);
-static nrbtreeNode_t* delete_lm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx);
-static nrbtreeNode_t* delete_rm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx);
+static nrbtreeNode_t* insert_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t* item, uint8_t* rc_color, uint8_t* rc_dir, nrbtreeNode_t** replaced);
+static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeNode_t** rm, uint8_t* ctx, base_tree_replacer_t replacer);
+static nrbtreeNode_t* delete_lm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx, base_tree_replacer_t replacer);
+static nrbtreeNode_t* delete_rm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx, base_tree_replacer_t replacer);
 static nrbtreeNode_t* rotate_left(nrbtreeNode_t* gparent_c);
 static nrbtreeNode_t* rotate_right(nrbtreeNode_t* gparent_c);
 static nrbtreeNode_t* update_color(nrbtreeNode_t* node_c);
@@ -89,21 +89,22 @@ void cdsl_nrbtreeNodeInit(nrbtreeNode_t* node, trkey_t key) {
 	node->key = key;
 }
 
-nrbtreeNode_t* cdsl_nrbtreeInsert(nrbtreeRoot_t* rootp,nrbtreeNode_t* item) {
+nrbtreeNode_t* cdsl_nrbtreeInsert(nrbtreeRoot_t* rootp,nrbtreeNode_t* item, BOOL is_set) {
 	if(!rootp)
 		return NULL;
 	if(!rootp->entry)
 	{
 		rootp->entry = item;
-		return item;
+		return NULL;
 	}
 	stack_top = (__cdsl_uaddr_t) &rootp;
 
 	uint8_t dir = 0;
 	uint8_t color = 0;
-	rootp->entry = insert_rc(rootp->entry, item, &color , &dir);
+	nrbtreeNode_t* replaced = NULL;
+	rootp->entry = insert_rc(rootp->entry, item, &color , &dir, (is_set? &replaced : NULL));
 	__dev_log("stack usage : %lu\n",stack_top - stack_bottom);
-	return item;
+	return replaced;
 }
 
 nrbtreeNode_t* cdsl_nrbtreeLookup(nrbtreeRoot_t* rootp, trkey_t key) {
@@ -122,18 +123,18 @@ nrbtreeNode_t* cdsl_nrbtreeLookup(nrbtreeRoot_t* rootp, trkey_t key) {
 	return NULL;
 }
 
-nrbtreeNode_t* cdsl_nrbtreeDelete(nrbtreeRoot_t* rootp, trkey_t key)
+nrbtreeNode_t* cdsl_nrbtreeDelete(nrbtreeRoot_t* rootp, trkey_t key, base_tree_replacer_t replacer)
 {
 	if(!rootp)
 		return NULL;
 	nrbtreeNode_t* del = NULL;
 	uint8_t ctx = 0;
-	rootp->entry = delete_rc(rootp->entry, key, &del, &ctx);
+	rootp->entry = delete_rc(rootp->entry, key, &del, &ctx, replacer);
 	return GET_PTR(del);
 }
 
 
-nrbtreeNode_t* cdsl_nrbtreeDeleteMin(nrbtreeRoot_t* rootp)
+nrbtreeNode_t* cdsl_nrbtreeDeleteMin(nrbtreeRoot_t* rootp, base_tree_replacer_t replacer)
 {
 	if(!rootp)
 		return NULL;
@@ -141,11 +142,11 @@ nrbtreeNode_t* cdsl_nrbtreeDeleteMin(nrbtreeRoot_t* rootp)
 		return NULL;
 	nrbtreeNode_t* del = NULL;
 	uint8_t ctx = 0;
-	rootp->entry = delete_lm_rc(rootp->entry, &del, &ctx);
+	rootp->entry = delete_lm_rc(rootp->entry, &del, &ctx, replacer);
 	return GET_PTR(del);
 }
 
-nrbtreeNode_t* cdsl_nrbtreeDeleteMax(nrbtreeRoot_t* rootp)
+nrbtreeNode_t* cdsl_nrbtreeDeleteMax(nrbtreeRoot_t* rootp, base_tree_replacer_t replacer)
 {
 	if(!rootp)
 		return NULL;
@@ -153,7 +154,7 @@ nrbtreeNode_t* cdsl_nrbtreeDeleteMax(nrbtreeRoot_t* rootp)
 		return NULL;
 	nrbtreeNode_t* del = NULL;
 	uint8_t ctx = 0;
-	rootp->entry = delete_rm_rc(rootp->entry, &del, &ctx);
+	rootp->entry = delete_rm_rc(rootp->entry, &del, &ctx, replacer);
 	return GET_PTR(del);
 }
 
@@ -197,18 +198,17 @@ static void node_print_rc(nrbtreeNode_t* node, int level) {
  *  ctx[3] = res for future
  */
 
-static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeNode_t** rm, uint8_t* ctx)
+static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeNode_t** rm, uint8_t* ctx, base_tree_replacer_t replacer)
 {
 	if(!sub_root_c)
 	{
-		if(rm)
-			*rm = NULL;
+		*rm = NULL;
 		return NULL;
 	}
 
 	if(GET_PTR(sub_root_c)->key < key)
 	{
-		GET_PTR(sub_root_c)->right = delete_rc(GET_PTR(sub_root_c)->right,key, rm, ctx);
+		GET_PTR(sub_root_c)->right = delete_rc(GET_PTR(sub_root_c)->right,key, rm, ctx, replacer);
 		if(*ctx & (1 << CTX_BB))
 		{
 			sub_root_c = resolve_black_black(sub_root_c, CTX_RIGHT, ctx);
@@ -217,15 +217,23 @@ static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeN
 	}
 	else if(GET_PTR(sub_root_c)->key > key)
 	{
-		GET_PTR(sub_root_c)->left = delete_rc(GET_PTR(sub_root_c)->left,key, rm, ctx);
+		GET_PTR(sub_root_c)->left = delete_rc(GET_PTR(sub_root_c)->left,key, rm, ctx, replacer);
 		if(*ctx & (1 << CTX_BB))
 		{
 			sub_root_c = resolve_black_black(sub_root_c, CTX_LEFT, ctx);
 		}
 		return sub_root_c;
 	}
-	if(rm)
-		*rm = sub_root_c;
+	*rm = sub_root_c;
+	if(replacer) {
+		nrbtreeNode_t* replace = GET_PTR(sub_root_c);
+		if(replacer((base_treeNode_t**) &replace)) {
+			replace->left = GET_PTR(sub_root_c)->left;
+			replace->right = GET_PTR(sub_root_c)->right;
+			PAINT_COLOR(replace, GET_COLOR(sub_root_c));
+			return replace;
+		}
+	}
 	if (GET_PTR(sub_root_c)->left) {
 		GET_PTR(sub_root_c)->left = up_from_rightmost_rc(GET_PTR(sub_root_c)->left, &sub_root_c,ctx);
 		GET_PTR(sub_root_c)->right = GET_PTR(*rm)->right;
@@ -248,11 +256,20 @@ static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeN
 
 
 
-static nrbtreeNode_t* delete_lm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx)
+static nrbtreeNode_t* delete_lm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx, base_tree_replacer_t replacer)
 {
 	if(!GET_PTR(sub_root_c)->left)
 	{
 		*rm = sub_root_c;
+		if(replacer) {
+			nrbtreeNode_t* replace = GET_PTR(sub_root_c);
+			if(replacer((base_treeNode_t**) &replace)) {
+				replace->left = GET_PTR(sub_root_c)->left;
+				replace->right = GET_PTR(sub_root_c)->right;
+				PAINT_COLOR(replace, GET_COLOR(sub_root_c));
+				return replace;
+			}
+		}
 		if(GET_PTR(sub_root_c)->right) {
 			GET_PTR(sub_root_c)->right = up_from_leftmost_rc(GET_PTR(sub_root_c)->right, &sub_root_c, ctx);
 			GET_PTR(sub_root_c)->left = GET_PTR(*rm)->left;
@@ -263,7 +280,7 @@ static nrbtreeNode_t* delete_lm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm
 		}
 		return NULL;
 	}
-	GET_PTR(sub_root_c)->left = delete_lm_rc(GET_PTR(sub_root_c)->left, rm, ctx);
+	GET_PTR(sub_root_c)->left = delete_lm_rc(GET_PTR(sub_root_c)->left, rm, ctx, replacer);
 	if(*ctx & (1 << CTX_BB))
 	{
 		sub_root_c = resolve_black_black(sub_root_c, CTX_LEFT, ctx);
@@ -271,11 +288,20 @@ static nrbtreeNode_t* delete_lm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm
 	return sub_root_c;
 }
 
-static nrbtreeNode_t* delete_rm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx)
+static nrbtreeNode_t* delete_rm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx, base_tree_replacer_t replacer)
 {
 	if(!GET_PTR(sub_root_c)->right)
 	{
 		*rm = sub_root_c;
+		if(replacer) {
+			nrbtreeNode_t* replace = GET_PTR(sub_root_c);
+			if(replacer((base_treeNode_t**) &replace)) {
+				replace->left = GET_PTR(sub_root_c)->left;
+				replace->right = GET_PTR(sub_root_c)->right;
+				PAINT_COLOR(replace, GET_COLOR(sub_root_c));
+				return replace;
+			}
+		}
 		if(GET_PTR(sub_root_c)->left) {
 			GET_PTR(sub_root_c)->left = up_from_rightmost_rc(GET_PTR(sub_root_c)->left, &sub_root_c, ctx);
 			GET_PTR(sub_root_c)->right = GET_PTR(*rm)->right;
@@ -286,7 +312,7 @@ static nrbtreeNode_t* delete_rm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm
 		}
 		return NULL;
 	}
-	GET_PTR(sub_root_c)->right = delete_rm_rc(GET_PTR(sub_root_c)->right, rm, ctx);
+	GET_PTR(sub_root_c)->right = delete_rm_rc(GET_PTR(sub_root_c)->right, rm, ctx, replacer);
 	if(*ctx & (1 << CTX_BB))
 	{
 		sub_root_c = resolve_black_black(sub_root_c, CTX_RIGHT, ctx);
@@ -428,7 +454,7 @@ static nrbtreeNode_t* resolve_red_red(nrbtreeNode_t* gparent_c,uint8_t color_ctx
 #define RC_CTX_PATTERN         ((uint8_t) 0xC0)
 #define RC_CTX_PATTERN_REDRED  ((uint8_t) 0xC0)
 
-static nrbtreeNode_t* insert_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t* item,uint8_t* rc_color, uint8_t* rc_dir)
+static nrbtreeNode_t* insert_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t* item,uint8_t* rc_color, uint8_t* rc_dir, nrbtreeNode_t** replaced)
 {
 	if(!GET_PTR(sub_root_c))
 	{
@@ -440,7 +466,7 @@ static nrbtreeNode_t* insert_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t* item,u
 	{
 		if(GET_PTR(sub_root_c)->key < GET_PTR(item)->key)
 		{
-			GET_PTR(sub_root_c)->right = insert_rc(GET_PTR(sub_root_c)->right, item, rc_color, rc_dir);
+			GET_PTR(sub_root_c)->right = insert_rc(GET_PTR(sub_root_c)->right, item, rc_color, rc_dir, replaced);
 
 			*rc_color >>= 1;
 			*rc_dir >>= 1;
@@ -457,7 +483,15 @@ static nrbtreeNode_t* insert_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t* item,u
 		}
 		else
 		{
-			GET_PTR(sub_root_c)->left = insert_rc(GET_PTR(sub_root_c)->left, item , rc_color, rc_dir);
+			if(replaced && (GET_PTR(sub_root_c)->key == item->key)) {
+				// if the key value of new item collides to another and the insert operation is performed with (is_set == true)
+				// replace old one with new item
+				*replaced = GET_PTR(sub_root_c);
+				item->left = GET_PTR(sub_root_c)->left;
+				item->right = GET_PTR(sub_root_c)->right;
+				return (nrbtreeNode_t*) ((__cdsl_uaddr_t) item | GET_COLOR(sub_root_c));
+			}
+			GET_PTR(sub_root_c)->left = insert_rc(GET_PTR(sub_root_c)->left, item , rc_color, rc_dir, replaced);
 
 			*rc_color >>= 1;
 			*rc_dir >>= 1;

@@ -9,6 +9,7 @@
 #define INCLUDE_CDSL_HASHTREE_H_
 
 #include "cdsl_nrbtree.h"
+#include "cdsl_slist.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,12 +26,13 @@ struct hashtree_node {
 	union {
 		nrbtreeNode_t     _base;
 		struct {
-			hashNode_t*    next;
-			hashNode_t*    prev;
+			hashNode_t*    right;
+			hashNode_t*    left;
 		};
 	};
-	__cdsl_uaddr_t         key;
-	const char*            _str_key;
+	__cdsl_uaddr_t         key;                       // converted hash value from the char string
+	const char*            _str_key;                  // char string used as a key
+	slistEntry_t           col_lentry;                // single-linked list to handle hash collision
 };
 
 typedef struct hashtree_root {

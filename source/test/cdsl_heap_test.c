@@ -14,7 +14,7 @@
 
 
 
-heapNode_t nodes[TEST_SIZE];
+static heapNode_t nodes[TEST_SIZE];
 BOOL cdsl_heapDoTest(void)
 {
 	heapRoot_t root;

@@ -22,21 +22,29 @@ extern "C" {
 #endif
 
 #ifdef __DBG
-#define __dev_log(...) 	PRINT(__VA_ARGS__)
+#define __dev_log(...) //	PRINT(__VA_ARGS__)
 #else
 #define __dev_log(...)
 #endif
 
 
 /*
- *  baremetal environment assume libc doesn't exist
- *  so PRINT do nothing till any target specific printf equivalent
+ *
+ * for baremetal application, you can provide your own implementation of dependencies
  */
 #ifdef BAREMETAL
+#include "baremetal.h"
 #define PRINT(...)
+#define PRINT_ERR(...)
+#define EXIT(n)
+#define STRCMP(s1,s2)       baremetal_strcmp(s1,s2)
 #else
 #include <stdio.h>
+#include <string.h>
 #define PRINT(...)           printf(__VA_ARGS__)
+#define PRINT_ERR(...)       fprintf(stderr, __VA_ARGS__)
+#define EXIT(n)              exit(n)
+#define STRCMP(s1,s2)        strcmp(s1,s2)
 #endif
 
 #define container_of(ptr, type, elem) 	((type*) ((size_t) ptr - offsetof(type, elem)))

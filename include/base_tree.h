@@ -27,6 +27,7 @@ typedef __cdsl_uaddr_t  trkey_t;
 typedef struct base_tree_node base_treeNode_t;
 typedef struct base_tree_root base_treeRoot_t;
 typedef int (*base_tree_callback_t)(int,base_treeNode_t*,void*);
+typedef int (*base_tree_replacer_t)(base_treeNode_t** node);
 
 struct base_tree_root {
 	base_treeNode_t* entry;
