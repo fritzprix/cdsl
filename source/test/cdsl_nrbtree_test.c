@@ -51,7 +51,7 @@ BOOL cdsl_nrbtreeDoTest(void) {
 	for (i = 0; i < TEST_SIZE; i++) {
 		delete_node = NULL;
 		__dev_log("\nkey : %d will be deleted!! \n\n",keys[i]);
-		delete_node = cdsl_nrbtreeDelete(&root, keys[i], NULL);
+		delete_node = cdsl_nrbtreeDelete(&root, keys[i]);
 		if (!delete_node) {
 			__dev_log("null node detected !!\n");
 			return FALSE;
@@ -68,7 +68,7 @@ BOOL cdsl_nrbtreeDoTest(void) {
 	trkey_t key = 0;
 	for (i = 0; i < TEST_SIZE; i++) {
 		delete_node = NULL;
-		delete_node = cdsl_nrbtreeDeleteMin(&root, NULL);
+		delete_node = cdsl_nrbtreeDeleteMin(&root);
 		if (!delete_node) {
 			__dev_log("null node detected !!\n");
 			return FALSE;
@@ -90,7 +90,7 @@ BOOL cdsl_nrbtreeDoTest(void) {
 	key = 0xffffffff;
 	for (i = 0; i < TEST_SIZE; i++) {
 		delete_node = NULL;
-		delete_node = cdsl_nrbtreeDeleteMax(&aroot, NULL);
+		delete_node = cdsl_nrbtreeDeleteMax(&aroot);
 		if(!delete_node) {
 			__dev_log("unexptected null node !! \n");
 			return FALSE;
@@ -119,7 +119,7 @@ BOOL cdsl_nrbtreeDoTest(void) {
 
 
 	for (i = 0;i < TEST_SIZE; i++) {
-		delete_node = cdsl_nrbtreeDeleteMin(&root, NULL);
+		delete_node = cdsl_nrbtreeDeleteMin(&root);
 		if(!delete_node) {
 			PRINT_ERR("unexpected null node\n");
 			return FALSE;

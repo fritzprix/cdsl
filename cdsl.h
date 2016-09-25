@@ -40,6 +40,7 @@ extern "C" {
 #define STRCMP(s1,s2)        baremetal_strcmp(s1,s2)
 #else
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #define PRINT(...)           printf(__VA_ARGS__)
 #define PRINT_ERR(...)       fprintf(stderr, __VA_ARGS__)
