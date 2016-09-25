@@ -18,7 +18,7 @@ typedef struct {
 	int age;
 } person_t;
 
-#define TEST_CNT 1000
+#define TEST_CNT 60000
 static person_t people[TEST_CNT];
 
 BOOL cdsl_hashtreeDoTest(void) {

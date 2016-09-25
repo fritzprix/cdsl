@@ -22,7 +22,7 @@ extern "C" {
 #endif
 
 #ifdef __DBG
-#define __dev_log(...) //	PRINT(__VA_ARGS__)
+#define __dev_log(...)       PRINT(__VA_ARGS__)
 #else
 #define __dev_log(...)
 #endif
@@ -37,9 +37,10 @@ extern "C" {
 #define PRINT(...)
 #define PRINT_ERR(...)
 #define EXIT(n)
-#define STRCMP(s1,s2)       baremetal_strcmp(s1,s2)
+#define STRCMP(s1,s2)        baremetal_strcmp(s1,s2)
 #else
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #define PRINT(...)           printf(__VA_ARGS__)
 #define PRINT_ERR(...)       fprintf(stderr, __VA_ARGS__)
