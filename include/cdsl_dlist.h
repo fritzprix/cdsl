@@ -11,7 +11,6 @@
 #ifndef CDSL_DLIST_H_
 #define CDSL_DLIST_H_
 
-#include "cdsl.h"
 #include "base_list.h"
 
 #if defined(__cplusplus)

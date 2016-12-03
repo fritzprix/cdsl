@@ -8,6 +8,7 @@
 #ifndef INCLUDE_CDSL_HASHTREE_H_
 #define INCLUDE_CDSL_HASHTREE_H_
 
+#include "cdsl_defs.h"
 #include "cdsl_nrbtree.h"
 #include "cdsl_slist.h"
 

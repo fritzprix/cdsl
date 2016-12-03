@@ -9,8 +9,6 @@
 #define INCLUDE_CDSL_NRBTREE_H_
 
 #include "base_tree.h"
-#include "cdsl.h"
-#include "arch.h"
 
 #ifdef __cplusplus
 extern "C" {

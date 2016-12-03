@@ -7,7 +7,7 @@
 
 #ifndef INCLUDE_TEST_CDSL_NRBTREE_TEST_H_
 #define INCLUDE_TEST_CDSL_NRBTREE_TEST_H_
-#include "cdsl.h"
+#include "cdsl_defs.h"
 
 #ifdef __cplusplus
 extern "C" {

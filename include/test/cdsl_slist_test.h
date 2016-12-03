@@ -8,7 +8,7 @@
 #ifndef CDSL_SLIST_TEST_H_
 #define CDSL_SLIST_TEST_H_
 
-#include "cdsl.h"
+#include "cdsl_defs.h"
 #ifdef __cplusplus
 extern "C" {
 #endif

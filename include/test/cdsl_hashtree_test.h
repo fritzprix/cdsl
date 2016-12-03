@@ -9,7 +9,7 @@
 #define INCLUDE_TEST_CDSL_HASHTREE_TEST_H_
 
 
-#include "cdsl.h"
+#include "cdsl_defs.h"
 
 
 #if defined(__cplusplus)

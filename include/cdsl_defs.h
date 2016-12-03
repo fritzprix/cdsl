@@ -1,19 +1,16 @@
 /*
- * cdsl.h
+ * cdsl_types.h
  *
- *  Created on: 2015. 5. 14.
+ *  Created on: 2016. 12. 3.
  *      Author: innocentevil
  */
 
-#ifndef CDSL_H_
-#define CDSL_H_
+#ifndef INCLUDE_CDSL_DEFS_H_
+#define INCLUDE_CDSL_DEFS_H_
 
 #include "autogen.h"
-#include <stdint.h>
-#include <stddef.h>
 
-
-#if defined(__cplusplus)
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -26,7 +23,6 @@ extern "C" {
 #else
 #define __dev_log(...)
 #endif
-
 
 /*
  *
@@ -42,6 +38,9 @@ extern "C" {
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdint.h>
+#include <stddef.h>
+
 #define PRINT(...)           printf(__VA_ARGS__)
 #define PRINT_ERR(...)       fprintf(stderr, __VA_ARGS__)
 #define EXIT(n)              exit(n)
@@ -67,14 +66,8 @@ typedef void (*cdsl_generic_printer_t) (void*);
 #define NULL 	((void*) 0)
 #endif
 
-
-
-
-
-#if defined(__cplusplus)
+#ifdef __cplusplus
 }
 #endif
 
-
-
-#endif /* CDSL_H_ */
+#endif /* INCLUDE_CDSL_DEFS_H_ */

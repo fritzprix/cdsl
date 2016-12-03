@@ -9,7 +9,7 @@
 #define BASE_TREE_H_
 
 #include "arch.h"
-#include "cdsl.h"
+#include "cdsl_defs.h"
 
 #if defined(__cplusplus)
 extern "C" {
