@@ -8,7 +8,6 @@
 #ifndef CDSL_BSTREE_H_
 #define CDSL_BSTREE_H_
 
-#include "cdsl.h"
 #include "base_tree.h"
 
 #if defined(__cplusplus)

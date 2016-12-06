@@ -8,7 +8,6 @@
 #ifndef CDSL_SLIST_H_
 #define CDSL_SLIST_H_
 
-#include "cdsl.h"
 #include "base_list.h"
 
 #if defined(__cplusplus)

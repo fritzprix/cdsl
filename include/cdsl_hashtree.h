@@ -8,6 +8,7 @@
 #ifndef INCLUDE_CDSL_HASHTREE_H_
 #define INCLUDE_CDSL_HASHTREE_H_
 
+#include "cdsl_defs.h"
 #include "cdsl_nrbtree.h"
 #include "cdsl_slist.h"
 
@@ -47,7 +48,6 @@ extern void cdsl_hashtreeRootInit(hashRoot_t* root);
 extern hashNode_t* cdsl_hashtreeInsert(hashRoot_t* root, hashNode_t* node);
 extern hashNode_t* cdsl_hashtreeLookup(hashRoot_t* root, const char* key);
 extern hashNode_t* cdsl_hashtreeRemove(hashRoot_t* root, const char* key);
-extern hashNode_t* cdsl_hashtreeRemoveRandom(hashRoot_t* root);
 
 
 

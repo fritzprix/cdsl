@@ -9,7 +9,6 @@
 #define CDSL_HEAP_H_
 
 #include "base_tree.h"
-#include "cdsl.h"
 
 #if defined(__cplusplus)
 extern "C" {

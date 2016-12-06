@@ -53,9 +53,9 @@ const char* COLOR_STRING[] = {
 
 static int max_depth_rc(nrbtreeNode_t* node);
 static nrbtreeNode_t* insert_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t* item, uint8_t* rc_color, uint8_t* rc_dir, nrbtreeNode_t** replaced);
-static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeNode_t** rm, uint8_t* ctx, base_tree_replacer_t replacer);
-static nrbtreeNode_t* delete_lm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx, base_tree_replacer_t replacer);
-static nrbtreeNode_t* delete_rm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx, base_tree_replacer_t replacer);
+static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeNode_t** rm, uint8_t* ctx, base_tree_replacer_t replacer, void* arg);
+static nrbtreeNode_t* delete_lm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx, base_tree_replacer_t replacer, void* arg);
+static nrbtreeNode_t* delete_rm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx, base_tree_replacer_t replacer, void* arg);
 static nrbtreeNode_t* rotate_left(nrbtreeNode_t* gparent_c);
 static nrbtreeNode_t* rotate_right(nrbtreeNode_t* gparent_c);
 static nrbtreeNode_t* update_color(nrbtreeNode_t* node_c);
@@ -123,18 +123,18 @@ nrbtreeNode_t* cdsl_nrbtreeLookup(nrbtreeRoot_t* rootp, trkey_t key) {
 	return NULL;
 }
 
-nrbtreeNode_t* cdsl_nrbtreeDelete(nrbtreeRoot_t* rootp, trkey_t key, base_tree_replacer_t replacer)
+nrbtreeNode_t* cdsl_nrbtreeDeleteReplace(nrbtreeRoot_t* rootp, trkey_t key, base_tree_replacer_t replacer, void* arg)
 {
 	if(!rootp)
 		return NULL;
 	nrbtreeNode_t* del = NULL;
 	uint8_t ctx = 0;
-	rootp->entry = delete_rc(rootp->entry, key, &del, &ctx, replacer);
+	rootp->entry = delete_rc(rootp->entry, key, &del, &ctx, replacer, arg);
 	return GET_PTR(del);
 }
 
 
-nrbtreeNode_t* cdsl_nrbtreeDeleteMin(nrbtreeRoot_t* rootp, base_tree_replacer_t replacer)
+nrbtreeNode_t* cdsl_nrbtreeDeleteMinReplace(nrbtreeRoot_t* rootp, base_tree_replacer_t replacer, void* arg)
 {
 	if(!rootp)
 		return NULL;
@@ -142,11 +142,11 @@ nrbtreeNode_t* cdsl_nrbtreeDeleteMin(nrbtreeRoot_t* rootp, base_tree_replacer_t 
 		return NULL;
 	nrbtreeNode_t* del = NULL;
 	uint8_t ctx = 0;
-	rootp->entry = delete_lm_rc(rootp->entry, &del, &ctx, replacer);
+	rootp->entry = delete_lm_rc(rootp->entry, &del, &ctx, replacer, arg);
 	return GET_PTR(del);
 }
 
-nrbtreeNode_t* cdsl_nrbtreeDeleteMax(nrbtreeRoot_t* rootp, base_tree_replacer_t replacer)
+nrbtreeNode_t* cdsl_nrbtreeDeleteMaxReplace(nrbtreeRoot_t* rootp, base_tree_replacer_t replacer, void* arg)
 {
 	if(!rootp)
 		return NULL;
@@ -154,7 +154,7 @@ nrbtreeNode_t* cdsl_nrbtreeDeleteMax(nrbtreeRoot_t* rootp, base_tree_replacer_t 
 		return NULL;
 	nrbtreeNode_t* del = NULL;
 	uint8_t ctx = 0;
-	rootp->entry = delete_rm_rc(rootp->entry, &del, &ctx, replacer);
+	rootp->entry = delete_rm_rc(rootp->entry, &del, &ctx, replacer, arg);
 	return GET_PTR(del);
 }
 
@@ -198,7 +198,7 @@ static void node_print_rc(nrbtreeNode_t* node, int level) {
  *  ctx[3] = res for future
  */
 
-static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeNode_t** rm, uint8_t* ctx, base_tree_replacer_t replacer)
+static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeNode_t** rm, uint8_t* ctx, base_tree_replacer_t replacer, void* cb_arg)
 {
 	if(!sub_root_c)
 	{
@@ -208,7 +208,7 @@ static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeN
 
 	if(GET_PTR(sub_root_c)->key < key)
 	{
-		GET_PTR(sub_root_c)->right = delete_rc(GET_PTR(sub_root_c)->right,key, rm, ctx, replacer);
+		GET_PTR(sub_root_c)->right = delete_rc(GET_PTR(sub_root_c)->right,key, rm, ctx, replacer, cb_arg);
 		if(*ctx & (1 << CTX_BB))
 		{
 			sub_root_c = resolve_black_black(sub_root_c, CTX_RIGHT, ctx);
@@ -217,7 +217,7 @@ static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeN
 	}
 	else if(GET_PTR(sub_root_c)->key > key)
 	{
-		GET_PTR(sub_root_c)->left = delete_rc(GET_PTR(sub_root_c)->left,key, rm, ctx, replacer);
+		GET_PTR(sub_root_c)->left = delete_rc(GET_PTR(sub_root_c)->left,key, rm, ctx, replacer, cb_arg);
 		if(*ctx & (1 << CTX_BB))
 		{
 			sub_root_c = resolve_black_black(sub_root_c, CTX_LEFT, ctx);
@@ -227,12 +227,18 @@ static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeN
 	*rm = sub_root_c;
 	if(replacer) {
 		nrbtreeNode_t* replace = GET_PTR(sub_root_c);
-		if(replacer((base_treeNode_t**) &replace)) {
+		if(replacer((base_treeNode_t**) &replace, cb_arg)) {
+			if(replace == GET_PTR(sub_root_c)) {
+				*rm = NULL;  // not found case, return immediately
+				return sub_root_c;
+			}
+			// override default hole handling behavior
 			replace->left = GET_PTR(sub_root_c)->left;
 			replace->right = GET_PTR(sub_root_c)->right;
 			PAINT_COLOR(replace, GET_COLOR(sub_root_c));
 			return replace;
 		}
+		// otherwise, perform default hole handling
 	}
 	if (GET_PTR(sub_root_c)->left) {
 		GET_PTR(sub_root_c)->left = up_from_rightmost_rc(GET_PTR(sub_root_c)->left, &sub_root_c,ctx);
@@ -256,19 +262,25 @@ static nrbtreeNode_t* delete_rc(nrbtreeNode_t* sub_root_c, trkey_t key, nrbtreeN
 
 
 
-static nrbtreeNode_t* delete_lm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx, base_tree_replacer_t replacer)
+static nrbtreeNode_t* delete_lm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx, base_tree_replacer_t replacer, void* cb_arg)
 {
 	if(!GET_PTR(sub_root_c)->left)
 	{
 		*rm = sub_root_c;
 		if(replacer) {
 			nrbtreeNode_t* replace = GET_PTR(sub_root_c);
-			if(replacer((base_treeNode_t**) &replace)) {
+			if(replacer((base_treeNode_t**) &replace, cb_arg)) {
+				if(replace == GET_PTR(sub_root_c)) {
+					*rm = NULL;  // not found case, return immediately
+					return sub_root_c;
+				}
+				// override default hole handling behavior
 				replace->left = GET_PTR(sub_root_c)->left;
 				replace->right = GET_PTR(sub_root_c)->right;
 				PAINT_COLOR(replace, GET_COLOR(sub_root_c));
 				return replace;
 			}
+			// otherwise, perform default hole handling
 		}
 		if(GET_PTR(sub_root_c)->right) {
 			GET_PTR(sub_root_c)->right = up_from_leftmost_rc(GET_PTR(sub_root_c)->right, &sub_root_c, ctx);
@@ -280,7 +292,7 @@ static nrbtreeNode_t* delete_lm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm
 		}
 		return NULL;
 	}
-	GET_PTR(sub_root_c)->left = delete_lm_rc(GET_PTR(sub_root_c)->left, rm, ctx, replacer);
+	GET_PTR(sub_root_c)->left = delete_lm_rc(GET_PTR(sub_root_c)->left, rm, ctx, replacer, cb_arg);
 	if(*ctx & (1 << CTX_BB))
 	{
 		sub_root_c = resolve_black_black(sub_root_c, CTX_LEFT, ctx);
@@ -288,19 +300,25 @@ static nrbtreeNode_t* delete_lm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm
 	return sub_root_c;
 }
 
-static nrbtreeNode_t* delete_rm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx, base_tree_replacer_t replacer)
+static nrbtreeNode_t* delete_rm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm, uint8_t* ctx, base_tree_replacer_t replacer, void* cb_arg)
 {
 	if(!GET_PTR(sub_root_c)->right)
 	{
 		*rm = sub_root_c;
 		if(replacer) {
 			nrbtreeNode_t* replace = GET_PTR(sub_root_c);
-			if(replacer((base_treeNode_t**) &replace)) {
+			if(replacer((base_treeNode_t**) &replace, cb_arg)) {
+				if(replace == GET_PTR(sub_root_c)) {
+					*rm = NULL;  // not found case, return immediately
+					return sub_root_c;
+				}
+				// override default hole handling behavior
 				replace->left = GET_PTR(sub_root_c)->left;
 				replace->right = GET_PTR(sub_root_c)->right;
 				PAINT_COLOR(replace, GET_COLOR(sub_root_c));
 				return replace;
 			}
+			// otherwise, perform default hole handling
 		}
 		if(GET_PTR(sub_root_c)->left) {
 			GET_PTR(sub_root_c)->left = up_from_rightmost_rc(GET_PTR(sub_root_c)->left, &sub_root_c, ctx);
@@ -312,7 +330,7 @@ static nrbtreeNode_t* delete_rm_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t** rm
 		}
 		return NULL;
 	}
-	GET_PTR(sub_root_c)->right = delete_rm_rc(GET_PTR(sub_root_c)->right, rm, ctx, replacer);
+	GET_PTR(sub_root_c)->right = delete_rm_rc(GET_PTR(sub_root_c)->right, rm, ctx, replacer, cb_arg);
 	if(*ctx & (1 << CTX_BB))
 	{
 		sub_root_c = resolve_black_black(sub_root_c, CTX_RIGHT, ctx);

@@ -7,11 +7,13 @@
 
 #include "baremetal.h"
 #include "baremetal_test.h"
+#include "assert.h"
 
 BOOL cdsl_baremetal_dep_test(void) {
 	if(baremetal_strcmp("Hello", "Hello")) {
 		return FALSE;
 	}
+
 	if(baremetal_strcmp("Hello", "Hello World") > 0) {
 		return FALSE;
 	}

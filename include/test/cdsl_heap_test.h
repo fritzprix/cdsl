@@ -8,7 +8,7 @@
 #ifndef CDSL_HEAP_TEST_H_
 #define CDSL_HEAP_TEST_H_
 
-#include "cdsl.h"
+#include "cdsl_defs.h"
 
 #if defined(__cplusplus)
 extern "C" {

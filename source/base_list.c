@@ -93,4 +93,3 @@ listNode_t* cdsl_iterRemove(listIter_t* iter)
 	cur->next = NULL;
 	return cur;
 }
-

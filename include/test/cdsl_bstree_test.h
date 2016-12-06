@@ -8,7 +8,7 @@
 #ifndef CDSL_BSTREE_TEST_H_
 #define CDSL_BSTREE_TEST_H_
 
-#include "cdsl.h"
+#include "cdsl_defs.h"
 
 #ifdef __cplusplus
 extern "C" {

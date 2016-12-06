@@ -9,8 +9,6 @@
 #define INCLUDE_CDSL_NRBTREE_H_
 
 #include "base_tree.h"
-#include "cdsl.h"
-#include "arch.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,6 +28,9 @@ extern "C" {
 #define cdsl_nrbtreeMin(root)                           (nrbtreeNode_t*) tree_min((base_treeRoot_t*) root)
 #define cdsl_nrbtreeMax(root)                           (nrbtreeNode_t*) tree_max((base_treeRoot_t*) root)
 #define cdsl_nrbtreeUpdate(root,nitem)                  (nrbtreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
+#define cdsl_nrbtreeDelete(root, key)                   cdsl_nrbtreeDeleteReplace(root, key, NULL, NULL)
+#define cdsl_nrbtreeDeleteMin(root)                     cdsl_nrbtreeDeleteMinReplace(root, NULL, NULL)
+#define cdsl_nrbtreeDeleteMax(root)                     cdsl_nrbtreeDeleteMaxReplace(root, NULL, NULL)
 
 
 typedef struct cdsl_nrbtree nrbtreeNode_t;
@@ -63,9 +64,9 @@ extern void cdsl_nrbtreeNodeInit(nrbtreeNode_t* node, trkey_t key);
  */
 extern nrbtreeNode_t* cdsl_nrbtreeInsert(nrbtreeRoot_t* rootp,nrbtreeNode_t* item, BOOL is_set);
 extern nrbtreeNode_t* cdsl_nrbtreeLookup(nrbtreeRoot_t* rootp,trkey_t key);
-extern nrbtreeNode_t* cdsl_nrbtreeDelete(nrbtreeRoot_t* rootp,trkey_t key, base_tree_replacer_t replacer);
-extern nrbtreeNode_t* cdsl_nrbtreeDeleteMin(nrbtreeRoot_t* rootp, base_tree_replacer_t replacer);
-extern nrbtreeNode_t* cdsl_nrbtreeDeleteMax(nrbtreeRoot_t* rootp, base_tree_replacer_t replacer);
+extern nrbtreeNode_t* cdsl_nrbtreeDeleteReplace(nrbtreeRoot_t* rootp,trkey_t key, base_tree_replacer_t replacer, void* cb_arg);
+extern nrbtreeNode_t* cdsl_nrbtreeDeleteMinReplace(nrbtreeRoot_t* rootp, base_tree_replacer_t replacer, void* cb_arg);
+extern nrbtreeNode_t* cdsl_nrbtreeDeleteMaxReplace(nrbtreeRoot_t* rootp, base_tree_replacer_t replacer, void* cb_arg);
 
 
 #ifdef __DBG

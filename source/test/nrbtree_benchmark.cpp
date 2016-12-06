@@ -104,7 +104,7 @@ bool perform_nrbtree_benchmark(void){
 
 			start = clock();
 			for(key = 0;key < TEST_CNT;key++) {
-				dp = (data_t*) cdsl_nrbtreeDelete(&root,key, NULL);
+				dp = (data_t*) cdsl_nrbtreeDelete(&root,key);
 				if(!dp)
 					return false;
 				delete dp;
