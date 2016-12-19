@@ -7,7 +7,6 @@
 
 #include <stddef.h>
 #include <stdio.h>
-#include "cdsl.h"
 #include "cdsl_dlist.h"
 #include "cdsl_list_test.h"
 
