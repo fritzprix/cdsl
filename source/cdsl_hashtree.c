@@ -39,7 +39,7 @@ hashNode_t* cdsl_hashtreeInsert(hashRoot_t* root, hashNode_t* node) {
 	// and old one returned as collision here
 	hashNode_t* collision  = (hashNode_t* )cdsl_nrbtreeInsert(&root->_base, &node->_base, TRUE);
 	if(collision) {
-		printf("collision\n");
+		PRINT("collision\n");
 		collision = container_of(collision, hashNode_t, _base);
 		if(STRCMP(collision->_str_key, node->_str_key)) {
 			// if key string of new item is different from collision, otherwise, discard collision
