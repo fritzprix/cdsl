@@ -5,7 +5,7 @@
  *      Author: innocentevil
  */
 
-#include "cdsl.h"
+#include "cdsl_defs.h"
 #include "cdsl_spltree.h"
 
 #define LEFT		((uint8_t) 0)

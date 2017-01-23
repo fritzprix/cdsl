@@ -6,7 +6,6 @@
  */
 
 
-#include "cdsl.h"
 #include "cdsl_spltree.h"
 #include "cdsl_spltree_test.h"
 #include <stdio.h>
