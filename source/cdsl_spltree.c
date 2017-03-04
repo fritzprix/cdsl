@@ -16,16 +16,13 @@
 #define NOT_FOUND	((uint8_t) 5)
 #define FOUND		((uint8_t) 6)
 
-static spltreeNode_t* insert_r(spltreeNode_t* current, spltreeNode_t* item,
-		uint8_t* context);
+static spltreeNode_t* insert_r(spltreeNode_t* current, spltreeNode_t* item,	uint8_t* context);
 static spltreeNode_t* lookup_r(spltreeNode_t* current, trkey_t key, uint8_t* context, BOOL splay);
 static spltreeNode_t* delete_r(spltreeNode_t* current, trkey_t key, uint8_t* context, spltreeNode_t** found);
 static spltreeNode_t* delete_min_rc(spltreeNode_t* splnode,spltreeNode_t** min);
 static spltreeNode_t* delete_max_rc(spltreeNode_t* splnode,spltreeNode_t** max);
-static spltreeNode_t* largest_r(spltreeNode_t* current, uint8_t* context,
-		BOOL splay, BOOL del);
-static spltreeNode_t* smallest_r(spltreeNode_t* current, uint8_t* context,
-		BOOL splay, BOOL del);
+static spltreeNode_t* largest_r(spltreeNode_t* current, uint8_t* context, BOOL splay, BOOL del);
+static spltreeNode_t* smallest_r(spltreeNode_t* current, uint8_t* context,BOOL splay, BOOL del);
 static spltreeNode_t* rotateLeft(spltreeNode_t* parent);
 static spltreeNode_t* rotateRight(spltreeNode_t* parent);
 
@@ -103,8 +100,7 @@ spltreeNode_t* cdsl_spltreeDeleteMax(spltreeRoot_t* root) {
 	return max;
 }
 
-static spltreeNode_t* insert_r(spltreeNode_t* current, spltreeNode_t* item,
-		uint8_t* context) {
+static spltreeNode_t* insert_r(spltreeNode_t* current, spltreeNode_t* item,	uint8_t* context) {
 	if (!current) {
 		*context = 0;
 		return item;
@@ -155,8 +151,7 @@ static spltreeNode_t* insert_r(spltreeNode_t* current, spltreeNode_t* item,
 	}
 }
 
-static spltreeNode_t* lookup_r(spltreeNode_t* current, trkey_t key,
-		uint8_t* context, BOOL splay) {
+static spltreeNode_t* lookup_r(spltreeNode_t* current, trkey_t key,	uint8_t* context, BOOL splay) {
 	if (!current) {
 		*context = NOT_FOUND;
 		return NULL;
@@ -218,8 +213,7 @@ static spltreeNode_t* lookup_r(spltreeNode_t* current, trkey_t key,
 	return NULL;
 }
 
-static spltreeNode_t* delete_r(spltreeNode_t* current, trkey_t key,
-		uint8_t* context, spltreeNode_t** found) {
+static spltreeNode_t* delete_r(spltreeNode_t* current, trkey_t key,	uint8_t* context, spltreeNode_t** found) {
 	if (!current) {
 		*context = NOT_FOUND;
 		*found = NULL;
@@ -253,8 +247,9 @@ static spltreeNode_t* delete_r(spltreeNode_t* current, trkey_t key,
 	if (current->key < key) {
 		*context = RIGHT;
 		current->right = delete_r(current->right, key, context, found);
-		if (!current->right)
+		if (!current->right){
 			return current;
+		}
 
 		switch (*context) {
 		case NOT_FOUND:
@@ -267,8 +262,9 @@ static spltreeNode_t* delete_r(spltreeNode_t* current, trkey_t key,
 			current->right = rotateRight(current->right);
 			return rotateLeft(current);
 		}
-		if (direction == ROOT)
+		if (direction == ROOT) {
 			return rotateLeft(current);
+		}
 		if (*context == FOUND) {
 			*context = (direction == RIGHT ? ZIGZIG_STEP : ZIGZAG_STEP);
 			return current;
@@ -276,8 +272,9 @@ static spltreeNode_t* delete_r(spltreeNode_t* current, trkey_t key,
 	} else {
 		*context = LEFT;
 		current->left = delete_r(current->left, key, context, found);
-		if (!current->left)
+		if (!current->left) {
 			return current;
+		}
 
 		switch (*context) {
 		case NOT_FOUND:
@@ -301,8 +298,7 @@ static spltreeNode_t* delete_r(spltreeNode_t* current, trkey_t key,
 }
 
 
-static spltreeNode_t* largest_r(spltreeNode_t* current, uint8_t* context,
-		BOOL splay, BOOL del) {
+static spltreeNode_t* largest_r(spltreeNode_t* current, uint8_t* context, BOOL splay, BOOL del) {
 	if (current->right == NULL) {
 		*context = FOUND;
 		return current;
@@ -327,8 +323,7 @@ static spltreeNode_t* largest_r(spltreeNode_t* current, uint8_t* context,
 	return NULL;
 }
 
-static spltreeNode_t* smallest_r(spltreeNode_t* current, uint8_t* context,
-		BOOL splay, BOOL del) {
+static spltreeNode_t* smallest_r(spltreeNode_t* current, uint8_t* context,	BOOL splay, BOOL del) {
 	if (current->left == NULL) {
 		*context = FOUND;
 		return current;
@@ -373,8 +368,9 @@ static spltreeNode_t* delete_min_rc(spltreeNode_t* splnode, spltreeNode_t** min)
 		return splnode->right;
 	}
 	splnode->left = delete_min_rc(splnode->left,min);
-	if(!splnode->left)
+	if(!splnode->left) {
 		return splnode;
+	}
 	return rotateRight(splnode);
 }
 
@@ -384,7 +380,8 @@ static spltreeNode_t* delete_max_rc(spltreeNode_t* splnode, spltreeNode_t** max)
 		return splnode->left;
 	}
 	splnode->right = delete_max_rc(splnode->right,max);
-	if(!splnode->right)
+	if(!splnode->right) {
 		return splnode;
+	}
 	return rotateLeft(splnode);
 }
