@@ -22,6 +22,7 @@ static avltreeNode_t* rotate_right(avltreeNode_t* sub_root);
 static avltreeNode_t* rotate_left(avltreeNode_t* sub_root);
 
 
+
 void cdsl_avltreeRootInit(avltreeRoot_t* rootp, int bal) {
 	if(!rootp) {
 		return;
