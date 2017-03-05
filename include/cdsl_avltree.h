@@ -15,11 +15,13 @@ extern "C" {
 #endif
 
 
+
 /*!
  * \addtogroup avl-tree AVL Tree
  * \brief AVL Tree (Recursive Version)
  * @{
  */
+
 
 #define cdsl_avltreeMaxDepth(root)                      tree_max_depth((base_treeRoot_t*) root)
 #define cdsl_avltreeTraverse(root, cb, order, arg)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order, arg)
@@ -36,6 +38,7 @@ extern "C" {
 #define cdsl_avltreeDelete(root, key)                   cdsl_avltreeDeleteReplace(root, key, NULL, NULL)
 #define cdsl_avltreeDeleteMin(root)                     cdsl_avltreeDeleteMinReplace(root, NULL, NULL)
 #define cdsl_avltreeDeleteMax(root)                     cdsl_avltreeDeleteMaxReplace(root, NULL, NULL)
+
 
 
 
@@ -223,6 +226,7 @@ extern avltreeNode_t* cdsl_avltreeDeleteMaxReplace(avltreeRoot_t* rootp, base_tr
 /*!
  * @}
  */
+
 
 #if defined(__cplusplus)
 }
