@@ -8,5 +8,6 @@ OBJ-y+=cdsl_bstree_test\
 		cdsl_spltree_test\
 		cdsl_nrbtree_test\
 		cdsl_hashtree_test\
+		cdsl_avltree_test\
 		nrbtree_benchmark\
 		baremetal_test
