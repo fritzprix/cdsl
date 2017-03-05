@@ -128,12 +128,12 @@ extern "C" {
 /*!
  * \brief tree node type definition
  */
-typedef struct avltree_node avltreeNode_t;
+typedef struct cdsl_avlnode avltreeNode_t;
 
 /*!
  * \brief tree root for AVL tree
  */
-typedef struct avltree_root {
+typedef struct cdsl_avlroot {
 	union {
 		base_treeRoot_t  base_root;
 		avltreeNode_t *entry;
@@ -144,11 +144,12 @@ typedef struct avltree_root {
 /*!
  * \brief tree node for AVL tree
  */
-struct avltree_node {
+struct cdsl_avlnode {
 	union {
-		base_treeNode_t base_node;
+		struct base_tree_node base_node;
 		struct {
-			avltreeNode_t* left, *right;
+			avltreeNode_t *left;
+			avltreeNode_t *right;
 			trkey_t key;
 		};
 	};
