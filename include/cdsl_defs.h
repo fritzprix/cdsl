@@ -30,6 +30,7 @@ extern "C" {
  */
 #ifdef BAREMETAL
 #include "baremetal.h"
+#include <stddef.h>
 #define PRINT(...)
 #define PRINT_ERR(...)
 #define EXIT(n)
