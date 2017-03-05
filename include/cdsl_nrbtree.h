@@ -45,13 +45,24 @@ extern "C" {
  *
  * \def cdsl_nrbtreeMaxDepth(root)
  * \brief Get max depth of the tree
+ * \param[in] root pointer to the root of tree
+ * \return max. depth of the tree
  *
  *
  * \def cdsl_nrbtreeTraverse(root, cb, order, arg)
  * \brief Traverse all the items within the tree, cb is callback function
+ * \param[in] root pointer to the root of tree
+ * \param[in] cb callback function called for each item of the tree
+ * \param[in] order incremental / decremental traversal order
+ * \param[in] arg argument which passed as argument when callback is invoked
+ *
  *
  * \def cdsl_nrbtreeTraverseTarget(root,cb,key, arg)
  * \brief Traverse all the parent item to the target node with given key value
+ * \param[in] root pointer to the root of tree
+ * \param[in] cb callback function called for each item of the tree
+ * \param[in] key key value for the target
+ * \param[in] arg argument which passed as argument when callback is invoked
  *
  * \def cdsl_nrbtreeSize(root)
  * \brief Get total item count of the tree
@@ -62,6 +73,58 @@ extern "C" {
  * \brief Print root structure of tree
  * \param[in] root pointer to the root of tree
  * \param[in] print printer callback which called with arg
+ *
+ * \def  cdsl_nrbtreeIsEmpty(root)
+ * \brief Check whether the tree is empty or not
+ * \param[in] root pointer to the root of tree
+ * \return return true, if there is no item on the tree, otherwise return false
+ *
+ * \def cdsl_nrbtreeTop(root)
+ * \brief Get root item of the tree (not very meaningful except for heap)
+ * \param[in] root pointer to the root of tree
+ * \return top (entry) item of the tree
+ *
+ * \def cdsl_nrbtreeGoLeft(cur)
+ * \brief Peek left child of current item
+ * \param[in] cur pointer to tree node
+ * \return left child of the given tree node
+ *
+ * \def cdsl_nrbtreeGoRight(cur)
+ * \brief Peek right child of current item
+ * \param[in] cur pointer to tree node
+ * \return right child of the given tree node
+ *
+ * \def cdsl_nrbtreeMin(root)
+ * \brief Peek item with minimum key value among the items in the tree
+ * \param[in] root pointer to tree root
+ * \return item with minimum key value
+ *
+ * \def cdsl_nrbtreeMax(root)
+ * \brief Peek item with maximum key value among the items in the tree
+ * \param[in] root pointer to tree root
+ * \return item with maximum key value
+ *
+ * \def cdsl_nrbtreeUpdate(root,nitem)
+ * \brief Replace item with new one with same key value
+ * \param[in] root pointer to tree root
+ * \param[in] nitem new item
+ * \return old item replaced by nitem
+ *
+ * \def cdsl_nrbtreeDelete(root, key)
+ * \brief Delete item with the key
+ * \param[in] root pointer to tree root
+ * \param[in] key value for item to be deleted
+ * \return deleted item
+ *
+ * \def cdsl_nrbtreeDeleteMin(root)
+ * \brief Delete item with minimum key value among the items in the tree
+ * \param[in] root pointer to tree root
+ * \return item with minimum key value
+ *
+ * \def cdsl_nrbtreeDeleteMax(root)
+ * \brief Delete item with maximum key value among the items in the tree
+ * \param[in] root pointer to tree root
+ * \return item with maximum key value
  */
 
 /*!

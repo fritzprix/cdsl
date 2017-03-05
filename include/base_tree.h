@@ -15,6 +15,13 @@
 extern "C" {
 #endif
 
+/*!
+ * \addtogroup base-tree Base Tree
+ * \brief Base Tree Implementation
+ * @{
+ */
+
+
 #define ORDER_INC			(int) 0
 #define ORDER_DEC			(int) 1
 
@@ -23,9 +30,33 @@ extern "C" {
 
 #define DECLARE_TRAVERSE_CALLBACK(fn) int fn(int order, base_treeNode_t* node,void* arg)
 
+/*!
+ * \def ORDER_INC
+ * \brief incremental traversal order
+ *
+ * \def ORDER_DEC
+ * \brief decremental traversal order
+ *
+ * \def TRAVERSE_OK
+ * \brief Traversal control return value which allow traversal keep continue
+ *
+ * \def TRAVERSE_BREAK
+ * \brief Traversal control return value which force traversal operation to stop
+ *
+ * \def DECLARE_TRAVERSE_CALLBACK(fn)
+ * \brief Declare Traversal callback
+ * \sa base_tree_callback_t
+ */
+
+/*!
+ * \brief key type for tree
+ */
 typedef __cdsl_uaddr_t  trkey_t;
-typedef struct base_tree_node base_treeNode_t;
-typedef struct base_tree_root base_treeRoot_t;
+typedef struct base_tree_node base_treeNode_t;  ///< Base tree node type
+typedef struct base_tree_root base_treeRoot_t;  ///< Base tree root type
+/*!
+ * \brief generic callback used in tree operation (traversal)
+ */
 typedef int (*base_tree_callback_t)(int,base_treeNode_t*,void*);
 
 /*! replacer callback function type to override default hole resolution mechanism of the given tree
@@ -36,27 +67,115 @@ typedef int (*base_tree_callback_t)(int,base_treeNode_t*,void*);
  */
 typedef int (*base_tree_replacer_t)(base_treeNode_t** node, void* ctx);
 
+/*!
+ * \brief Generic tree root structure which is used widely through all the tree family implementation
+ */
 struct base_tree_root {
-	base_treeNode_t* entry;
+	base_treeNode_t* entry; ///< entry item (root) of the tree
 };
 
+/*!
+ * \brief Generic tree node structure used widely through all the tree family implementation
+ */
 struct base_tree_node {
-	base_treeNode_t *left,*right;
-	trkey_t          key;
+	base_treeNode_t *left,   ///< left child node
+	*right;                  ///< right child node
+	trkey_t          key;    ///< key value of the node
 };
 
+/*!
+ * \brief traverse tree
+ * \param[in] rootp pointer to root of the tree
+ * \param[in] cb callback invoked for each node for the tree
+ * \param[in] order traversal order, either \ref ORDER_INC or \ref ORDER_DEC
+ * \param[in] arg argument passed when callback invoked
+ * \sa ORDER_INC ORDER_DEC base_tree_callback_t
+ */
 extern void tree_traverse(base_treeRoot_t* rootp, base_tree_callback_t cb,int order, void* arg);
+
+/*!
+ * \brief traverse to the given target
+ * \param[in] rootp pointer to root of the tree
+ * \param[in] cb callback invoked for each node for the tree
+ * \param[in] key key value for the target
+ * \param[in] arg argument passed when callback invoked
+ * \sa base_tree_callback_t
+ */
 extern void tree_traverse_target(base_treeRoot_t* rootp, base_tree_callback_t cb, trkey_t key,void* arg);
+
+/*!
+ * \brief Peek left child of given tree node
+ * \param[in] cur pointer to tree node
+ * \return left child of the given tree node
+ */
 extern base_treeNode_t* tree_go_left(base_treeNode_t* cur);
+
+/*!
+ * \brief Peek right child of given tree node
+ * \param[in] cur pointer to tree node
+ * \return right child of the given tree node
+ */
 extern base_treeNode_t* tree_go_right(base_treeNode_t* cur);
+
+/*!
+ * \brief Peek top item of the tree
+ * \param[in] rootp pointer to root of the tree
+ * \return top node of the tree
+ */
 extern base_treeNode_t* tree_top(base_treeRoot_t* rootp);
+
+/*!
+ * \brief Get total item count of the tree
+ * \param[in] rootp pointer to root of the tree
+ * \return total item count of the tree
+ */
 extern int tree_size(base_treeRoot_t* rootp);
+
+/*!
+ * \brief Print whole tree nodes
+ * \param[in] rootp pointer to root of the tree
+ * \param[in] prt Printer function
+ */
 extern void tree_print(base_treeRoot_t* rootp,cdsl_generic_printer_t prt);
+
+/*!
+ * \brief Get max depth of the tree
+ * \param[in] rootp pointer to root of the tree
+ * \return max. depth of the tree
+ */
 extern int tree_max_depth(base_treeRoot_t* rootp);
+
+/*!
+ * \brief Check whether the tree is empty or not
+ * \return true if tree has no item, otherwise false
+ */
 extern BOOL tree_is_empty(base_treeRoot_t* rootp);
+
+/*!
+ * \brief Get node with minimum key value among the all items of the tree
+ * \param[in] rootp pointer to root of the tree
+ * \return tree node with minimum key value
+ */
 extern base_treeNode_t* tree_min(base_treeRoot_t* rootp);
+
+/*!
+ * \brief Get node with maximum key value among the all items of the tree
+ * \param[in] rootp pointer to root of the tree
+ * \return tree node with maximum key value
+ */
 extern base_treeNode_t* tree_max(base_treeRoot_t* rootp);
+
+/*!
+ * \brief Replace item with new one
+ * \param[in] rootp pointer to root of the tree
+ * \param[in] nitem new item
+ * \return the item replaced by new item
+ */
 extern base_treeNode_t* tree_update(base_treeRoot_t* rootp, base_treeNode_t* nitem);
+
+/*!
+ * @}
+ */
 
 
 #if defined(__cplusplus)
