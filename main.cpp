@@ -15,6 +15,7 @@
 #include "cdsl_bstree_test.h"
 #include "cdsl_spltree_test.h"
 #include "cdsl_hashtree_test.h"
+#include "cdsl_avltree_test.h"
 #include "baremetal_test.h"
 
 #include "nrbtree_benchmark.h"
@@ -67,6 +68,12 @@ int main(void){
 	}
 
 	printf("Hash Tree Test Result : %s\n",RESULT_STRING[result = cdsl_hashtreeDoTest()]);
+	if(result == FALSE)
+	{
+		exit(-1);
+	}
+
+	printf("AVL Tree Test Result : %s\n",RESULT_STRING[result = cdsl_avltreeDoTest()]);
 	if(result == FALSE)
 	{
 		exit(-1);

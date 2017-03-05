@@ -60,6 +60,10 @@ extern "C" {
 #define DECLARE_COMPARE_FN(fn) void* fn(void* a,void* b)
 #endif
 
+#ifndef DECLARE_PRINTER
+#define DECLARE_PRINTER(fn) void fn(void* node)
+#endif
+
 typedef void* (*cdsl_generic_compare_t)(void*, void*);
 typedef void (*cdsl_generic_printer_t) (void*);
 
