@@ -100,8 +100,9 @@ nrbtreeNode_t* cdsl_nrbtreeInsert(nrbtreeRoot_t* rootp, nrbtreeNode_t* item, BOO
 }
 
 nrbtreeNode_t* cdsl_nrbtreeLookup(nrbtreeRoot_t* rootp, trkey_t key) {
-	if (!rootp)
+	if (!rootp) {
 		return NULL;
+	}
 	nrbtreeNode_t* cur_node = rootp->entry;	// always black so don't need to use GET_PTR() macro
 	while (cur_node) {
 		if (GET_PTR(cur_node)->key > key) {
