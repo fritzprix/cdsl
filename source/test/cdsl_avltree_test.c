@@ -32,6 +32,14 @@ BOOL cdsl_avltreeDoTest(void) {
 			keys[i] = i;
 		cdsl_avltreeNodeInit(&node_pool[i], keys[i]);
 		cdsl_avltreeInsert(&root, &node_pool[i], FALSE);
+  }
+	if(cdsl_avltreeSize(&root) != TEST_SIZE) {
+		return FALSE;
+	}
+	avltreeNode_t* node = cdsl_avltreeLookup(&root, keys[0]);
+	if(node->key != keys[0]) {
+		return FALSE;
+	}
 
 	if(cdsl_avltreeSize(&root) != TEST_SIZE) {
 		return FALSE;
@@ -40,6 +48,7 @@ BOOL cdsl_avltreeDoTest(void) {
 	if(node->key != keys[0]) {
 		return FALSE;
 	}
+
 
 
 //	cdsl_avltreePrint(&root, avlnode_printer);

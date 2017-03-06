@@ -61,7 +61,7 @@ extern "C" {
 #endif
 
 #ifndef DECLARE_PRINTER
-#define DECLARE_PRINTER(fn) void fn(void* node)
+#define DECLARE_PRINTER(fn)    void fn(void* node)
 #endif
 
 typedef void* (*cdsl_generic_compare_t)(void*, void*);
