@@ -156,7 +156,7 @@ struct cdsl_avlnode {
 			trkey_t key;
 		};
 	};
-	int depth;  ///< node depth within the tree
+	int height;  ///< node depth within the tree
 };
 
 /*!
