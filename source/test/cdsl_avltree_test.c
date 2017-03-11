@@ -12,7 +12,6 @@
 #include <stdlib.h>
 
 
-
 static avltreeNode_t node_pool[TEST_SIZE];
 static avltreeNode_t replace;
 static trkey_t keys[TEST_SIZE];
@@ -45,7 +44,7 @@ BOOL cdsl_avltreeDoTest(void) {
 	if(cdsl_avltreeSize(&root) != TEST_SIZE) {
 		return FALSE;
 	}
-	for (i = TEST_SIZE - 1;i >= 0; i--) {
+	for (i = 0;i < TEST_SIZE; i++) {
 		if(i != TEST_SIZE - 1)
 			keys[i] = i;
 		node = cdsl_avltreeDeleteReplace(&root, keys[i], NULL, NULL);

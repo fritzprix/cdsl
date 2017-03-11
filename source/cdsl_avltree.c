@@ -117,47 +117,59 @@ static avltreeNode_t* delete_rc(int bal, avltreeNode_t* sub_root_c, avltreeNode_
 	}
 	if(sub_root_c->key > key) {
 		sub_root_c->left = delete_rc(bal, sub_root_c->left, deleted, key, replacer, args);
-		sub_root_c->height = max_child_height(sub_root_c) + 1;
 		if(!sub_root_c->left) {
-			if(sub_root_c->right && sub_root_c->right->height > bal) {
-				if(!sub_root_c->right->right) {
-					sub_root_c->right = rotate_right(sub_root_c->right);
+			if(sub_root_c->right) {
+				sub_root_c->height = sub_root_c->right->height + 1;
+				if(sub_root_c->right->height > bal) {
+					if(!sub_root_c->right->right) {
+						sub_root_c->right = rotate_right(sub_root_c->right);
+					}
+					sub_root_c = rotate_left(sub_root_c);
 				}
-				sub_root_c = rotate_left(sub_root_c);
+			} else {
+				sub_root_c->height = 1;
 			}
 		} else {
 			if(sub_root_c->right) {
+				sub_root_c->height = sub_root_c->right->height > sub_root_c->left->height? sub_root_c->right->height + 1 : sub_root_c->left->height + 1;
 				if(sub_root_c->right->height - sub_root_c->left->height > bal) {
 					if(!sub_root_c->right->right) {
 						sub_root_c->right = rotate_right(sub_root_c->right);
 					}
 					sub_root_c = rotate_left(sub_root_c);
 				}
+			} else {
+				sub_root_c->height = sub_root_c->left->height + 1;
 			}
 		}
-		sub_root_c->height = max_child_height(sub_root_c) + 1;
 		return sub_root_c;
 	} else if(sub_root_c->key < key) {
 		sub_root_c->right = delete_rc(bal, sub_root_c->right, deleted, key,  replacer, args);
-		sub_root_c->height = max_child_height(sub_root_c) + 1;
 		if(!sub_root_c->right) {
-			if(sub_root_c->left && sub_root_c->left->height > bal) {
-				if(!sub_root_c->left->left) {
-					sub_root_c->left = rotate_left(sub_root_c->left);
+			if(sub_root_c->left) {
+				sub_root_c->height = sub_root_c->left->height + 1;
+				if(sub_root_c->left->height > bal) {
+					if (!sub_root_c->left->left) {
+						sub_root_c->left = rotate_left(sub_root_c->left);
+					}
+					sub_root_c = rotate_right(sub_root_c);
 				}
-				sub_root_c = rotate_right(sub_root_c);
+			} else {
+				sub_root_c->height = 1;
 			}
 		} else {
 			if(sub_root_c->left) {
+				sub_root_c->height = sub_root_c->right->height > sub_root_c->left->height? sub_root_c->right->height + 1 : sub_root_c->left->height + 1;
 				if(sub_root_c->left->height - sub_root_c->right->height > bal) {
 					if(!sub_root_c->left->left) {
 						sub_root_c->left = rotate_left(sub_root_c->left);
 					}
 					sub_root_c = rotate_right(sub_root_c);
 				}
+			} else {
+				sub_root_c->height = sub_root_c->right->height + 1;
 			}
 		}
-		sub_root_c->height = max_child_height(sub_root_c) + 1;
 		return sub_root_c;
 	} else {
 		*deleted = sub_root_c;
