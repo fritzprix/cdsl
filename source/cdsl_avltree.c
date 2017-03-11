@@ -15,10 +15,14 @@
 #define LEFTRIGTH_PATTERN ((uint8_t) (DIR_RIGHT << 2) | DIR_LEFT)
 #define LEFTLEFT_PATTERN  ((uint8_t) (DIR_LEFT << 2) | DIR_LEFT)
 #define RIGHTLEFT_PATTERN ((uint8_t) (DIR_LEFT << 2) | DIR_RIGHT)
-#define RIGHTRIGHT_PATTER ((uint8_t) (DIR_RIGHT << 2) | DIR_RIGHT)
+#define RIGHTRIGHT_PATTERN ((uint8_t) (DIR_RIGHT << 2) | DIR_RIGHT)
 
 static avltreeNode_t* insert_rc(int bal, avltreeNode_t* sub_root_c, avltreeNode_t* item, uint8_t *rc_dir, avltreeNode_t** replaced);
-static avltreeNode_t* delete_rc(int bal, avltreeNode_t* sub_root_c, trkey_t key, uint8_t *rc_dir);
+static avltreeNode_t* delete_rc(int bal, avltreeNode_t* sub_root_c, avltreeNode_t** deleteed,trkey_t key, base_tree_replacer_t replacer, void* args);
+static avltreeNode_t* delete_lm_rc(int bal, avltreeNode_t* sub_root_c, avltreeNode_t** deleted, base_tree_replacer_t replacer, void* args);
+static avltreeNode_t* delete_rm_rc(int bal, avltreeNode_t* sub_root_c, avltreeNode_t** deleted, base_tree_replacer_t replacer, void* args);
+static avltreeNode_t* take_rightmost_rc(int bal, avltreeNode_t* parent, avltreeNode_t** leaf);
+static avltreeNode_t* take_leftmost_rc(int bal, avltreeNode_t* parent, avltreeNode_t** leaf);
 
 static avltreeNode_t* rotate_right(avltreeNode_t* sub_root);
 static avltreeNode_t* rotate_left(avltreeNode_t* sub_root);
@@ -32,10 +36,6 @@ void cdsl_avltreeRootInit(avltreeRoot_t* rootp, int bal) {
 	if(!rootp) {
 		return;
 	}
-	PRINT("LEFT-LEFT : %d\n", LEFTLEFT_PATTERN);
-	PRINT("LEFT_RIGHT : %d\n", LEFTRIGTH_PATTERN);
-	PRINT("RIGHT-RIGHT : %d\n", RIGHTRIGHT_PATTER);
-	PRINT("RIGHT-LEFT : %d\n", RIGHTLEFT_PATTERN);
 	rootp->balance_factor = bal;
 	rootp->entry = NULL;
 }
@@ -84,7 +84,9 @@ avltreeNode_t* cdsl_avltreeDeleteReplace(avltreeRoot_t* rootp,trkey_t key, base_
 	if(!rootp) {
 		return NULL;
 	}
-	return NULL;
+	avltreeNode_t* deleted = NULL;
+	rootp->entry = delete_rc(rootp->balance_factor, rootp->entry, &deleted, key, replacer, cb_arg);
+	return deleted;
 }
 
 avltreeNode_t* cdsl_avltreeDeleteMinReplace(avltreeRoot_t* rootp, base_tree_replacer_t replacer, void* cb_arg) {
@@ -101,18 +103,158 @@ avltreeNode_t* cdsl_avltreeDeleteMaxReplace(avltreeRoot_t* rootp, base_tree_repl
 	return NULL;
 }
 
-static avltreeNode_t* delete_rc(int bal, avltreeNode_t* sub_root_c, trkey_t key, uint8_t *rc_dir) {
+static avltreeNode_t* delete_lm_rc(int bal, avltreeNode_t* sub_root_c, avltreeNode_t** deleted, base_tree_replacer_t replacer, void* args) {
+	return NULL;
+}
+
+static avltreeNode_t* delete_rm_rc(int bal, avltreeNode_t* sub_root_c, avltreeNode_t** deleted, base_tree_replacer_t replacer, void* args) {
+	return NULL;
+}
+
+static avltreeNode_t* delete_rc(int bal, avltreeNode_t* sub_root_c, avltreeNode_t** deleted,trkey_t key, base_tree_replacer_t replacer, void* args) {
 	if(!sub_root_c) {
 		return NULL;
 	}
 	if(sub_root_c->key > key) {
-		sub_root_c->left = delete_rc(bal, sub_root_c->left, key, rc_dir);
-		*rc_dir |= DIR_LEFT;
+		sub_root_c->left = delete_rc(bal, sub_root_c->left, deleted, key, replacer, args);
+		sub_root_c->height = max_child_height(sub_root_c) + 1;
+		if(!sub_root_c->left) {
+			if(sub_root_c->right && sub_root_c->right->height > bal) {
+				if(!sub_root_c->right->right) {
+					sub_root_c->right = rotate_right(sub_root_c->right);
+				}
+				sub_root_c = rotate_left(sub_root_c);
+			}
+		} else {
+			if(sub_root_c->right) {
+				if(sub_root_c->right->height - sub_root_c->left->height > bal) {
+					if(!sub_root_c->right->right) {
+						sub_root_c->right = rotate_right(sub_root_c->right);
+					}
+					sub_root_c = rotate_left(sub_root_c);
+				}
+			}
+		}
+		sub_root_c->height = max_child_height(sub_root_c) + 1;
+		return sub_root_c;
 	} else if(sub_root_c->key < key) {
-		sub_root_c->right = delete_rc(bal, sub_root_c->right, key, rc_dir);
-		*rc_dir |= DIR_RIGHT;
+		sub_root_c->right = delete_rc(bal, sub_root_c->right, deleted, key,  replacer, args);
+		sub_root_c->height = max_child_height(sub_root_c) + 1;
+		if(!sub_root_c->right) {
+			if(sub_root_c->left && sub_root_c->left->height > bal) {
+				if(!sub_root_c->left->left) {
+					sub_root_c->left = rotate_left(sub_root_c->left);
+				}
+				sub_root_c = rotate_right(sub_root_c);
+			}
+		} else {
+			if(sub_root_c->left) {
+				if(sub_root_c->left->height - sub_root_c->right->height > bal) {
+					if(!sub_root_c->left->left) {
+						sub_root_c->left = rotate_left(sub_root_c->left);
+					}
+					sub_root_c = rotate_right(sub_root_c);
+				}
+			}
+		}
+		sub_root_c->height = max_child_height(sub_root_c) + 1;
+		return sub_root_c;
+	} else {
+		*deleted = sub_root_c;
+		avltreeNode_t* nroot = NULL;
+		if(replacer && replacer((base_treeNode_t**) &nroot, args)) {
+			if(nroot == NULL) {
+				return sub_root_c;
+			}
+			nroot->height = sub_root_c->height;
+			nroot->left = sub_root_c->left;
+			nroot->right = sub_root_c->right;
+			sub_root_c->left = NULL;
+			sub_root_c->right = NULL;
+			return nroot;
+		}
+		if (sub_root_c->right) {
+			sub_root_c->right = take_leftmost_rc(bal, sub_root_c->right, &nroot);
+			nroot->right = sub_root_c->right;
+			nroot->left = sub_root_c->left;
+			nroot->height = sub_root_c->height;
+			sub_root_c->left = sub_root_c->right = NULL;
+			sub_root_c = nroot;
+		} else if (sub_root_c->left) {
+			sub_root_c->left = take_rightmost_rc(bal, sub_root_c->left, &nroot);
+			nroot->left = sub_root_c->left;
+			nroot->right = sub_root_c->right;
+			nroot->height = sub_root_c->height;
+			sub_root_c->left = sub_root_c->right = NULL;
+			sub_root_c = nroot;
+		} else {
+			return NULL;
+		}
 	}
-	return NULL;
+	sub_root_c->height = max_child_height(sub_root_c) + 1;
+	return sub_root_c;
+}
+
+static avltreeNode_t* take_rightmost_rc(int bal, avltreeNode_t* parent, avltreeNode_t** leaf) {
+	if(!parent) {
+		return NULL;
+	}
+	if(!parent->right) {
+		*leaf = parent;
+		return parent->left;
+	}
+	parent->right = take_rightmost_rc(bal, parent->right, leaf);
+	if(!parent->right) {
+		if(!parent->left) {
+			parent->height = 1;
+			return parent;
+		}
+
+		if(parent->left->height > bal) {
+			return rotate_right(parent);
+		}
+	} else {
+		if(!parent->left) {
+			parent->height = parent->right->height + 1;
+			return parent;
+		}
+
+		if(parent->left->height - parent->right->height > bal) {
+			return rotate_right(parent);
+		}
+	}
+	return parent;
+}
+
+static avltreeNode_t* take_leftmost_rc(int bal, avltreeNode_t* parent, avltreeNode_t** leaf) {
+	if(!parent) {
+		return NULL;
+	}
+	if(!parent->left) {
+		*leaf = parent;
+		return parent->right;
+	}
+	parent->left = take_leftmost_rc(bal, parent->left, leaf);
+	if(!parent->left) {
+		if(!parent->right) {
+			parent->height = 1;
+			return parent;
+		}
+
+		if(parent->right->height > bal) {
+			return rotate_left(parent);
+		}
+	} else {
+		if(!parent->right) {
+			parent->height = parent->left->height + 1;
+			return parent;
+		}
+
+		if(parent->right->height - parent->left->height > bal) {
+			return rotate_left(parent);
+		}
+	}
+	return parent;
 }
 
 
@@ -142,7 +284,6 @@ static avltreeNode_t* insert_rc(int bal, avltreeNode_t* sub_root_c, avltreeNode_
 			*rc_dir |= DIR_LEFT;
 		}
 	}
-	PRINT("DIR : %d\n",(*rc_dir & PATTERN_MASK));
 	switch((*rc_dir) & PATTERN_MASK) {
 	case RIGHTLEFT_PATTERN:
 		/*
@@ -162,7 +303,7 @@ static avltreeNode_t* insert_rc(int bal, avltreeNode_t* sub_root_c, avltreeNode_
 		sub_root_c->right = rotate_right(sub_root_c->right);
 		sub_root_c = rotate_left(sub_root_c);
 		break;
-	case RIGHTRIGHT_PATTER:
+	case RIGHTRIGHT_PATTERN:
 		if(!sub_root_c->left) {
 
 			if(!(sub_root_c->height > bal)) {
@@ -205,9 +346,6 @@ static avltreeNode_t* insert_rc(int bal, avltreeNode_t* sub_root_c, avltreeNode_
 		sub_root_c->left = rotate_left(sub_root_c->left);
 		sub_root_c = rotate_right(sub_root_c);
 		break;
-
-
-
 	}
 	*rc_dir <<= 2;
 	return sub_root_c;
@@ -215,6 +353,9 @@ static avltreeNode_t* insert_rc(int bal, avltreeNode_t* sub_root_c, avltreeNode_
 
 static avltreeNode_t* rotate_right(avltreeNode_t* sub_root) {
 	if(!sub_root) {
+		return sub_root;
+	}
+	if(!sub_root->left) {
 		return sub_root;
 	}
 	avltreeNode_t* nroot = sub_root->left;
@@ -229,6 +370,9 @@ static avltreeNode_t* rotate_right(avltreeNode_t* sub_root) {
 
 static avltreeNode_t* rotate_left(avltreeNode_t* sub_root) {
 	if(!sub_root) {
+		return sub_root;
+	}
+	if(!sub_root->right) {
 		return sub_root;
 	}
 	avltreeNode_t* nroot = sub_root->right;

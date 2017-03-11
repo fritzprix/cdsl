@@ -12,6 +12,7 @@
 #include <stdlib.h>
 
 
+
 static avltreeNode_t node_pool[TEST_SIZE];
 static avltreeNode_t replace;
 static trkey_t keys[TEST_SIZE];
@@ -20,7 +21,7 @@ static DECLARE_PRINTER(avlnode_printer);
 
 BOOL cdsl_avltreeDoTest(void) {
 	avltreeRoot_t root;
-	cdsl_avltreeRootInit(&root, 2);
+	cdsl_avltreeRootInit(&root, 1);
 
 	keys[TEST_SIZE - 1] = TEST_SIZE + 1;
 	cdsl_avltreeNodeInit(&replace, keys[TEST_SIZE - 1]);
@@ -32,7 +33,7 @@ BOOL cdsl_avltreeDoTest(void) {
 			keys[i] = i;
 		cdsl_avltreeNodeInit(&node_pool[i], keys[i]);
 		cdsl_avltreeInsert(&root, &node_pool[i], FALSE);
-        }
+	}
 	if(cdsl_avltreeSize(&root) != TEST_SIZE) {
 		return FALSE;
 	}
@@ -44,7 +45,17 @@ BOOL cdsl_avltreeDoTest(void) {
 	if(cdsl_avltreeSize(&root) != TEST_SIZE) {
 		return FALSE;
 	}
-
+	for (i = TEST_SIZE - 1;i >= 0; i--) {
+		if(i != TEST_SIZE - 1)
+			keys[i] = i;
+		node = cdsl_avltreeDeleteReplace(&root, keys[i], NULL, NULL);
+		if(!node) {
+			return FALSE;
+		}
+		if(node->key != keys[i]) {
+			return FALSE;
+		}
+	}
 
 //	cdsl_avltreePrint(&root, avlnode_printer);
 
