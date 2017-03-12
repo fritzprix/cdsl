@@ -11,7 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-
 static avltreeNode_t node_pool[TEST_SIZE];
 static avltreeNode_t replace;
 static trkey_t keys[TEST_SIZE];
@@ -45,8 +44,6 @@ BOOL cdsl_avltreeDoTest(void) {
 		return FALSE;
 	}
 	for (i = 0;i < TEST_SIZE; i++) {
-		if(i != TEST_SIZE - 1)
-			keys[i] = i;
 		node = cdsl_avltreeDeleteReplace(&root, keys[i], NULL, NULL);
 		if(!node) {
 			return FALSE;
@@ -55,8 +52,41 @@ BOOL cdsl_avltreeDoTest(void) {
 			return FALSE;
 		}
 	}
+	for (i = 0; i < TEST_SIZE; i++) {
+		cdsl_avltreeNodeInit(&node_pool[i], keys[i]);
+		cdsl_avltreeInsert(&root, &node_pool[i], FALSE);
+	}
+	if(cdsl_avltreeSize(&root) != TEST_SIZE) {
+		return FALSE;
+	}
+	for (i = 0;i < TEST_SIZE; i++) {
+		node = cdsl_avltreeDeleteMinReplace(&root, NULL, NULL);
+		if(!node) {
+			return FALSE;
+		}
+	}
 
-//	cdsl_avltreePrint(&root, avlnode_printer);
+	if(cdsl_avltreeSize(&root) != 0) {
+		return FALSE;
+	}
+
+	for (i = 0; i < TEST_SIZE; i++) {
+		cdsl_avltreeNodeInit(&node_pool[i], keys[i]);
+		cdsl_avltreeInsert(&root, &node_pool[i], FALSE);
+	}
+	if (cdsl_avltreeSize(&root) != TEST_SIZE) {
+		return FALSE;
+	}
+	for (i = 0; i < TEST_SIZE; i++) {
+		node = cdsl_avltreeDeleteMaxReplace(&root, NULL, NULL);
+		if (!node) {
+			return FALSE;
+		}
+	}
+
+	if (cdsl_avltreeSize(&root) != 0) {
+		return FALSE;
+	}
 
 	return TRUE;
 }
