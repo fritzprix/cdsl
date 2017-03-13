@@ -400,7 +400,7 @@ static avltreeNode_t* insert_rc(int bal, avltreeNode_t* sub_root_c, avltreeNode_
 		sub_root_c->height = sub_root_c->right->height + 1;
 		*rc_dir |= DIR_RIGHT;
 	} else {
-		if(*replaced) {
+		if(replaced) {
 			*replaced = sub_root_c;
 			item->left = sub_root_c->left;
 			item->right = sub_root_c->right;
@@ -489,8 +489,11 @@ static avltreeNode_t* rotate_right(avltreeNode_t* sub_root) {
 	avltreeNode_t* nroot = sub_root->left;
 	sub_root->left = nroot->right;
 	nroot->right = sub_root;
-
-	nroot->height = nroot->left->height + 1;
+	if(nroot->left) {
+		nroot->height = nroot->left->height + 1;
+	} else {
+		nroot->height = 1;
+	}
 	nroot->right->height = max_child_height(nroot->right) + 1;
 
 	return nroot;
@@ -507,7 +510,11 @@ static avltreeNode_t* rotate_left(avltreeNode_t* sub_root) {
 	sub_root->right = nroot->left;
 	nroot->left = sub_root;
 
-	nroot->height = nroot->right->height + 1;
+	if(nroot->right) {
+		nroot->height = nroot->right->height + 1;
+	} else {
+		nroot->height = 1;
+	}
 	nroot->left->height = max_child_height(nroot->left) + 1;
 	return nroot;
 }
