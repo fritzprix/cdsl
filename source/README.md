@@ -34,10 +34,43 @@ int main(void) {
 		cdsl_slistNodeInit(&people[i].lhead);
 		cdsl_slistPutTail(&lentry,&people[i].lhead);
         /*or you can simply use casting considering memory layout*/
-        cdsl_slistPutTail(&lentry,(slistNode_t*) &people);
+        cdsl_slistPutTail(&lentry,(slistNode_t*) &people[i]);
 	}
     while(!cdsl_slistIsEmpty(&lentry)){
     	p = (struct person*)cdsl_slistRemoveHead(&lentry);
+        printf("this is (name :%s %s / age : %d)\n",p->firstname,p->lastname,p->age);
+    }
+    return 0;
+}
+
+```
+
+#### red-black tree (C example)
+```C
+struct person {
+	nrbtreeNode_t node;
+    int age;
+    char firstname[20];
+    char lastname[20]; 
+};
+
+nrbtreeRoot_t root;
+static struct people[10];
+
+int main(void) {
+	int i;
+    struct person* p;
+    cdsl_nrbtreeRootInit(&root);
+    for(i = 0;i < 10;i++){
+		people[i].age = rand();
+        ...
+		cdsl_nrbtreeNodeInit(&people[i].node);
+		cdsl_nrbtreeInsert(&root, &people[i].node, FALSE);
+        /*or you can simply use casting considering memory layout*/
+//      cdsl_nrbtreeInsert(&root,(nrbtreeNode_t*) &people[i]);
+	}
+    while(!cdsl_nrbtreeIsEmpty(&lentry)){
+    	p = (struct person*) cdsl_nrbtreeDeleteMax(&root);
         printf("this is (name :%s %s / age : %d)\n",p->firstname,p->lastname,p->age);
     }
     return 0;
