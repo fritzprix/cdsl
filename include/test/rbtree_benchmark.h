@@ -5,8 +5,8 @@
  *      Author: innocentevil
  */
 
-#ifndef INCLUDE_TEST_NRBTREE_BENCHMARK_H_
-#define INCLUDE_TEST_NRBTREE_BENCHMARK_H_
+#ifndef INCLUDE_TEST_RBTREE_BENCHMARK_H_
+#define INCLUDE_TEST_RBTREE_BENCHMARK_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,4 +21,4 @@ extern bool perform_nrbtree_benchmark(void);
 
 
 
-#endif /* INCLUDE_TEST_NRBTREE_BENCHMARK_H_ */
+#endif /* INCLUDE_TEST_RBTREE_BENCHMARK_H_ */

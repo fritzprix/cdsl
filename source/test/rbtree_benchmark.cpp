@@ -14,8 +14,8 @@
 #include <sys/types.h>
 
 #include "base_tree.h"
-#include "cdsl_nrbtree.h"
-#include "nrbtree_benchmark.h"
+#include "../../include/cdsl_rbtree.h"
+#include "../../include/test/rbtree_benchmark.h"
 
 
 #define TEST_CNT  2000000
@@ -42,9 +42,6 @@ bool perform_nrbtree_benchmark(void){
 
 	pid_t pid = fork();
 	if(pid == 0) {
-		/*
-		 * test rbtree performance
-		 */
 		std::map<trkey_t,data_t*> rbtree;
 		for(loop = 0;loop < TEST_LOOP;loop++)
 		{
@@ -122,8 +119,8 @@ bool perform_nrbtree_benchmark(void){
 		printf("avg.delete test for rbtree : %f\n",remove_avg);
 
 	}else {
-
+		perror("Can't fork Benchmark process\n");
+		return false;
 	}
-
 	return true;
 }

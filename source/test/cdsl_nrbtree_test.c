@@ -5,13 +5,13 @@
  *      Author: innocentevil
  */
 
-#include "cdsl_nrbtree.h"
 #include "cdsl_nrbtree_test.h"
 
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
+#include "../../include/cdsl_rbtree.h"
 
 static nrbtreeNode_t node_pool[TEST_SIZE];
 static nrbtreeNode_t replace;

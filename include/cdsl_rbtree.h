@@ -5,8 +5,8 @@
  *      Author: innocentevil
  */
 
-#ifndef INCLUDE_CDSL_NRBTREE_H_
-#define INCLUDE_CDSL_NRBTREE_H_
+#ifndef INCLUDE_CDSL_RBTREE_H_
+#define INCLUDE_CDSL_RBTREE_H_
 
 #include "base_tree.h"
 
@@ -242,4 +242,4 @@ extern void cdsl_nrbtreePrint_dev(nrbtreeRoot_t* root);
 }
 #endif
 
-#endif /* INCLUDE_CDSL_NRBTREE_H_ */
+#endif /* INCLUDE_CDSL_RBTREE_H_ */
