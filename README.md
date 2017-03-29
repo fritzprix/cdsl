@@ -44,6 +44,21 @@
 	$> make config
 	$> make test
 	
+## How-to-install (x86 32bit)
+	1. release build (libcdsl.a libcdsl.so)
+	for 32 bit machine
+	$> make config DEFCONF=x86_32
+	
+	for 64 bit machine 
+	$> make config DEFCONF=x86_64
+	
+	build library
+	$> make release
+	
+	2. install them
+	$> sudo make install 
+
+	
 ## LICENSE 
 	BSD-2
 

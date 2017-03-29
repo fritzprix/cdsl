@@ -172,10 +172,10 @@ install : install_include install_lib
 install_include : 
 	install -d $(INCDIR) 
 	install ./include/*.* $(INCDIR)
-	install ./cdsl.h $(INCDIR)
+	install ./$(AUTOGEN_DIR)/autogen.h $(INCDIR)
 	install ./include/arch/$(shell uname -m)/arch.h $(INCDIR)
 
-install_lib :
+install_lib : $(REL_STATIC_TARGET)
 	install $(REL_STATIC_TARGET) $(LIBDIR)
 	
 uninstall : uninstall_lib uninstall_include
