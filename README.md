@@ -44,7 +44,7 @@
 	$> make config
 	$> make test
 	
-## How-to-install (x86 32bit)
+## How-to-install (x86)
 	1. release build (libcdsl.a libcdsl.so)
 	for 32 bit machine
 	$> make config DEFCONF=x86_32
