@@ -18,7 +18,8 @@
 #include "cdsl_avltree_test.h"
 #include "baremetal_test.h"
 
-#include "nrbtree_benchmark.h"
+#include "include/test/rbtree_benchmark.h"
+#include "include/test/avltree_benchmark.h"
 
 const char* RESULT_STRING[] = {
 		"FAIL",
@@ -79,6 +80,7 @@ int main(void){
 		exit(-1);
 	}
 
+	perform_avltree_benchmark();
 	perform_nrbtree_benchmark();
 	return 0;
 }

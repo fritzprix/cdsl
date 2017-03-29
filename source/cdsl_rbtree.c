@@ -5,8 +5,8 @@
  *      Author: innocentevil
  */
 
+#include "../include/cdsl_rbtree.h"
 #include "arch.h"
-#include "cdsl_nrbtree.h"
 
 #define GET_PTR(node)                         ((nrbtreeNode_t*)(((__cdsl_uaddr_t) node) & ~1))
 #define RED                                   ((uint8_t) 1)
@@ -88,7 +88,9 @@ nrbtreeNode_t* cdsl_nrbtreeInsert(nrbtreeRoot_t* rootp, nrbtreeNode_t* item, BOO
 		rootp->entry = item;
 		return NULL;
 	}
+#ifdef __DBG
 	stack_top = (__cdsl_uaddr_t) &rootp;
+#endif
 
 	uint8_t dir = 0;
 	uint8_t color = 0;
@@ -449,7 +451,9 @@ static nrbtreeNode_t* insert_rc(nrbtreeNode_t* sub_root_c, nrbtreeNode_t* item,
 		uint8_t* rc_color, uint8_t* rc_dir, nrbtreeNode_t** replaced) {
 	if (!GET_PTR(sub_root_c)) {
 		PAINT_RED(item);
+#ifdef __DBG
 		stack_bottom = (__cdsl_uaddr_t) &sub_root_c;
+#endif
 		return item;
 	} else {
 		if (GET_PTR(sub_root_c)->key < GET_PTR(item)->key) {

@@ -9,7 +9,7 @@ OBJ-y+= base_list\
 		cdsl_heap\
 		cdsl_slist\
 		cdsl_spltree\
-		cdsl_nrbtree\
+		cdsl_rbtree\
 		cdsl_hashtree\
 		baremetal
 
