@@ -25,7 +25,7 @@ typedef struct hashtree_node hashNode_t;
 
 struct hashtree_node {
 	union {
-		nrbtreeNode_t     _base;
+		rbtreeNode_t     _base;
 		struct {
 			hashNode_t*    right;
 			hashNode_t*    left;
@@ -38,7 +38,7 @@ struct hashtree_node {
 
 typedef struct hashtree_root {
 	union {
-		nrbtreeRoot_t      _base;
+		rbtreeRoot_t      _base;
 		hashNode_t*        entry;
 	};
 }hashRoot_t;

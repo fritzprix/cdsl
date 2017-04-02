@@ -26,19 +26,19 @@ static int cdsl_hashtreeReplacer(hashNode_t** node, struct replacer_arg* rep_arg
 
 void cdsl_hashtreeNodeInit(hashNode_t* node, const char* key) {
 	node->_str_key = key;
-	cdsl_nrbtreeNodeInit(&node->_base, sbdm_hash((unsigned char*) key));
+	cdsl_rbtreeNodeInit(&node->_base, sbdm_hash((unsigned char*) key));
 	cdsl_slistEntryInit(&node->col_lentry);
 }
 
 void cdsl_hashtreeRootInit(hashRoot_t* root) {
-	cdsl_nrbtreeRootInit(&root->_base);
+	cdsl_rbtreeRootInit(&root->_base);
 }
 
 
 hashNode_t* cdsl_hashtreeInsert(hashRoot_t* root, hashNode_t* node) {
 	// if collision happens, new item replace old one,
 	// and old one returned as collision here
-	hashNode_t* collision  = (hashNode_t* )cdsl_nrbtreeInsert(&root->_base, &node->_base, TRUE);
+	hashNode_t* collision  = (hashNode_t* )cdsl_rbtreeInsert(&root->_base, &node->_base, TRUE);
 	if(collision) {
 		PRINT("collision\n");
 		collision = container_of(collision, hashNode_t, _base);
@@ -64,7 +64,7 @@ hashNode_t* cdsl_hashtreeInsert(hashRoot_t* root, hashNode_t* node) {
 
 hashNode_t* cdsl_hashtreeLookup(hashRoot_t* root, const char* key) {
 	trkey_t tkey = sbdm_hash((unsigned char*) key);
-	hashNode_t* node = (hashNode_t* )cdsl_nrbtreeLookup(&root->_base,tkey);
+	hashNode_t* node = (hashNode_t* )cdsl_rbtreeLookup(&root->_base,tkey);
 	if(node) {
 		node = container_of(node, hashNode_t, _base);
 		if(!cdsl_slistIsEmpty(&node->col_lentry)) {
@@ -87,7 +87,7 @@ hashNode_t* cdsl_hashtreeRemove(hashRoot_t* root, const char* key) {
 	trkey_t tkey = sbdm_hash((unsigned char*) key);
 	struct replacer_arg rep_arg = REPLACER_ARG_INIT;
 	rep_arg.key_str = key;
-	hashNode_t* node = (hashNode_t* ) cdsl_nrbtreeDeleteReplace(&root->_base, tkey, (base_tree_replacer_t) cdsl_hashtreeReplacer, &rep_arg);
+	hashNode_t* node = (hashNode_t* ) cdsl_rbtreeDeleteReplace(&root->_base, tkey, (base_tree_replacer_t) cdsl_hashtreeReplacer, &rep_arg);
 	if(rep_arg.target) {
 		return rep_arg.target;
 	} else if (node) {

@@ -5,18 +5,18 @@
  *      Author: innocentevil
  */
 
-#ifndef INCLUDE_TEST_CDSL_NRBTREE_TEST_H_
-#define INCLUDE_TEST_CDSL_NRBTREE_TEST_H_
+#ifndef INCLUDE_TEST_CDSL_RBTREE_TEST_H_
+#define INCLUDE_TEST_CDSL_RBTREE_TEST_H_
 #include "cdsl_defs.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-extern BOOL cdsl_nrbtreeDoTest(void);
+extern BOOL cdsl_rbtreeDoTest(void);
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* INCLUDE_TEST_CDSL_NRBTREE_TEST_H_ */
+#endif /* INCLUDE_TEST_CDSL_RBTREE_TEST_H_ */

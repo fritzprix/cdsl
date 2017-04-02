@@ -13,7 +13,7 @@ extern "C" {
 #endif
 
 
-extern bool perform_nrbtree_benchmark(void);
+extern bool perform_rbtree_benchmark(void);
 
 #ifdef __cplusplus
 }

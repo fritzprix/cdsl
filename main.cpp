@@ -8,7 +8,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "cdsl_nrbtree_test.h"
 #include "cdsl_heap_test.h"
 #include "cdsl_list_test.h"
 #include "cdsl_slist_test.h"
@@ -20,6 +19,7 @@
 
 #include "include/test/rbtree_benchmark.h"
 #include "include/test/avltree_benchmark.h"
+#include "include/test/cdsl_rbtree_test.h"
 
 const char* RESULT_STRING[] = {
 		"FAIL",
@@ -62,18 +62,16 @@ int main(void){
 	{
 		exit(-1);
 	}
-	printf("Red Black Tree Test Result : %s\n",RESULT_STRING[result = cdsl_nrbtreeDoTest()]);
+	printf("Red Black Tree Test Result : %s\n",RESULT_STRING[result = cdsl_rbtreeDoTest()]);
 	if(result == FALSE)
 	{
 		exit(-1);
 	}
-
 	printf("Hash Tree Test Result : %s\n",RESULT_STRING[result = cdsl_hashtreeDoTest()]);
 	if(result == FALSE)
 	{
 		exit(-1);
 	}
-
 	printf("AVL Tree Test Result : %s\n",RESULT_STRING[result = cdsl_avltreeDoTest()]);
 	if(result == FALSE)
 	{
@@ -81,7 +79,7 @@ int main(void){
 	}
 
 	perform_avltree_benchmark();
-	perform_nrbtree_benchmark();
+	perform_rbtree_benchmark();
 	return 0;
 }
 
