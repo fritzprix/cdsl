@@ -428,9 +428,10 @@ static rbtreeNode_t* resolve_red_red(rbtreeNode_t* gparent_c,	uint8_t color_ctx,
 	if(!GET_PTR(gparent_c)) {
 		return gparent_c;
 	}
-	if((GET_COLOR(GET_PTR(gparent_c)->left) == RED) && (GET_COLOR(GET_PTR(gparent_c)->right) == RED)) {
-		PAINT_BLACK(GET_PTR(gparent_c)->left);
-		PAINT_BLACK(GET_PTR(gparent_c)->right);
+	rbtreeNode_t* bare_ptr = GET_PTR(gparent_c);
+	if((GET_COLOR(bare_ptr->left) == RED) && (GET_COLOR(bare_ptr->right) == RED)) {
+		PAINT_BLACK(bare_ptr->left);
+		PAINT_BLACK(bare_ptr->right);
 		PAINT_RED(gparent_c);
 		return gparent_c;
 	}
@@ -444,7 +445,7 @@ static rbtreeNode_t* resolve_red_red(rbtreeNode_t* gparent_c,	uint8_t color_ctx,
 			 *      /  \                      /  \
 			 *     ..  new                  new
 			 */
-			GET_PTR(gparent_c)->left = rotate_left(GET_PTR(gparent_c)->left);
+			bare_ptr->left = rotate_left(bare_ptr->left);
 			/*
 			 *  rotate performed to make left-left sequence
 			 *  so now PATTERN_LEFT_LEFT case
@@ -462,7 +463,7 @@ static rbtreeNode_t* resolve_red_red(rbtreeNode_t* gparent_c,	uint8_t color_ctx,
 			 *           /  \                      /   \
 			 *         new  ..                    ..   new
 			 */
-			GET_PTR(gparent_c)->right = rotate_right(GET_PTR(gparent_c)->right);
+			bare_ptr->right = rotate_right(bare_ptr->right);
 			/*
 			 *  rotate performed to make right-right sequence
 			 *  so now PATTERN_RIGHT_RIGHT case
@@ -478,42 +479,42 @@ static rbtreeNode_t* resolve_red_red(rbtreeNode_t* gparent_c,	uint8_t color_ctx,
 
 
 static rbtreeNode_t* insert_rc(rbtreeNode_t* sub_root_c, rbtreeNode_t* item, uint8_t* rc_color, uint8_t* rc_dir, rbtreeNode_t** replaced) {
+	rbtreeNode_t* bare_ptr = GET_PTR(sub_root_c);
 	if(!GET_PTR(sub_root_c)) {
 		PAINT_RED(item);
 #ifdef __DBG
 		stack_bottom = (__cdsl_uaddr_t) &sub_root_c;
 #endif
 		return item;
-	} else if(GET_PTR(sub_root_c)->key < item->key) {
-		GET_PTR(sub_root_c)->right = insert_rc(GET_PTR(sub_root_c)->right, item, rc_color, rc_dir, replaced);
+	}
+	if(bare_ptr->key < item->key) {
+		bare_ptr->right = insert_rc(bare_ptr->right, item, rc_color, rc_dir, replaced);
 		*rc_color <<= 1;
 		*rc_dir <<= 1;
-		*rc_color |= GET_COLOR(GET_PTR(sub_root_c)->right);
+		*rc_color |= GET_COLOR(bare_ptr->right);
 		*rc_dir |= CTX_RIGHT;
 		if((*rc_color & RCC_CTX_PATTERN) == RCC_CTX_PATTERN_REDRED) {
 			sub_root_c = resolve_red_red(sub_root_c, *rc_color, *rc_dir);
-			*rc_color = 0;
-			*rc_dir = 0;
+			*rc_color = GET_COLOR(bare_ptr->right);
 		}
 		return sub_root_c;
 	} else {
-		if(replaced && (GET_PTR(sub_root_c)->key == item->key)) {
+		if(replaced && (bare_ptr->key == item->key)) {
 			// if the key value of new item collides to another and the insert operation is performed with (is_set == true)
 			// replace old one with new item
-			*replaced = GET_PTR(sub_root_c);
-			item->left = GET_PTR(sub_root_c)->left;
-			item->right = GET_PTR(sub_root_c)->right;
+			*replaced = bare_ptr;
+			item->left = bare_ptr->left;
+			item->right = bare_ptr->right;
 			return (rbtreeNode_t*) ((__cdsl_uaddr_t) item | GET_COLOR(sub_root_c));
 		}
-		GET_PTR(sub_root_c)->left = insert_rc(GET_PTR(sub_root_c)->left, item, rc_color, rc_dir, replaced);
+		bare_ptr->left = insert_rc(bare_ptr->left, item, rc_color, rc_dir, replaced);
 		*rc_color <<= 1;
 		*rc_dir <<= 1;
-		*rc_color |= GET_COLOR(GET_PTR(sub_root_c)->left);
+		*rc_color |= GET_COLOR(bare_ptr->left);
 		*rc_dir |= CTX_LEFT;
 		if((*rc_color & RCC_CTX_PATTERN) == RCC_CTX_PATTERN_REDRED) {
 			sub_root_c = resolve_red_red(sub_root_c, *rc_color, *rc_dir);
-			*rc_color = 0;
-			*rc_dir = 0;
+			*rc_color = GET_COLOR(bare_ptr->left);
 		}
 		return sub_root_c;
 	}
