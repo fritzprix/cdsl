@@ -1,5 +1,5 @@
 /*
- * cdsl_nrbtree.h
+ * cdsl_rbtree.h
  *
  *  Created on: Mar 24, 2016
  *      Author: innocentevil
@@ -21,29 +21,29 @@ extern "C" {
  * @{
  */
 
-#define cdsl_nrbtreeMaxDepth(root)                      tree_max_depth((base_treeRoot_t*) root)
-#define cdsl_nrbtreeTraverse(root, cb, order, arg)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order, arg)
-#define cdsl_nrbtreeTraverseTarget(root,cb,key, arg)    tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, key, arg)
-#define cdsl_nrbtreeSize(root)                          tree_size((base_treeRoot_t*) root)
-#define cdsl_nrbtreePrint(root, print)                  tree_print((base_treeRoot_t*) root, print)
-#define cdsl_nrbtreeIsEmpty(root)                       tree_is_empty((base_treeRoot_t*) root)
-#define cdsl_nrbtreeTop(root)                           (nrbtreeNode_t*) tree_top((base_treeRoot_t*) root)
-#define cdsl_nrbtreeGoLeft(cur)                         (nrbtreeNode_t*) tree_go_left((base_treeNode_t*) cur)
-#define cdsl_nrbtreeGoRight(cur)                        (nrbtreeNode_t*) tree_go_right((base_treeNode_t*) cur)
-#define cdsl_nrbtreeMin(root)                           (nrbtreeNode_t*) tree_min((base_treeRoot_t*) root)
-#define cdsl_nrbtreeMax(root)                           (nrbtreeNode_t*) tree_max((base_treeRoot_t*) root)
-#define cdsl_nrbtreeUpdate(root,nitem)                  (nrbtreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
-#define cdsl_nrbtreeDelete(root, key)                   cdsl_nrbtreeDeleteReplace(root, key, NULL, NULL)
-#define cdsl_nrbtreeDeleteMin(root)                     cdsl_nrbtreeDeleteMinReplace(root, NULL, NULL)
-#define cdsl_nrbtreeDeleteMax(root)                     cdsl_nrbtreeDeleteMaxReplace(root, NULL, NULL)
+#define cdsl_rbtreeMaxDepth(root)                      tree_max_depth((base_treeRoot_t*) root)
+#define cdsl_rbtreeTraverse(root, cb, order, arg)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order, arg)
+#define cdsl_rbtreeTraverseTarget(root,cb,key, arg)    tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, key, arg)
+#define cdsl_rbtreeSize(root)                          tree_size((base_treeRoot_t*) root)
+#define cdsl_rbtreePrint(root, print)                  tree_print((base_treeRoot_t*) root, print)
+#define cdsl_rbtreeIsEmpty(root)                       tree_is_empty((base_treeRoot_t*) root)
+#define cdsl_rbtreeTop(root)                           (rbtreeNode_t*) tree_top((base_treeRoot_t*) root)
+#define cdsl_rbtreeGoLeft(cur)                         (rbtreeNode_t*) tree_go_left((base_treeNode_t*) cur)
+#define cdsl_rbtreeGoRight(cur)                        (rbtreeNode_t*) tree_go_right((base_treeNode_t*) cur)
+#define cdsl_rbtreeMin(root)                           (rbtreeNode_t*) tree_min((base_treeRoot_t*) root)
+#define cdsl_rbtreeMax(root)                           (rbtreeNode_t*) tree_max((base_treeRoot_t*) root)
+#define cdsl_rbtreeUpdate(root,nitem)                  (rbtreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
+#define cdsl_rbtreeDelete(root, key)                   cdsl_rbtreeDeleteReplace(root, key, NULL, NULL)
+#define cdsl_rbtreeDeleteMin(root)                     cdsl_rbtreeDeleteMinReplace(root, NULL, NULL)
+#define cdsl_rbtreeDeleteMax(root)                     cdsl_rbtreeDeleteMaxReplace(root, NULL, NULL)
 
 
 /*!
- * \def cdsl_nrbtreePrint_dev(root)
+ * \def cdsl_rbtreePrint_dev(root)
  * \brief Print tree structure
  * \param[in] root pointer to the root of tree
  *
- * \def cdsl_nrbtreeMaxDepth(root)
+ * \def cdsl_rbtreeMaxDepth(root)
  * \brief Get max depth of the tree
 
  * \param[in] root pointer to the root of tree
@@ -51,7 +51,7 @@ extern "C" {
 
  *
  *
- * \def cdsl_nrbtreeTraverse(root, cb, order, arg)
+ * \def cdsl_rbtreeTraverse(root, cb, order, arg)
  * \brief Traverse all the items within the tree, cb is callback function
 
  * \param[in] root pointer to the root of tree
@@ -60,7 +60,7 @@ extern "C" {
  * \param[in] arg argument which passed as argument when callback is invoked
  *
  *
- * \def cdsl_nrbtreeTraverseTarget(root,cb,key, arg)
+ * \def cdsl_rbtreeTraverseTarget(root,cb,key, arg)
  * \brief Traverse all the parent item to the target node with given key value
  * \param[in] root pointer to the root of tree
  * \param[in] cb callback function called for each item of the tree
@@ -68,65 +68,65 @@ extern "C" {
  * \param[in] arg argument which passed as argument when callback is invoked
 
  *
- * \def cdsl_nrbtreeSize(root)
+ * \def cdsl_rbtreeSize(root)
  * \brief Get total item count of the tree
  * \param[in] root pointer to the root of tree
  * \return total item count of the tree
  *
- * \def cdsl_nrbtreePrint(root, print)
+ * \def cdsl_rbtreePrint(root, print)
  * \brief Print root structure of tree
  * \param[in] root pointer to the root of tree
  * \param[in] print printer callback which called with arg
 
  *
- * \def  cdsl_nrbtreeIsEmpty(root)
+ * \def  cdsl_rbtreeIsEmpty(root)
  * \brief Check whether the tree is empty or not
  * \param[in] root pointer to the root of tree
  * \return return true, if there is no item on the tree, otherwise return false
  *
- * \def cdsl_nrbtreeTop(root)
+ * \def cdsl_rbtreeTop(root)
  * \brief Get root item of the tree (not very meaningful except for heap)
  * \param[in] root pointer to the root of tree
  * \return top (entry) item of the tree
  *
- * \def cdsl_nrbtreeGoLeft(cur)
+ * \def cdsl_rbtreeGoLeft(cur)
  * \brief Peek left child of current item
  * \param[in] cur pointer to tree node
  * \return left child of the given tree node
  *
- * \def cdsl_nrbtreeGoRight(cur)
+ * \def cdsl_rbtreeGoRight(cur)
  * \brief Peek right child of current item
  * \param[in] cur pointer to tree node
  * \return right child of the given tree node
  *
- * \def cdsl_nrbtreeMin(root)
+ * \def cdsl_rbtreeMin(root)
  * \brief Peek item with minimum key value among the items in the tree
  * \param[in] root pointer to tree root
  * \return item with minimum key value
  *
- * \def cdsl_nrbtreeMax(root)
+ * \def cdsl_rbtreeMax(root)
  * \brief Peek item with maximum key value among the items in the tree
  * \param[in] root pointer to tree root
  * \return item with maximum key value
  *
- * \def cdsl_nrbtreeUpdate(root,nitem)
+ * \def cdsl_rbtreeUpdate(root,nitem)
  * \brief Replace item with new one with same key value
  * \param[in] root pointer to tree root
  * \param[in] nitem new item
  * \return old item replaced by nitem
  *
- * \def cdsl_nrbtreeDelete(root, key)
+ * \def cdsl_rbtreeDelete(root, key)
  * \brief Delete item with the key
  * \param[in] root pointer to tree root
  * \param[in] key value for item to be deleted
  * \return deleted item
  *
- * \def cdsl_nrbtreeDeleteMin(root)
+ * \def cdsl_rbtreeDeleteMin(root)
  * \brief Delete item with minimum key value among the items in the tree
  * \param[in] root pointer to tree root
  * \return item with minimum key value
  *
- * \def cdsl_nrbtreeDeleteMax(root)
+ * \def cdsl_rbtreeDeleteMax(root)
  * \brief Delete item with maximum key value among the items in the tree
  * \param[in] root pointer to tree root
  * \return item with maximum key value
@@ -136,7 +136,7 @@ extern "C" {
 /*!
  * \brief red-black node type
  */
-typedef struct cdsl_nrbtree nrbtreeNode_t;
+typedef struct cdsl_rbtree rbtreeNode_t;
 /*!
  * \brief root of red-black tree
  *
@@ -147,19 +147,19 @@ typedef struct cdsl_nrbroot {
 	 */
 	union {
 		struct base_tree_root 	base_root;
-		nrbtreeNode_t* entry;
+		rbtreeNode_t* entry;
 	};
-}nrbtreeRoot_t;
+}rbtreeRoot_t;
 
 /*!
  * \brief node of red-black tree
  */
-struct cdsl_nrbtree {
+struct cdsl_rbtree {
 	union {
 		struct base_tree_node 	base_node;
 		struct {
-			nrbtreeNode_t* left;
-			nrbtreeNode_t* right;
+			rbtreeNode_t* left;
+			rbtreeNode_t* right;
 			trkey_t          key;
 		};
 
@@ -168,20 +168,20 @@ struct cdsl_nrbtree {
 
 
 /*!
- * \fn void cdsl_nrbtreeRootInit(nrbtreeRoot_t* rootp)
+ * \fn void cdsl_rbtreeRootInit(rbtreeRoot_t* rootp)
  * \brief Initialize red-black tree root
- * \param[in] rootp pointer to uninitialized \ref nrbtreeRoot_t
+ * \param[in] rootp pointer to uninitialized \ref rbtreeRoot_t
  */
-extern void cdsl_nrbtreeRootInit(nrbtreeRoot_t* rootp);
+extern void cdsl_rbtreeRootInit(rbtreeRoot_t* rootp);
 /*!
- * \fn void cdsl_nrbtreeNodeInit(nrbtreeNode_t* node, trkey_t key)
+ * \fn void cdsl_rbtreeNodeInit(rbtreeNode_t* node, trkey_t key)
  * \brief Initialize red-black tree node
- * \param[in] node pointer to uninitialized \ref nrbtreeNode_t
+ * \param[in] node pointer to uninitialized \ref rbtreeNode_t
  * \param[in] key key value for the node
  */
-extern void cdsl_nrbtreeNodeInit(nrbtreeNode_t* node, trkey_t key);
+extern void cdsl_rbtreeNodeInit(rbtreeNode_t* node, trkey_t key);
 
-/*!\fn nrbtreeNode_t* cdsl_nrbtreeInsert(nrbtreeRoot_t* rootp,nrbtreeNode_t* item, BOOL is_set)
+/*!\fn rbtreeNode_t* cdsl_rbtreeInsert(rbtreeRoot_t* rootp,rbtreeNode_t* item, BOOL is_set)
  * \brief Insert element to tree
  * \param[in] rootp pointer of tree root
  * \param[in] item new tree node item to be inserted
@@ -190,15 +190,15 @@ extern void cdsl_nrbtreeNodeInit(nrbtreeNode_t* node, trkey_t key);
  *  	within the tree, otherwise, added without replacement
 *  \return if is_set is true, return replaced node otherwise, return null
  */
-extern nrbtreeNode_t* cdsl_nrbtreeInsert(nrbtreeRoot_t* rootp,nrbtreeNode_t* item, BOOL is_set);
+extern rbtreeNode_t* cdsl_rbtreeInsert(rbtreeRoot_t* rootp,rbtreeNode_t* item, BOOL is_set);
 
 /*!
  * \brief Perform lookup operation and return node with given key, if there are multiple items with same key, the first encountered item during lookup operation will be returned
  * \param[in] rootp pointer of tree root
  * \param[in] key key value for the target node
- * \return found node (\ref nrbtreeNode_t) with given key
+ * \return found node (\ref rbtreeNode_t) with given key
  */
-extern nrbtreeNode_t* cdsl_nrbtreeLookup(nrbtreeRoot_t* rootp,trkey_t key);
+extern rbtreeNode_t* cdsl_rbtreeLookup(rbtreeRoot_t* rootp,trkey_t key);
 
 /*!
  * \brief Delete item with or without replacement
@@ -208,7 +208,7 @@ extern nrbtreeNode_t* cdsl_nrbtreeLookup(nrbtreeRoot_t* rootp,trkey_t key);
  * \param[in] cb_arg callback argument for replacer
  * \return deleted item
  */
-extern nrbtreeNode_t* cdsl_nrbtreeDeleteReplace(nrbtreeRoot_t* rootp,trkey_t key, base_tree_replacer_t replacer, void* cb_arg);
+extern rbtreeNode_t* cdsl_rbtreeDeleteReplace(rbtreeRoot_t* rootp,trkey_t key, base_tree_replacer_t replacer, void* cb_arg);
 
 /*!
  * \brief Delete item with minimum key value within the tree
@@ -217,7 +217,7 @@ extern nrbtreeNode_t* cdsl_nrbtreeDeleteReplace(nrbtreeRoot_t* rootp,trkey_t key
  * \param[in] cb_arg callback argument for replacer
  * \return deleted item
  */
-extern nrbtreeNode_t* cdsl_nrbtreeDeleteMinReplace(nrbtreeRoot_t* rootp, base_tree_replacer_t replacer, void* cb_arg);
+extern rbtreeNode_t* cdsl_rbtreeDeleteMinReplace(rbtreeRoot_t* rootp, base_tree_replacer_t replacer, void* cb_arg);
 /*!
  * \brief Delete item with maximum key value within the tree
  * \param[in] rootp pointer of tree root
@@ -225,13 +225,13 @@ extern nrbtreeNode_t* cdsl_nrbtreeDeleteMinReplace(nrbtreeRoot_t* rootp, base_tr
  * \param[in] cb_arg callback argument for replacer
  * \return deleted item
  */
-extern nrbtreeNode_t* cdsl_nrbtreeDeleteMaxReplace(nrbtreeRoot_t* rootp, base_tree_replacer_t replacer, void* cb_arg);
+extern rbtreeNode_t* cdsl_rbtreeDeleteMaxReplace(rbtreeRoot_t* rootp, base_tree_replacer_t replacer, void* cb_arg);
 
 
 #ifdef __DBG
-extern void cdsl_nrbtreePrint_dev(nrbtreeRoot_t* root);
+extern void cdsl_rbtreePrint_dev(rbtreeRoot_t* root);
 #else
-#define cdsl_nrbtreePrint_dev(root)
+#define cdsl_rbtreePrint_dev(root)
 #endif
 
 /*!

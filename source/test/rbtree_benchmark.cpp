@@ -1,5 +1,5 @@
 /*
- * nrbtree_benchmark.c
+ * rbtree_benchmark.c
  *
  *  Created on: Apr 7, 2016
  *      Author: innocentevil
@@ -22,23 +22,24 @@
 #define TEST_LOOP 10
 
 typedef struct {
-	nrbtreeNode_t node;
+	rbtreeNode_t node;
 	int val;
 } data_t;
 
 
 
-bool perform_nrbtree_benchmark(void){
+
+bool perform_rbtree_benchmark(void){
 
 	double insert_avg = 0;
 	double lookup_avg = 0;
 	double remove_avg = 0;
 	int loop = 0;
-	nrbtreeRoot_t root;
+	rbtreeRoot_t root;
 	clock_t start, end;
 	data_t* dp;
 	trkey_t key = 0;
-	cdsl_nrbtreeRootInit(&root);
+	cdsl_rbtreeRootInit(&root);
 
 	pid_t pid = fork();
 	if(pid == 0) {
@@ -85,15 +86,14 @@ bool perform_nrbtree_benchmark(void){
 			start = clock();
 			for(key = 0;key < TEST_CNT;key++) {
 				dp = new data_t();
-				cdsl_nrbtreeNodeInit(&dp->node, key);
-				cdsl_nrbtreeInsert(&root, &dp->node, FALSE);
+				cdsl_rbtreeNodeInit(&dp->node, key);
+				cdsl_rbtreeInsert(&root, &dp->node, FALSE);
 			}
 			end = clock();
 			insert_avg += (double)((end - start)) / CLOCKS_PER_SEC;
-
 			start = clock();
 			for(key = 0;key < TEST_CNT;key++) {
-				if(((data_t*) cdsl_nrbtreeLookup(&root,key))->node.key != key)
+				if(((data_t*) cdsl_rbtreeLookup(&root,key))->node.key != key)
 					return false;
 			}
 			end = clock();
@@ -101,7 +101,7 @@ bool perform_nrbtree_benchmark(void){
 
 			start = clock();
 			for(key = 0;key < TEST_CNT;key++) {
-				dp = (data_t*) cdsl_nrbtreeDelete(&root,key);
+				dp = (data_t*) cdsl_rbtreeDelete(&root,key);
 				if(!dp)
 					return false;
 				delete dp;
@@ -109,7 +109,6 @@ bool perform_nrbtree_benchmark(void){
 			end = clock();
 			remove_avg += (double)((end - start)) / CLOCKS_PER_SEC;
 		}
-
 		insert_avg /= TEST_LOOP;
 		lookup_avg /= TEST_LOOP;
 		remove_avg /= TEST_LOOP;
@@ -124,3 +123,5 @@ bool perform_nrbtree_benchmark(void){
 	}
 	return true;
 }
+
+

@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 #ifndef TEST_SIZE
-#define TEST_SIZE 10000
+#define TEST_SIZE 100
 #endif
 
 #ifdef __DBG
