@@ -23,7 +23,7 @@ HEADER_ROOT=$(PROJECT_ROOT_DIR)/include
 SOURCE_ROOT=$(PROJECT_ROOT_DIR)/source
 TOOL_DIR=$(PROJECT_ROOT_DIR)/tools
 
-CONFIG_PY=$(TOOL_DIR)/jconfigpy/jconfigpy.py
+CONFIG_PY=$(TOOL_DIR)/jconfigpy
 
 TEST_TARGET=cdsl
 DEV_TEST_TARGET=cdsl_dev
