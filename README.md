@@ -6,16 +6,11 @@
 	
 ## About
 	simple C implementations of various data structures, including sigle / double linked list,
-	binary search tree, some balanced tree (red-black tree, splay tree), binary heap.
+	binary search tree, some balanced tree (red-black tree, AVL tree, splay tree), binary heap.
 	 
 
 ## Note
-    all the tree implementations depend on recursion which is typically considered impractical 
-    due to its stack usage. however, for balanced tree family (AVL, Red-Black ..), it's possible to keep recursion depth in reasonable level 
-    so recursion can be practical for them. for example, red black tree requires only 2kbytes at maximum when handling 2,000,000 nodes.    
-    most of them are focused to reduce memory foot print cosidering very constrained system. (typically having only a few killobytes of RAM)
-    you can see this kind of effort by investigating node structure in red black tree implmentation. and all the implementation adopt object-oriented concept so you can easily 
-    integrate it with your own data structure design. (inheritance / genericity)
+    the motivation of this project is implementing data structure algorithm which has very efficient memory foot print by minimizing the node structure. for the sake of recursion, each node doesn't need to has pointer to parent, recursion is considered impractical due to its stack usage though, in case of balanced tree(like red-black tree / AVL tree) , however, it's possible to keep recursion depth in reasonable level. for example, red black tree requires only 2kbytes at maximum when handling 2,000,000 nodes. node & root (or list item & list entry) can be used by inserting itself into another one (your own C struct). so it can be integrated easily into your design and doesn't necessarily depend on dyanmic memory allocation.   
          
     
      
