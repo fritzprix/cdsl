@@ -10,14 +10,21 @@
 	 
 
 ## Note
-    the motivation of this project is implementing data structure algorithm which has very efficient memory foot print by minimizing the node structure. for the sake of recursion, each node doesn't need to has pointer to parent, recursion is considered impractical due to its stack usage though, in case of balanced tree(like red-black tree / AVL tree) , however, it's possible to keep recursion depth in reasonable level. for example, red black tree requires only 2kbytes at maximum when handling 2,000,000 nodes. node & root (or list item & list entry) can be used by inserting itself into another one (your own C struct). so it can be integrated easily into your design and doesn't necessarily depend on dyanmic memory allocation.   
+    the motivation of this project is implementing data structure algorithm which has very efficient 
+    memory footprint by minimizing the node structure. for the sake of recursion, each node doesn't 
+    need to have pointer to parent. recursion is considered impractical due to its stack usage though, 
+    in case of balanced tree(like red-black tree / AVL tree) , however, it's possible to keep recursion 
+    depth in reasonable level. for example, red black tree requires only 2 kbytes at maximum when handling 
+    2,000,000 nodes. node & root (or list item & list entry) can be used by inserting itself into another 
+    one (your own C struct). so it can be integrated easily into your design and doesn't necessarily 
+    depend on dyanmic memory allocation.   
          
     
      
     trees heavily depends on recursion
     - splay tree (spltree)
     - red black tree (nrbtree)
-    - avl tree (avltree)
+    - AVL tree (avltree)
     - hash tree (hashtree)
     - binary heap (heap)
     
