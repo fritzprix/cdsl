@@ -54,6 +54,9 @@ extern "C" {
 typedef __cdsl_uaddr_t  trkey_t;
 typedef struct base_tree_node base_treeNode_t;  ///< Base tree node type
 typedef struct base_tree_root base_treeRoot_t;  ///< Base tree root type
+
+typedef BOOL (*condition_t)(base_treeNode_t* node, trkey_t key);
+
 /*!
  * \brief generic callback used in tree operation (traversal)
  */

@@ -144,7 +144,7 @@ rbtreeNode_t* cdsl_rbtreeConditionalLookup(rbtreeRoot_t* rootp, trkey_t key, con
 	}
 	rbtreeNode_t* cur_node = rootp->entry;	// always black so don't need to use GET_PTR() macro
 	while (cur_node) {
-		if(match(cur_node, key)) {
+		if(match(&cur_node->base_node, key)) {
 			return cur_node;
 		}
 		if (GET_PTR(cur_node)->key < key) {

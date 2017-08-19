@@ -192,6 +192,18 @@ extern avltreeNode_t* cdsl_avltreeInsert(avltreeRoot_t* rootp, avltreeNode_t* it
  */
 extern avltreeNode_t* cdsl_avltreeLookup(avltreeRoot_t* rootp,trkey_t key);
 
+
+/*!
+ * \brief Try lookup node with given key & additional condition. if both the key and the condition match to node, the node will be return, otherwise null.
+ *        this API is useful if there are nodes with same key value, then additional condition can be used to pick exact node.
+ *        or traverse down the tree with given key and try to pick node with additional condition
+ * \param[in] rootp pointer of tree root
+ * \param[in] key key value for the target node
+ * \param[in] match condition callback used to pick node
+ * \return found node (\ref rbtreeNode_t) with given key
+ */
+extern avltreeNode_t* cdsl_avltreeConditionalLookup(avltreeRoot_t* rootp, trkey_t key, condition_t match);
+
 /*!
  * \brief Delete item with or without replacement
  * \param[in] rootp pointer of tree root
