@@ -22,10 +22,7 @@ struct compete_req {
 	pthread_mutex_t* lock;
 };
 
-static trkey_t given_keys [] = {
-		10, 85, 15, 70, 20, 60, 30
-};
-
+static BOOL is_match(rbtreeNode_t* node, trkey_t key);
 
 BOOL cdsl_rbtreeDoTest(void) {
 	rbtreeRoot_t root, aroot;
@@ -149,6 +146,16 @@ BOOL cdsl_rbtreeDoTest(void) {
 		return FALSE;
 	}
 
+	if(!cdsl_rbtreeConditionalLookup(&root, 1, is_match)) {
+		PRINT_ERR("fail to condition match\n");
+		return FALSE;
+	}
+
 	return TRUE;
+}
+
+
+static BOOL is_match(rbtreeNode_t* node, trkey_t key) {
+	return node->key == key;
 }
 

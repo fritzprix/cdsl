@@ -25,7 +25,7 @@ extern "C" {
 
 #define cdsl_avltreeMaxDepth(root)                      tree_max_depth((base_treeRoot_t*) root)
 #define cdsl_avltreeTraverse(root, cb, order, arg)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order, arg)
-#define cdsl_avltreeTraverseTarget(root,cb,key, arg)    tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, key, arg)
+#define cdsl_avltreeTraverseTarget(root,cb,key, arg)    tree_traverse_target((base_treeRoot_t*) root, (base_tree_callback_t) cb, key, arg)
 #define cdsl_avltreeSize(root)                          tree_size((base_treeRoot_t*) root)
 #define cdsl_avltreePrint(root, print)                  tree_print((base_treeRoot_t*) root, print)
 #define cdsl_avltreeIsEmpty(root)                       tree_is_empty((base_treeRoot_t*) root)

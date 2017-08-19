@@ -23,7 +23,7 @@ extern "C" {
 
 #define cdsl_rbtreeMaxDepth(root)                      tree_max_depth((base_treeRoot_t*) root)
 #define cdsl_rbtreeTraverse(root, cb, order, arg)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order, arg)
-#define cdsl_rbtreeTraverseTarget(root,cb,key, arg)    tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, key, arg)
+#define cdsl_rbtreeTraverseTarget(root, cb, key, arg)  tree_traverse_target((base_treeRoot_t*) root, (base_tree_callback_t) cb, key, arg)
 #define cdsl_rbtreeSize(root)                          tree_size((base_treeRoot_t*) root)
 #define cdsl_rbtreePrint(root, print)                  tree_print((base_treeRoot_t*) root, print)
 #define cdsl_rbtreeIsEmpty(root)                       tree_is_empty((base_treeRoot_t*) root)
@@ -166,6 +166,8 @@ struct cdsl_rbtree {
 	};
 };
 
+typedef BOOL (*condition_t)(rbtreeNode_t* node, trkey_t key);
+
 
 /*!
  * \fn void cdsl_rbtreeRootInit(rbtreeRoot_t* rootp)
@@ -199,6 +201,17 @@ extern rbtreeNode_t* cdsl_rbtreeInsert(rbtreeRoot_t* rootp,rbtreeNode_t* item, B
  * \return found node (\ref rbtreeNode_t) with given key
  */
 extern rbtreeNode_t* cdsl_rbtreeLookup(rbtreeRoot_t* rootp,trkey_t key);
+
+/*!
+ * \brief Try lookup node with given key & additional condition. if both the key and the condition match to node, the node will be return, otherwise null.
+ *        this API is useful if there are nodes with same key value, then additional condition can be used to pick exact node.
+ *        or traverse down the tree with given key and try to pick node with additional condition
+ * \param[in] rootp pointer of tree root
+ * \param[in] key key value for the target node
+ * \param[in] match condition callback used to pick node
+ * \return found node (\ref rbtreeNode_t) with given key
+ */
+extern rbtreeNode_t* cdsl_rbtreeConditionalLookup(rbtreeRoot_t* rootp, trkey_t key, condition_t match);
 
 /*!
  * \brief Delete item with or without replacement
