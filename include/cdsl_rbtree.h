@@ -166,8 +166,6 @@ struct cdsl_rbtree {
 	};
 };
 
-typedef BOOL (*condition_t)(rbtreeNode_t* node, trkey_t key);
-
 
 /*!
  * \fn void cdsl_rbtreeRootInit(rbtreeRoot_t* rootp)

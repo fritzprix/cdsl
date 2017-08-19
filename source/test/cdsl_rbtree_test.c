@@ -22,7 +22,7 @@ struct compete_req {
 	pthread_mutex_t* lock;
 };
 
-static BOOL is_match(rbtreeNode_t* node, trkey_t key);
+static BOOL is_match(base_treeNode_t* node, trkey_t key);
 
 BOOL cdsl_rbtreeDoTest(void) {
 	rbtreeRoot_t root, aroot;
@@ -155,7 +155,7 @@ BOOL cdsl_rbtreeDoTest(void) {
 }
 
 
-static BOOL is_match(rbtreeNode_t* node, trkey_t key) {
+static BOOL is_match(base_treeNode_t* node, trkey_t key) {
 	return node->key == key;
 }
 

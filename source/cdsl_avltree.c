@@ -80,6 +80,25 @@ avltreeNode_t* cdsl_avltreeLookup(avltreeRoot_t* rootp,trkey_t key) {
 	return NULL;
 }
 
+avltreeNode_t* cdsl_avltreeConditionalLookup(avltreeRoot_t* rootp, trkey_t key, condition_t match) {
+	if(!rootp) {
+		return NULL;
+	}
+	avltreeNode_t* cur = rootp->entry;
+	while(cur) {
+		if(match(&cur->base_node, key)) {
+			return cur;
+		}
+		if(cur->key < key) {
+			cur = cur->right;
+		} else {
+			cur = cur->left;
+		}
+	}
+	return NULL;
+}
+
+
 avltreeNode_t* cdsl_avltreeDeleteReplace(avltreeRoot_t* rootp,trkey_t key, base_tree_replacer_t replacer, void* cb_arg) {
 	if(!rootp) {
 		return NULL;

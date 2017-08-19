@@ -74,6 +74,25 @@ bstreeNode_t* cdsl_bstreeLookup(bstreeRoot_t* rootp, trkey_t key) {
 	return NULL;
 }
 
+bstreeNode_t* cdsl_bstreeConidtionalLookup(bstreeRoot_t* rootp, trkey_t key, condition_t match) {
+	if(!rootp) {
+		return NULL;
+	}
+	bstreeNode_t* current = rootp->entry;
+	while(current) {
+		if(match(&current->node, key)) {
+			return current;
+		}
+		if(current->key < key) {
+			current = current->right;
+		} else {
+			current = current->left;
+		}
+	}
+	return NULL;
+}
+
+
 bstreeNode_t* cdsl_bstreeDelete(bstreeRoot_t* rootp, trkey_t key) {
 	bstreeNode_t* todelete = NULL;
 	if ((rootp == NULL) || (rootp->entry == NULL))
