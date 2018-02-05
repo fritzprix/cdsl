@@ -15,6 +15,7 @@ static bstreeNode_t* take_rightmost_rc(bstreeNode_t* node);
 static bstreeNode_t* move_up_leftmost_rc(bstreeNode_t* node);
 static bstreeNode_t* take_leftmost_rc(bstreeNode_t* node);
 
+
 void cdsl_bstreeRootInit(bstreeRoot_t* rootp) {
 	if (rootp == NULL)
 		return;
@@ -164,6 +165,7 @@ bstreeNode_t* cdsl_bstreeDeleteMax(bstreeRoot_t* rootp) {
 	}
 	return rm;
 }
+
 
 static bstreeNode_t* take_rightmost_rc(bstreeNode_t* node) {
 	if (!node->right) {
