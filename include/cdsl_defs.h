@@ -66,6 +66,7 @@ extern "C" {
 
 typedef void* (*cdsl_generic_compare_t)(void*, void*);
 typedef void (*cdsl_generic_printer_t) (void*);
+typedef void* (*cdsl_alloc_t)(size_t);
 
 #ifndef NULL
 #define NULL 	((void*) 0)

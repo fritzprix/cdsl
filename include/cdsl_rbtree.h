@@ -21,21 +21,21 @@ extern "C" {
  * @{
  */
 
-#define cdsl_rbtreeMaxDepth(root)                      tree_max_depth((base_treeRoot_t*) root)
-#define cdsl_rbtreeTraverse(root, cb, order, arg)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order, arg)
-#define cdsl_rbtreeTraverseTarget(root, cb, key, arg)  tree_traverse_target((base_treeRoot_t*) root, (base_tree_callback_t) cb, key, arg)
-#define cdsl_rbtreeSize(root)                          tree_size((base_treeRoot_t*) root)
-#define cdsl_rbtreePrint(root, print)                  tree_print((base_treeRoot_t*) root, print)
-#define cdsl_rbtreeIsEmpty(root)                       tree_is_empty((base_treeRoot_t*) root)
-#define cdsl_rbtreeTop(root)                           (rbtreeNode_t*) tree_top((base_treeRoot_t*) root)
-#define cdsl_rbtreeGoLeft(cur)                         (rbtreeNode_t*) tree_go_left((base_treeNode_t*) cur)
-#define cdsl_rbtreeGoRight(cur)                        (rbtreeNode_t*) tree_go_right((base_treeNode_t*) cur)
-#define cdsl_rbtreeMin(root)                           (rbtreeNode_t*) tree_min((base_treeRoot_t*) root)
-#define cdsl_rbtreeMax(root)                           (rbtreeNode_t*) tree_max((base_treeRoot_t*) root)
-#define cdsl_rbtreeUpdate(root,nitem)                  (rbtreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
-#define cdsl_rbtreeDelete(root, key)                   cdsl_rbtreeDeleteReplace(root, key, NULL, NULL)
-#define cdsl_rbtreeDeleteMin(root)                     cdsl_rbtreeDeleteMinReplace(root, NULL, NULL)
-#define cdsl_rbtreeDeleteMax(root)                     cdsl_rbtreeDeleteMaxReplace(root, NULL, NULL)
+#define cdsl_rbtreeMaxDepth(root)                       tree_max_depth((base_treeRoot_t*) root)
+#define cdsl_rbtreeForEach(root, cb, order, arg)        tree_for_each((base_treeRoot_t*) root, (base_tree_callback_t) cb, order, arg)
+#define cdsl_rbtreeForEachToTarget(root, cb, key, arg)  tree_for_each_to_target((base_treeRoot_t*) root, (base_tree_callback_t) cb, key, arg)
+#define cdsl_rbtreeSize(root)                           tree_size((base_treeRoot_t*) root)
+#define cdsl_rbtreePrint(root, print)                   tree_print((base_treeRoot_t*) root, print)
+#define cdsl_rbtreeIsEmpty(root)                        tree_is_empty((base_treeRoot_t*) root)
+#define cdsl_rbtreeTop(root)                            (rbtreeNode_t*) tree_top((base_treeRoot_t*) root)
+#define cdsl_rbtreeGoLeft(cur)                          (rbtreeNode_t*) tree_go_left((base_treeNode_t*) cur)
+#define cdsl_rbtreeGoRight(cur)                         (rbtreeNode_t*) tree_go_right((base_treeNode_t*) cur)
+#define cdsl_rbtreeMin(root)                            (rbtreeNode_t*) tree_min((base_treeRoot_t*) root)
+#define cdsl_rbtreeMax(root)                            (rbtreeNode_t*) tree_max((base_treeRoot_t*) root)
+#define cdsl_rbtreeUpdate(root,nitem)                   (rbtreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
+#define cdsl_rbtreeDelete(root, key)                    cdsl_rbtreeDeleteReplace(root, key, NULL, NULL)
+#define cdsl_rbtreeDeleteMin(root)                      cdsl_rbtreeDeleteMinReplace(root, NULL, NULL)
+#define cdsl_rbtreeDeleteMax(root)                      cdsl_rbtreeDeleteMaxReplace(root, NULL, NULL)
 
 
 /*!

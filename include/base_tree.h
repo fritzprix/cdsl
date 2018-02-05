@@ -9,6 +9,7 @@
 #define BASE_TREE_H_
 
 #include "arch.h"
+#include "serializer/serializer.h"
 #include "cdsl_defs.h"
 
 #if defined(__cplusplus)
@@ -28,7 +29,7 @@ extern "C" {
 #define TRAVERSE_OK         (int) 0
 #define TRAVERSE_BREAK      (int) 1
 
-#define DECLARE_TRAVERSE_CALLBACK(fn) int fn(int order, base_treeNode_t* node,void* arg)
+#define DECLARE_FOREACH_CALLBACK(fn) int fn(int order, base_treeNode_t* node,void* arg)
 
 /*!
  * \def ORDER_INC
@@ -86,6 +87,8 @@ struct base_tree_node {
 	trkey_t          key;    ///< key value of the node
 };
 
+extern void tree_serializer_init(base_treeRoot_t* rootp, serializable_t* serializer);
+
 /*!
  * \brief traverse tree
  * \param[in] rootp pointer to root of the tree
@@ -94,7 +97,7 @@ struct base_tree_node {
  * \param[in] arg argument passed when callback invoked
  * \sa ORDER_INC ORDER_DEC base_tree_callback_t
  */
-extern void tree_traverse(base_treeRoot_t* rootp, base_tree_callback_t cb,int order, void* arg);
+extern void tree_for_each(base_treeRoot_t* rootp, base_tree_callback_t cb,int order, void* arg);
 
 /*!
  * \brief traverse to the given target
@@ -104,7 +107,7 @@ extern void tree_traverse(base_treeRoot_t* rootp, base_tree_callback_t cb,int or
  * \param[in] arg argument passed when callback invoked
  * \sa base_tree_callback_t
  */
-extern void tree_traverse_target(base_treeRoot_t* rootp, base_tree_callback_t cb, trkey_t key,void* arg);
+extern void tree_for_each_to_target(base_treeRoot_t* rootp, base_tree_callback_t cb, trkey_t key,void* arg);
 
 /*!
  * \brief Peek left child of given tree node

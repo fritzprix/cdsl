@@ -23,21 +23,21 @@ extern "C" {
  */
 
 
-#define cdsl_avltreeMaxDepth(root)                      tree_max_depth((base_treeRoot_t*) root)
-#define cdsl_avltreeTraverse(root, cb, order, arg)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order, arg)
-#define cdsl_avltreeTraverseTarget(root,cb,key, arg)    tree_traverse_target((base_treeRoot_t*) root, (base_tree_callback_t) cb, key, arg)
-#define cdsl_avltreeSize(root)                          tree_size((base_treeRoot_t*) root)
-#define cdsl_avltreePrint(root, print)                  tree_print((base_treeRoot_t*) root, print)
-#define cdsl_avltreeIsEmpty(root)                       tree_is_empty((base_treeRoot_t*) root)
-#define cdsl_avltreeTop(root)                           (avltreeNode_t*) tree_top((base_treeRoot_t*) root)
-#define cdsl_avltreeGoLeft(cur)                         (avltreeNode_t*) tree_go_left((base_treeNode_t*) cur)
-#define cdsl_avltreeGoRight(cur)                        (avltreeNode_t*) tree_go_right((base_treeNode_t*) cur)
-#define cdsl_avltreeMin(root)                           (avltreeNode_t*) tree_min((base_treeRoot_t*) root)
-#define cdsl_avltreeMax(root)                           (avltreeNode_t*) tree_max((base_treeRoot_t*) root)
-#define cdsl_avltreeUpdate(root,nitem)                  (avltreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
-#define cdsl_avltreeDelete(root, key)                   cdsl_avltreeDeleteReplace(root, key, NULL, NULL)
-#define cdsl_avltreeDeleteMin(root)                     cdsl_avltreeDeleteMinReplace(root, NULL, NULL)
-#define cdsl_avltreeDeleteMax(root)                     cdsl_avltreeDeleteMaxReplace(root, NULL, NULL)
+#define cdsl_avltreeMaxDepth(root)                       tree_max_depth((base_treeRoot_t*) root)
+#define cdsl_avltreeForEach(root, cb, order, arg)        tree_for_each((base_treeRoot_t*) root, (base_tree_callback_t) cb, order, arg)
+#define cdsl_avltreeForEachToTarget(root,cb,key, arg)    tree_for_each_to_target((base_treeRoot_t*) root, (base_tree_callback_t) cb, key, arg)
+#define cdsl_avltreeSize(root)                           tree_size((base_treeRoot_t*) root)
+#define cdsl_avltreePrint(root, print)                   tree_print((base_treeRoot_t*) root, print)
+#define cdsl_avltreeIsEmpty(root)                        tree_is_empty((base_treeRoot_t*) root)
+#define cdsl_avltreeTop(root)                            (avltreeNode_t*) tree_top((base_treeRoot_t*) root)
+#define cdsl_avltreeGoLeft(cur)                          (avltreeNode_t*) tree_go_left((base_treeNode_t*) cur)
+#define cdsl_avltreeGoRight(cur)                         (avltreeNode_t*) tree_go_right((base_treeNode_t*) cur)
+#define cdsl_avltreeMin(root)                            (avltreeNode_t*) tree_min((base_treeRoot_t*) root)
+#define cdsl_avltreeMax(root)                            (avltreeNode_t*) tree_max((base_treeRoot_t*) root)
+#define cdsl_avltreeUpdate(root,nitem)                   (avltreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
+#define cdsl_avltreeDelete(root, key)                    cdsl_avltreeDeleteReplace(root, key, NULL, NULL)
+#define cdsl_avltreeDeleteMin(root)                      cdsl_avltreeDeleteMinReplace(root, NULL, NULL)
+#define cdsl_avltreeDeleteMax(root)                      cdsl_avltreeDeleteMaxReplace(root, NULL, NULL)
 
 
 

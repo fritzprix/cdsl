@@ -16,7 +16,7 @@
 extern "C" {
 #endif
 
-#define cdsl_hashtreeTraverse(root, cb, order,arg)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order,arg)
+#define cdsl_hashtreeForEach(root, cb, order,arg)       tree_for_each((base_treeRoot_t*) root, (base_tree_callback_t) cb, order,arg)
 #define cdsl_hashtreeSize(root)                         tree_size((base_treeRoot_t*) root)
 #define cdsl_hashtreePrint(root, print)                 tree_print((base_treeRoot_t*) root, print)
 #define cdsl_hashtreeIsEmpty(root)                      tree_is_empty((base_treeRoot_t*) root)

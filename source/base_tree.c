@@ -16,6 +16,11 @@
 	ptr = (base_treeNode_t*) (((__cdsl_uaddr_t) ptr) | v);\
 } while(0)
 
+struct serialize_argument {
+	const serializable_handler_t* ser_handler;
+	const serializable_callback_t* ser_callback;
+};
+
 static int calc_max_depth_rc(base_treeNode_t** root);
 static int calc_size_rc(base_treeNode_t** root);
 static void print_rc(base_treeNode_t* current,cdsl_generic_printer_t prt,int depth);
@@ -23,8 +28,48 @@ static int traverse_incremental_rc(base_treeNode_t* current,int* current_order,b
 static int traverse_decremental_rc(base_treeNode_t* current,int* current_order,base_tree_callback_t cb, void* arg);
 static void traverse_target_rc(base_treeNode_t* current, int* order, trkey_t key, base_tree_callback_t cb,void* arg);
 static void print_tab(int cnt);
+static void serialize(const serializable_t* self, const serializable_handler_t* serialize_handler, const serializable_callback_t* cb);
 
-void tree_traverse(base_treeRoot_t* rootp, base_tree_callback_t cb,int order, void* arg)
+
+void tree_serializer_init(base_treeRoot_t* rootp, serializable_t* serializer) {
+	if(serializer == NULL) {
+		return;
+	}
+	serializer->serialize = serialize;
+	serializer->target = rootp;
+}
+
+DECLARE_FOREACH_CALLBACK(serialize_for_each) {
+	const struct serialize_argument* args = (const struct serialize_argument*) arg;
+	const serializable_handler_t* handler = args->ser_handler;
+	size_t size = 0;
+	void* data = args->ser_callback->get_data(node, &size);
+	handler->on_next(handler, data, size);
+	return TRAVERSE_OK;
+}
+
+
+static void serialize(const serializable_t* self, const serializable_handler_t* serialize_handler, const serializable_callback_t* cb) {
+	if((self == NULL) || (serialize_handler == NULL) || (cb == NULL)) {
+		return;
+	}
+	base_treeRoot_t* rootp = (base_treeRoot_t*) self->target;
+	serialize_header_t header;
+
+	struct serialize_argument args;
+	args.ser_callback = cb;
+	args.ser_handler = serialize_handler;
+
+	header.type = BASE_TREE;
+	header.ver = GET_SER_VERSION();
+	serialize_handler->on_head(serialize_handler, &header);
+	tree_for_each(self->target, serialize_for_each, ORDER_INC, &args);
+	serialize_handler->on_tail(serialize_handler);
+}
+
+
+
+void tree_for_each(base_treeRoot_t* rootp, base_tree_callback_t cb,int order, void* arg)
 {
 	if((cb == NULL) || (rootp == NULL) || (GET_PTR(rootp->entry) == NULL))
 		return;
@@ -35,7 +80,7 @@ void tree_traverse(base_treeRoot_t* rootp, base_tree_callback_t cb,int order, vo
 		traverse_incremental_rc(rootp->entry,&i,cb,arg);
 }
 
-void tree_traverse_target(base_treeRoot_t* rootp, base_tree_callback_t cb, trkey_t key, void* arg) {
+void tree_for_each_to_target(base_treeRoot_t* rootp, base_tree_callback_t cb, trkey_t key, void* arg) {
 	if((cb == NULL) || (rootp == NULL) || (GET_PTR(rootp->entry) == NULL))
 		return;
 	int i = 0;

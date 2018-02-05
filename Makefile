@@ -1,8 +1,11 @@
 # makefile for cdsl
+include version
 
 ifeq ($(CLANG),)
 CLANG:=clang-3.6
 endif
+
+VERSION=-D__MAJOR__=$(MAJOR) -D__MINOR__=$(MINOR)
 
 CC=$(CLANG)
 CXX=g++
@@ -11,8 +14,9 @@ PYTHON=python
 PIP=pip
 MKDIR=mkdir
 
-DBG_CFLAG = -O0 -g3 -fmessage-length=0  $(CFLAG) -D__DBG
-REL_CFLAG = -O2 -g0 -fmessage-length=0  $(CFLAG)
+
+DBG_CFLAG = -O0 -g3 -fmessage-length=0  $(CFLAG) -D__DBG $(VERSION)
+REL_CFLAG = -O2 -g0 -fmessage-length=0  $(CFLAG) $(VERSION)
 DYNAMIC_FLAG = -fPIC
 
 LIBDIR=/usr/local/lib
