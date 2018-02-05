@@ -40,9 +40,11 @@ void tree_serializer_init(base_treeRoot_t* rootp, serializable_t* serializer) {
 }
 
 DECLARE_FOREACH_CALLBACK(serialize_for_each) {
-	const struct serialize_argument* args = (const serializable_handler_t*) arg;
+	const struct serialize_argument* args = (const struct serialize_argument*) arg;
 	const serializable_handler_t* handler = args->ser_handler;
-	->on_next(handle, node, sizeof(node));
+	size_t size = 0;
+	void* data = args->ser_callback->get_data(node, &size);
+	handler->on_next(handler, data, size);
 	return TRAVERSE_OK;
 }
 
