@@ -123,5 +123,5 @@ static DECLARE_FOREACH_CALLBACK(onTreeNode) {
 		*cnt = 0;
 	}
 	(*cnt)++;
-	return TRAVERSE_OK;
+	return FOREACH_CONTINUE;
 }

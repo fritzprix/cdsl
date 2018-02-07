@@ -17,10 +17,9 @@ extern "C" {
 typedef struct file_serializer file_serialzer_t;
 
 struct file_serializer {
-	serializable_handler_t handle;
-	int fd;
-	uint32_t count;
-	uint32_t chksum;
+	serializer_t        handle;
+	int                 fd;
+	serializer_header_t header;
 };
 
 extern void file_serializerInit(file_serialzer_t* serializer, const char* filename);

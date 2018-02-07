@@ -26,8 +26,8 @@ extern "C" {
 #define ORDER_INC			(int) 0
 #define ORDER_DEC			(int) 1
 
-#define TRAVERSE_OK         (int) 0
-#define TRAVERSE_BREAK      (int) 1
+#define FOREACH_CONTINUE   (int) 0
+#define FOREACH_BREAK      (int) 1
 
 #define DECLARE_FOREACH_CALLBACK(fn) int fn(int order, base_treeNode_t* node,void* arg)
 

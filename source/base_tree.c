@@ -17,8 +17,9 @@
 } while(0)
 
 struct serialize_argument {
-	const serializable_handler_t* ser_handler;
+	const serializer_t* ser_handler;
 	const serializable_callback_t* ser_callback;
+	int  result_code;
 };
 
 static int calc_max_depth_rc(base_treeNode_t** root);
@@ -28,7 +29,7 @@ static int traverse_incremental_rc(base_treeNode_t* current,int* current_order,b
 static int traverse_decremental_rc(base_treeNode_t* current,int* current_order,base_tree_callback_t cb, void* arg);
 static void traverse_target_rc(base_treeNode_t* current, int* order, trkey_t key, base_tree_callback_t cb,void* arg);
 static void print_tab(int cnt);
-static void serialize(const serializable_t* self, const serializable_handler_t* serialize_handler, const serializable_callback_t* cb);
+static void serialize(const serializable_t* self, const serializer_t* serializer, const serializable_callback_t* cb);
 
 
 void tree_serializer_init(base_treeRoot_t* rootp, serializable_t* serializer) {
@@ -41,30 +42,37 @@ void tree_serializer_init(base_treeRoot_t* rootp, serializable_t* serializer) {
 
 DECLARE_FOREACH_CALLBACK(serialize_for_each) {
 	const struct serialize_argument* args = (const struct serialize_argument*) arg;
-	const serializable_handler_t* handler = args->ser_handler;
+	const serializer_t* handler = args->ser_handler;
 	size_t size = 0;
 	void* data = args->ser_callback->get_data(node, &size);
-	handler->on_next(handler, data, size);
-	return TRAVERSE_OK;
+	int res = handler->on_next(handler, data, size);
+	args->result_code = res;
+	if(res < 0) {
+		return FOREACH_BREAK;
+	}
+	return FOREACH_CONTINUE;
 }
 
 
-static void serialize(const serializable_t* self, const serializable_handler_t* serialize_handler, const serializable_callback_t* cb) {
-	if((self == NULL) || (serialize_handler == NULL) || (cb == NULL)) {
+static void serialize(const serializable_t* self, const serializer_t* serializer, const serializable_callback_t* cb) {
+	if((self == NULL) || (serializer == NULL) || (cb == NULL)) {
 		return;
 	}
 	base_treeRoot_t* rootp = (base_treeRoot_t*) self->target;
-	serialize_header_t header;
+	serializable_header_t header;
 
 	struct serialize_argument args;
+	args.result_code = 0;
 	args.ser_callback = cb;
-	args.ser_handler = serialize_handler;
+	args.ser_handler = serializer;
 
 	header.type = BASE_TREE;
 	header.ver = GET_SER_VERSION();
-	serialize_handler->on_head(serialize_handler, &header);
-	tree_for_each(self->target, serialize_for_each, ORDER_INC, &args);
-	serialize_handler->on_tail(serialize_handler);
+	args.result_code =  serializer->on_head(serializer, &header);
+	if(!(args.result_code < 0)) {
+		tree_for_each(self->target, serialize_for_each, ORDER_INC, &args);
+	}
+	serializer->on_tail(serializer, args.result_code);
 }
 
 
@@ -237,13 +245,13 @@ static int traverse_incremental_rc(base_treeNode_t* current, int* current_order,
 	if(GET_PTR(current) == NULL)
 		return 0;
 	switch(traverse_incremental_rc(GET_PTR(current)->left,current_order,cb,arg)) {
-	case TRAVERSE_BREAK:
-		return TRAVERSE_BREAK;
+	case FOREACH_BREAK:
+		return FOREACH_BREAK;
 	}
 	*current_order += 1;
 	switch(cb(*current_order, GET_PTR(current),arg)) {
-	case TRAVERSE_BREAK:
-		return TRAVERSE_BREAK;
+	case FOREACH_BREAK:
+		return FOREACH_BREAK;
 	}
 	return traverse_incremental_rc(GET_PTR(current)->right,current_order,cb,arg);
 }
@@ -253,13 +261,13 @@ static int traverse_decremental_rc(base_treeNode_t* current, int* current_order,
 	if(GET_PTR(current) == NULL)
 		return 0;
 	switch(traverse_decremental_rc(GET_PTR(current)->right,current_order,cb, arg)) {
-	case TRAVERSE_BREAK:
-		return TRAVERSE_BREAK;
+	case FOREACH_BREAK:
+		return FOREACH_BREAK;
 	}
 	*current_order += 1;
 	switch(cb(*current_order,GET_PTR(current), arg)) {
-	case TRAVERSE_BREAK:
-		return TRAVERSE_BREAK;
+	case FOREACH_BREAK:
+		return FOREACH_BREAK;
 	}
 	return traverse_decremental_rc(GET_PTR(current)->left,current_order,cb, arg);
 }
@@ -276,7 +284,7 @@ static void traverse_target_rc(base_treeNode_t* current, int* order, trkey_t key
 		return;
 	}
 	switch(cb((*order)++, GET_PTR(current),arg)) {
-	case TRAVERSE_BREAK:
+	case FOREACH_BREAK:
 		/**
 		 *  currently, this switch block has not much to do
 		 */
