@@ -25,8 +25,9 @@ struct serialize_argument {
 static int calc_max_depth_rc(base_treeNode_t** root);
 static int calc_size_rc(base_treeNode_t** root);
 static void print_rc(base_treeNode_t* current,cdsl_generic_printer_t prt,int depth);
-static int traverse_incremental_rc(base_treeNode_t* current,int* current_order,base_tree_callback_t cb, void* arg);
-static int traverse_decremental_rc(base_treeNode_t* current,int* current_order,base_tree_callback_t cb, void* arg);
+static int foreach_incremental_rc(base_treeNode_t* current,int* current_order,base_tree_callback_t cb, void* arg);
+static int foreach_decremental_rc(base_treeNode_t* current,int* current_order,base_tree_callback_t cb, void* arg);
+static int foreach_down_rc(base_treeNode_t* current,int* current_order,base_tree_callback_t cb, void* arg);
 static void traverse_target_rc(base_treeNode_t* current, int* order, trkey_t key, base_tree_callback_t cb,void* arg);
 static void print_tab(int cnt);
 static void serialize(const serializable_t* self, const serializer_t* serializer, const serializable_callback_t* cb);
@@ -41,7 +42,7 @@ void tree_serializer_init(base_treeRoot_t* rootp, serializable_t* serializer) {
 }
 
 DECLARE_FOREACH_CALLBACK(serialize_for_each) {
-	const struct serialize_argument* args = (const struct serialize_argument*) arg;
+	struct serialize_argument* args = (struct serialize_argument*) arg;
 	const serializer_t* handler = args->ser_handler;
 	size_t size = 0;
 	void* data = args->ser_callback->get_data(node, &size);
@@ -70,7 +71,7 @@ static void serialize(const serializable_t* self, const serializer_t* serializer
 	header.ver = GET_SER_VERSION();
 	args.result_code =  serializer->on_head(serializer, &header);
 	if(!(args.result_code < 0)) {
-		tree_for_each(self->target, serialize_for_each, ORDER_INC, &args);
+		tree_for_each(self->target, serialize_for_each, ORDER_DOWN, &args);
 	}
 	serializer->on_tail(serializer, args.result_code);
 }
@@ -82,10 +83,19 @@ void tree_for_each(base_treeRoot_t* rootp, base_tree_callback_t cb,int order, vo
 	if((cb == NULL) || (rootp == NULL) || (GET_PTR(rootp->entry) == NULL))
 		return;
 	int i = 0;
-	if(order == ORDER_DEC)
-		traverse_decremental_rc(rootp->entry,&i,cb,arg);
-	else
-		traverse_incremental_rc(rootp->entry,&i,cb,arg);
+	int (*for_each)(base_treeNode_t* current, int* current_order, base_tree_callback_t cb, void* arg) = NULL;
+	switch(order) {
+	case ORDER_DEC:
+		for_each = foreach_decremental_rc;
+		break;
+	case ORDER_INC:
+		for_each = foreach_incremental_rc;
+		break;
+	case ORDER_DOWN:
+		for_each = foreach_down_rc;
+		break;
+	}
+	for_each(rootp->entry, &i, cb, arg);
 }
 
 void tree_for_each_to_target(base_treeRoot_t* rootp, base_tree_callback_t cb, trkey_t key, void* arg) {
@@ -240,37 +250,53 @@ static void print_tab(int cnt)
 		PRINT("\t");
 }
 
-static int traverse_incremental_rc(base_treeNode_t* current, int* current_order, base_tree_callback_t cb, void* arg)
+static int foreach_incremental_rc(base_treeNode_t* current, int* current_order, base_tree_callback_t cb, void* arg)
 {
 	if(GET_PTR(current) == NULL)
 		return 0;
-	switch(traverse_incremental_rc(GET_PTR(current)->left,current_order,cb,arg)) {
+	switch(foreach_incremental_rc(GET_PTR(current)->left,current_order,cb,arg)) {
 	case FOREACH_BREAK:
 		return FOREACH_BREAK;
 	}
-	*current_order += 1;
-	switch(cb(*current_order, GET_PTR(current),arg)) {
+//	*current_order += 1;
+	switch(cb((*current_order)++, GET_PTR(current),arg)) {
 	case FOREACH_BREAK:
 		return FOREACH_BREAK;
 	}
-	return traverse_incremental_rc(GET_PTR(current)->right,current_order,cb,arg);
+	return foreach_incremental_rc(GET_PTR(current)->right,current_order,cb,arg);
 }
 
-static int traverse_decremental_rc(base_treeNode_t* current, int* current_order, base_tree_callback_t cb, void* arg)
+static int foreach_decremental_rc(base_treeNode_t* current, int* current_order, base_tree_callback_t cb, void* arg)
 {
 	if(GET_PTR(current) == NULL)
 		return 0;
-	switch(traverse_decremental_rc(GET_PTR(current)->right,current_order,cb, arg)) {
+	switch(foreach_decremental_rc(GET_PTR(current)->right,current_order,cb, arg)) {
 	case FOREACH_BREAK:
 		return FOREACH_BREAK;
 	}
-	*current_order += 1;
-	switch(cb(*current_order,GET_PTR(current), arg)) {
+//	*current_order += 1;
+	switch(cb((*current_order)++,GET_PTR(current), arg)) {
 	case FOREACH_BREAK:
 		return FOREACH_BREAK;
 	}
-	return traverse_decremental_rc(GET_PTR(current)->left,current_order,cb, arg);
+	return foreach_decremental_rc(GET_PTR(current)->left,current_order,cb, arg);
 }
+
+static int foreach_down_rc(base_treeNode_t* current,int* current_order,base_tree_callback_t cb, void* arg) {
+	if(GET_PTR(current) == NULL)
+		return 0;
+	const int order = (*current_order)++;
+	switch(cb(order, GET_PTR(current), arg)) {
+	case FOREACH_BREAK:
+		return FOREACH_BREAK;
+	}
+	switch(foreach_down_rc(GET_PTR(current)->left, current_order, cb, arg)) {
+	case FOREACH_BREAK:
+		return FOREACH_BREAK;
+	}
+	return foreach_down_rc(GET_PTR(current)->right, current_order, cb, arg);
+}
+
 
 
 static void traverse_target_rc(base_treeNode_t* current, int* order, trkey_t key, base_tree_callback_t cb, void* arg) {
