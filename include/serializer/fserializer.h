@@ -19,7 +19,7 @@ typedef struct file_serializer file_serialzer_t;
 struct file_serializer {
 	serializer_t        handle;
 	int                 fd;
-	serializer_header_t header;
+	serializer_tail_t   tail;
 };
 
 extern void file_serializerInit(file_serialzer_t* serializer, const char* filename);

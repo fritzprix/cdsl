@@ -25,7 +25,6 @@ extern "C" {
 
 #define ORDER_INC			(int) 0
 #define ORDER_DEC			(int) 1
-#define ORDER_DOWN          (int) -1
 
 #define FOREACH_CONTINUE   (int) 0
 #define FOREACH_BREAK      (int) 1
@@ -60,7 +59,7 @@ typedef struct base_tree_root base_treeRoot_t;  ///< Base tree root type
 typedef BOOL (*condition_t)(base_treeNode_t* node, trkey_t key);
 
 /*!
- * \brief generic callback used in tree operation (traversal)
+ * \brief generic callback used in tree operation (for-each)
  * \param[in] order the order of given node, for example, if this callback is used with for_each incremental order, order 0 means the given node is smallest element
  * \param[in] node the node of tree element
  * \param[in] arg argument
