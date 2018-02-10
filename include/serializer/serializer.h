@@ -26,10 +26,17 @@ extern "C" {
 
 #define GET_SER_VERSION()  (((__MAJOR__ * 10) + (__MINOR__)) | (SER_MAGIC << 8))
 
-typedef struct serializable_handler serializable_handler_t;
+typedef struct serializer_interface serializer_t;
 typedef struct serializable serializable_t;
 typedef struct serializable_callback serializable_callback_t;
-typedef struct serialize_header serialize_header_t;
+typedef struct serializable_header serializable_header_t;
+typedef struct serializable_node serializable_node_t;
+typedef struct serializable_tail serializer_tail_t;
+
+#define ERR_INV_PARAM    ((int) -0x0001)
+#define ERR_WR_OP_FAIL   ((int) -0x0002)
+#define ERR_RD_OP_FAIL   ((int) -0x0003)
+
 
 
 struct serializable_callback {
@@ -38,21 +45,54 @@ struct serializable_callback {
 	 * \param[in] node pointer to the node of the structure, which can be either tree or list
 	 * \param[in] size user must write actual size of the data given size parameter. if the value is less than or equal to 0, only the node will be serialized
 	 */
-	void* (*get_data) (void* node, size_t* size);
+	void* (*get_data) (const void* node, size_t* size);
 };
 
-struct serialize_header {
+struct serializable_header {
 	uint16_t ver;         //<   lower byte : version | upper byte : magic
-#define BASE_TREE           ((uint16_t) 0x01)
-#define BASE_LIST           ((uint16_t) 0x02)
-#define DOUBLE_LIST         ((uint16_t) 0x03)
+#define TYPE_TREE           ((uint16_t) (1 << 8))
+#define SUB_TYPE_PLAIN      ((uint16_t) 0)
+#define SUB_TYPE_REDBLACK   ((uint16_t) 1)
+#define TYPE_LIST           ((uint16_t) (2 << 8))
 	uint16_t type;
 };
 
+struct serializable_node {
+	//  MSB -------------------/ -------------------/  -------------------/ -------------------/
+	// reserved for future use / type specific flag /         type        /       sub type     /
+	union {
+		uint32_t flags;
+		struct {
+			uint8_t _;
+			// spec |  |  |  |  |  |  |  |  |
+			union {
+				uint8_t spec;
+				struct {
+					unsigned is_embedded:1;
+					unsigned sub_type_spec:7;
+				};
+			};
+#define NODE_VALID        ((uint8_t) 0x1)
+#define NODE_NULL         ((uint8_t) 0x0)
+			uint8_t type;
+			uint8_t sub_type;
+		} __attribute__((packed));
+	};
+	size_t size;   ///< size in bytes of the node data
+	size_t offset; ///< offset in bytes from the end of this struct to embedded tree node struct
+};
+
+struct serializable_tail {
+	uint32_t     count;
+	size_t       size;
+	uint32_t     chksum;
+};
+
+
 /*!
- *  \brief serializable function should be called
+ *  \brief serializer interface
  */
-struct serializable_handler {
+struct serializer_interface {
 	/*!
 	 * \brief write head into byte stream
 	 * \param[in] buffer write buffer
@@ -60,14 +100,16 @@ struct serializable_handler {
 	 * \return size of unwritten part of head (sizeof(head) - sizeof(buffer)), so for example, if the size of given buffer is larger than the size of head to be written, negative value would be returned
 	 *
 	 */
-	void (*on_head)(const serializable_handler_t* self, const serialize_header_t* head);
-	void (*on_next)(const serializable_handler_t* self, const uint8_t* next, size_t sz);
-	void (*on_tail)(const serializable_handler_t* self);
+
+
+	int (*on_head)(const serializer_t* self, const serializable_header_t* head);
+	int (*on_next)(const serializer_t* self, serializable_node_t* node, const uint8_t* data, size_t sz);
+	void (*on_tail)(const serializer_t* self, int res);
 };
 
 
 struct serializable {
-	void (*serialize)(const serializable_t* self, const serializable_handler_t* handler, const serializable_callback_t* cb);
+	void (*serialize)(const serializable_t* self, const serializer_t* handler, const serializable_callback_t* cb);
 	void* target;
 };
 

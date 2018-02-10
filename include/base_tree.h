@@ -26,8 +26,8 @@ extern "C" {
 #define ORDER_INC			(int) 0
 #define ORDER_DEC			(int) 1
 
-#define TRAVERSE_OK         (int) 0
-#define TRAVERSE_BREAK      (int) 1
+#define FOREACH_CONTINUE   (int) 0
+#define FOREACH_BREAK      (int) 1
 
 #define DECLARE_FOREACH_CALLBACK(fn) int fn(int order, base_treeNode_t* node,void* arg)
 
@@ -59,9 +59,13 @@ typedef struct base_tree_root base_treeRoot_t;  ///< Base tree root type
 typedef BOOL (*condition_t)(base_treeNode_t* node, trkey_t key);
 
 /*!
- * \brief generic callback used in tree operation (traversal)
+ * \brief generic callback used in tree operation (for-each)
+ * \param[in] order the order of given node, for example, if this callback is used with for_each incremental order, order 0 means the given node is smallest element
+ * \param[in] node the node of tree element
+ * \param[in] arg argument
  */
-typedef int (*base_tree_callback_t)(int,base_treeNode_t*,void*);
+
+typedef int (*base_tree_callback_t)(int order, base_treeNode_t* node ,void* arg);
 
 /*! replacer callback function type to override default hole resolution mechanism of the given tree
  *  replacer result shall be one among the three cases below
@@ -93,7 +97,7 @@ extern void tree_serializer_init(base_treeRoot_t* rootp, serializable_t* seriali
  * \brief traverse tree
  * \param[in] rootp pointer to root of the tree
  * \param[in] cb callback invoked for each node for the tree
- * \param[in] order traversal order, either \ref ORDER_INC or \ref ORDER_DEC
+ * \param[in] order traversal order, either \ref ORDER_INC or \ref ORDER_DEC or \ref ORDER_DOWN
  * \param[in] arg argument passed when callback invoked
  * \sa ORDER_INC ORDER_DEC base_tree_callback_t
  */
