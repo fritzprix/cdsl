@@ -23,21 +23,21 @@ extern "C" {
  */
 
 
-#define cdsl_avltreeMaxDepth(root)                      tree_max_depth((base_treeRoot_t*) root)
-#define cdsl_avltreeTraverse(root, cb, order, arg)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order, arg)
-#define cdsl_avltreeTraverseTarget(root,cb,key, arg)    tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, key, arg)
-#define cdsl_avltreeSize(root)                          tree_size((base_treeRoot_t*) root)
-#define cdsl_avltreePrint(root, print)                  tree_print((base_treeRoot_t*) root, print)
-#define cdsl_avltreeIsEmpty(root)                       tree_is_empty((base_treeRoot_t*) root)
-#define cdsl_avltreeTop(root)                           (avltreeNode_t*) tree_top((base_treeRoot_t*) root)
-#define cdsl_avltreeGoLeft(cur)                         (avltreeNode_t*) tree_go_left((base_treeNode_t*) cur)
-#define cdsl_avltreeGoRight(cur)                        (avltreeNode_t*) tree_go_right((base_treeNode_t*) cur)
-#define cdsl_avltreeMin(root)                           (avltreeNode_t*) tree_min((base_treeRoot_t*) root)
-#define cdsl_avltreeMax(root)                           (avltreeNode_t*) tree_max((base_treeRoot_t*) root)
-#define cdsl_avltreeUpdate(root,nitem)                  (avltreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
-#define cdsl_avltreeDelete(root, key)                   cdsl_avltreeDeleteReplace(root, key, NULL, NULL)
-#define cdsl_avltreeDeleteMin(root)                     cdsl_avltreeDeleteMinReplace(root, NULL, NULL)
-#define cdsl_avltreeDeleteMax(root)                     cdsl_avltreeDeleteMaxReplace(root, NULL, NULL)
+#define cdsl_avltreeMaxDepth(root)                       tree_max_depth((base_treeRoot_t*) root)
+#define cdsl_avltreeForEach(root, cb, order, arg)        tree_for_each((base_treeRoot_t*) root, (base_tree_callback_t) cb, order, arg)
+#define cdsl_avltreeForEachToTarget(root,cb,key, arg)    tree_for_each_to_target((base_treeRoot_t*) root, (base_tree_callback_t) cb, key, arg)
+#define cdsl_avltreeSize(root)                           tree_size((base_treeRoot_t*) root)
+#define cdsl_avltreePrint(root, print)                   tree_print((base_treeRoot_t*) root, print)
+#define cdsl_avltreeIsEmpty(root)                        tree_is_empty((base_treeRoot_t*) root)
+#define cdsl_avltreeTop(root)                            (avltreeNode_t*) tree_top((base_treeRoot_t*) root)
+#define cdsl_avltreeGoLeft(cur)                          (avltreeNode_t*) tree_go_left((base_treeNode_t*) cur)
+#define cdsl_avltreeGoRight(cur)                         (avltreeNode_t*) tree_go_right((base_treeNode_t*) cur)
+#define cdsl_avltreeMin(root)                            (avltreeNode_t*) tree_min((base_treeRoot_t*) root)
+#define cdsl_avltreeMax(root)                            (avltreeNode_t*) tree_max((base_treeRoot_t*) root)
+#define cdsl_avltreeUpdate(root,nitem)                   (avltreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
+#define cdsl_avltreeDelete(root, key)                    cdsl_avltreeDeleteReplace(root, key, NULL, NULL)
+#define cdsl_avltreeDeleteMin(root)                      cdsl_avltreeDeleteMinReplace(root, NULL, NULL)
+#define cdsl_avltreeDeleteMax(root)                      cdsl_avltreeDeleteMaxReplace(root, NULL, NULL)
 
 
 
@@ -191,6 +191,18 @@ extern avltreeNode_t* cdsl_avltreeInsert(avltreeRoot_t* rootp, avltreeNode_t* it
  * \return found node (\ref avltreeNode_t) with given key
  */
 extern avltreeNode_t* cdsl_avltreeLookup(avltreeRoot_t* rootp,trkey_t key);
+
+
+/*!
+ * \brief Try lookup node with given key & additional condition. if both the key and the condition match to node, the node will be return, otherwise null.
+ *        this API is useful if there are nodes with same key value, then additional condition can be used to pick exact node.
+ *        or traverse down the tree with given key and try to pick node with additional condition
+ * \param[in] rootp pointer of tree root
+ * \param[in] key key value for the target node
+ * \param[in] match condition callback used to pick node
+ * \return found node (\ref rbtreeNode_t) with given key
+ */
+extern avltreeNode_t* cdsl_avltreeConditionalLookup(avltreeRoot_t* rootp, trkey_t key, condition_t match);
 
 /*!
  * \brief Delete item with or without replacement

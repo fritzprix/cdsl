@@ -21,21 +21,21 @@ extern "C" {
  * @{
  */
 
-#define cdsl_rbtreeMaxDepth(root)                      tree_max_depth((base_treeRoot_t*) root)
-#define cdsl_rbtreeTraverse(root, cb, order, arg)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order, arg)
-#define cdsl_rbtreeTraverseTarget(root,cb,key, arg)    tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, key, arg)
-#define cdsl_rbtreeSize(root)                          tree_size((base_treeRoot_t*) root)
-#define cdsl_rbtreePrint(root, print)                  tree_print((base_treeRoot_t*) root, print)
-#define cdsl_rbtreeIsEmpty(root)                       tree_is_empty((base_treeRoot_t*) root)
-#define cdsl_rbtreeTop(root)                           (rbtreeNode_t*) tree_top((base_treeRoot_t*) root)
-#define cdsl_rbtreeGoLeft(cur)                         (rbtreeNode_t*) tree_go_left((base_treeNode_t*) cur)
-#define cdsl_rbtreeGoRight(cur)                        (rbtreeNode_t*) tree_go_right((base_treeNode_t*) cur)
-#define cdsl_rbtreeMin(root)                           (rbtreeNode_t*) tree_min((base_treeRoot_t*) root)
-#define cdsl_rbtreeMax(root)                           (rbtreeNode_t*) tree_max((base_treeRoot_t*) root)
-#define cdsl_rbtreeUpdate(root,nitem)                  (rbtreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
-#define cdsl_rbtreeDelete(root, key)                   cdsl_rbtreeDeleteReplace(root, key, NULL, NULL)
-#define cdsl_rbtreeDeleteMin(root)                     cdsl_rbtreeDeleteMinReplace(root, NULL, NULL)
-#define cdsl_rbtreeDeleteMax(root)                     cdsl_rbtreeDeleteMaxReplace(root, NULL, NULL)
+#define cdsl_rbtreeMaxDepth(root)                       tree_max_depth((base_treeRoot_t*) root)
+#define cdsl_rbtreeForEach(root, cb, order, arg)        tree_for_each((base_treeRoot_t*) root, (base_tree_callback_t) cb, order, arg)
+#define cdsl_rbtreeForEachToTarget(root, cb, key, arg)  tree_for_each_to_target((base_treeRoot_t*) root, (base_tree_callback_t) cb, key, arg)
+#define cdsl_rbtreeSize(root)                           tree_size((base_treeRoot_t*) root)
+#define cdsl_rbtreePrint(root, print)                   tree_print((base_treeRoot_t*) root, print)
+#define cdsl_rbtreeIsEmpty(root)                        tree_is_empty((base_treeRoot_t*) root)
+#define cdsl_rbtreeTop(root)                            (rbtreeNode_t*) tree_top((base_treeRoot_t*) root)
+#define cdsl_rbtreeGoLeft(cur)                          (rbtreeNode_t*) tree_go_left((base_treeNode_t*) cur)
+#define cdsl_rbtreeGoRight(cur)                         (rbtreeNode_t*) tree_go_right((base_treeNode_t*) cur)
+#define cdsl_rbtreeMin(root)                            (rbtreeNode_t*) tree_min((base_treeRoot_t*) root)
+#define cdsl_rbtreeMax(root)                            (rbtreeNode_t*) tree_max((base_treeRoot_t*) root)
+#define cdsl_rbtreeUpdate(root,nitem)                   (rbtreeNode_t*) tree_update((base_treeRoot_t*) root, (base_treeNode_t*) nitem)
+#define cdsl_rbtreeDelete(root, key)                    cdsl_rbtreeDeleteReplace(root, key, NULL, NULL)
+#define cdsl_rbtreeDeleteMin(root)                      cdsl_rbtreeDeleteMinReplace(root, NULL, NULL)
+#define cdsl_rbtreeDeleteMax(root)                      cdsl_rbtreeDeleteMaxReplace(root, NULL, NULL)
 
 
 /*!
@@ -199,6 +199,17 @@ extern rbtreeNode_t* cdsl_rbtreeInsert(rbtreeRoot_t* rootp,rbtreeNode_t* item, B
  * \return found node (\ref rbtreeNode_t) with given key
  */
 extern rbtreeNode_t* cdsl_rbtreeLookup(rbtreeRoot_t* rootp,trkey_t key);
+
+/*!
+ * \brief Try lookup node with given key & additional condition. if both the key and the condition match to node, the node will be return, otherwise null.
+ *        this API is useful if there are nodes with same key value, then additional condition can be used to pick exact node.
+ *        or traverse down the tree with given key and try to pick node with additional condition
+ * \param[in] rootp pointer of tree root
+ * \param[in] key key value for the target node
+ * \param[in] match condition callback used to pick node
+ * \return found node (\ref rbtreeNode_t) with given key
+ */
+extern rbtreeNode_t* cdsl_rbtreeConditionalLookup(rbtreeRoot_t* rootp, trkey_t key, condition_t match);
 
 /*!
  * \brief Delete item with or without replacement

@@ -138,6 +138,25 @@ rbtreeNode_t* cdsl_rbtreeLookup(rbtreeRoot_t* rootp, trkey_t key) {
 	return NULL;
 }
 
+rbtreeNode_t* cdsl_rbtreeConditionalLookup(rbtreeRoot_t* rootp, trkey_t key, condition_t match) {
+	if (!rootp) {
+		return NULL;
+	}
+	rbtreeNode_t* cur_node = rootp->entry;	// always black so don't need to use GET_PTR() macro
+	while (cur_node) {
+		if(match(&cur_node->base_node, key)) {
+			return cur_node;
+		}
+		if (GET_PTR(cur_node)->key < key) {
+			cur_node = GET_PTR(cur_node)->right;
+		} else {
+			cur_node = GET_PTR(cur_node)->left;
+		}
+	}
+	return NULL;
+}
+
+
 rbtreeNode_t* cdsl_rbtreeDeleteReplace(rbtreeRoot_t* rootp, trkey_t key,	base_tree_replacer_t replacer, void* arg) {
 	if (!rootp)
 		return NULL;

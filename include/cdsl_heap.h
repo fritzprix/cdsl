@@ -15,7 +15,7 @@ extern "C" {
 #endif
 
 #define cdsl_heapMaxDepth(root)                 tree_max_depth((base_treeRoot_t*) root)
-#define cdsl_heapTraverse(root, cb, order)      tree_traverse((base_treeRoot_t*) root, (base_tree_callback_t) cb, order)
+#define cdsl_heapForEach(root, cb, order)       tree_for_each((base_treeRoot_t*) root, (base_tree_callback_t) cb, order)
 #define cdsl_heapSize(root)                     tree_size((base_treeRoot_t*) root)
 #define cdsl_heapTop(root)                      (heapNode_t*) tree_top((base_treeRoot*) root)
 #define cdsl_heapPrint(root, print)             tree_print((base_treeRoot_t*) root, print)

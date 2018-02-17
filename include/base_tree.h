@@ -9,6 +9,7 @@
 #define BASE_TREE_H_
 
 #include "arch.h"
+#include "serializer/serializer.h"
 #include "cdsl_defs.h"
 
 #if defined(__cplusplus)
@@ -25,10 +26,10 @@ extern "C" {
 #define ORDER_INC			(int) 0
 #define ORDER_DEC			(int) 1
 
-#define TRAVERSE_OK         (int) 0
-#define TRAVERSE_BREAK      (int) 1
+#define FOREACH_CONTINUE   (int) 0
+#define FOREACH_BREAK      (int) 1
 
-#define DECLARE_TRAVERSE_CALLBACK(fn) int fn(int order, base_treeNode_t* node,void* arg)
+#define DECLARE_FOREACH_CALLBACK(fn) int fn(int order, base_treeNode_t* node,void* arg)
 
 /*!
  * \def ORDER_INC
@@ -54,10 +55,17 @@ extern "C" {
 typedef __cdsl_uaddr_t  trkey_t;
 typedef struct base_tree_node base_treeNode_t;  ///< Base tree node type
 typedef struct base_tree_root base_treeRoot_t;  ///< Base tree root type
+
+typedef BOOL (*condition_t)(base_treeNode_t* node, trkey_t key);
+
 /*!
- * \brief generic callback used in tree operation (traversal)
+ * \brief generic callback used in tree operation (for-each)
+ * \param[in] order the order of given node, for example, if this callback is used with for_each incremental order, order 0 means the given node is smallest element
+ * \param[in] node the node of tree element
+ * \param[in] arg argument
  */
-typedef int (*base_tree_callback_t)(int,base_treeNode_t*,void*);
+
+typedef int (*base_tree_callback_t)(int order, base_treeNode_t* node ,void* arg);
 
 /*! replacer callback function type to override default hole resolution mechanism of the given tree
  *  replacer result shall be one among the three cases below
@@ -83,15 +91,17 @@ struct base_tree_node {
 	trkey_t          key;    ///< key value of the node
 };
 
+extern void tree_serializer_init(base_treeRoot_t* rootp, serializable_t* serializer);
+
 /*!
  * \brief traverse tree
  * \param[in] rootp pointer to root of the tree
  * \param[in] cb callback invoked for each node for the tree
- * \param[in] order traversal order, either \ref ORDER_INC or \ref ORDER_DEC
+ * \param[in] order traversal order, either \ref ORDER_INC or \ref ORDER_DEC or \ref ORDER_DOWN
  * \param[in] arg argument passed when callback invoked
  * \sa ORDER_INC ORDER_DEC base_tree_callback_t
  */
-extern void tree_traverse(base_treeRoot_t* rootp, base_tree_callback_t cb,int order, void* arg);
+extern void tree_for_each(base_treeRoot_t* rootp, base_tree_callback_t cb,int order, void* arg);
 
 /*!
  * \brief traverse to the given target
@@ -101,7 +111,7 @@ extern void tree_traverse(base_treeRoot_t* rootp, base_tree_callback_t cb,int or
  * \param[in] arg argument passed when callback invoked
  * \sa base_tree_callback_t
  */
-extern void tree_traverse_target(base_treeRoot_t* rootp, base_tree_callback_t cb, trkey_t key,void* arg);
+extern void tree_for_each_to_target(base_treeRoot_t* rootp, base_tree_callback_t cb, trkey_t key,void* arg);
 
 /*!
  * \brief Peek left child of given tree node
