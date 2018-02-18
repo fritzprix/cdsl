@@ -7,10 +7,9 @@
 
 #include "cdsl_defs.h"
 #include "fserializer.h"
-
-static int on_head(const serializer_t* self, const serializable_header_t* head);
-static int on_next(const serializer_t* self, const uint8_t* next, size_t sz);
-static void on_tail(const serializer_t* self, int res);
+static int on_head(const cdsl_serializer_t* self, const cdsl_serializeHeader_t* head);
+static int on_next(const cdsl_serializer_t* self, const cdsl_serializeNode_t* node, size_t nsz, const uint8_t* data);
+static int on_tail(const cdsl_serializer_t* self, const cdsl_serializeTail_t* tail);
 
 void file_serializerInit(file_serialzer_t* serializer, const char* filename) {
 
@@ -19,15 +18,13 @@ void file_serializerInit(file_serialzer_t* serializer, const char* filename) {
 	}
 
 	//TODO : set mode for file open
-	const int fd = F_OPEN(filename,1);
+	const int fd = F_OPEN(filename, FO_RDWR);
 	if(fd < 0) {
+		PRINT("fail to open\n");
 		return;
 	}
 
 	serializer->fd = fd;
-	serializer->tail.chksum = 0;
-	serializer->tail.count = 0;
-	serializer->tail.size = 0;
 
 	serializer->handle.on_head = on_head;
 	serializer->handle.on_next = on_next;
@@ -44,36 +41,63 @@ void file_serializerExit(file_serialzer_t* serializer) {
 
 
 
-static int on_head(const serializer_t* self, const serializable_header_t* head) {
+static int on_head(const cdsl_serializer_t* self, const cdsl_serializeHeader_t* head) {
 	if((self == NULL) ||
 			(head == NULL)) {
 		return ERR_INV_PARAM;
 	}
-	int res;
+	uint16_t ser_starter = SERIALIZER_START_OF_FILE;
 	const file_serialzer_t* serializer = container_of(self, file_serialzer_t, handle);
 	if(serializer->fd < 0) {
 		return ERR_INV_PARAM;
 	}
-	if((res = F_WRITE(serializer->fd, head, sizeof(head))) < 0) {
+	if(F_WRITE(serializer->fd, &ser_starter, sizeof(uint16_t)) < 0) {
 		return ERR_WR_OP_FAIL;
 	}
-	return 0;
+	if(F_WRITE(serializer->fd, head, sizeof(head)) < 0) {
+		return ERR_WR_OP_FAIL;
+	}
+	return OK;
 }
 
-static int on_next(const serializer_t* self, const uint8_t* next, size_t sz) {
+static int on_next(const cdsl_serializer_t* self, const cdsl_serializeNode_t* node, size_t nsz,const uint8_t* data){
 	if((self == NULL) ||
-			(next == NULL) ||
-			(sz > 0)) {
+			(node == NULL)) {
 		return ERR_INV_PARAM;
 	}
-	int res;
 	const file_serialzer_t* serializer = container_of(self, file_serialzer_t, handle);
 	if(serializer->fd < 0) {
 		return ERR_INV_PARAM;
 	}
-	return 0;
+	if(F_WRITE(serializer->fd, node, nsz) < 0){
+		return ERR_WR_OP_FAIL;
+	}
+	uint16_t node_term[2] = {0};
+	if(node->d_size > 0) {
+		node_term[0] = serializer_calcNodeChecksum(node, data);
+		if (F_WRITE(serializer->fd, data, node->d_size) < 0) {
+			return ERR_WR_OP_FAIL;
+		}
+	}
+	node_term[1] = SERIALIZER_DELIM;
+	if(F_WRITE(serializer->fd, node_term, sizeof(uint32_t)) < 0) {
+		return ERR_WR_OP_FAIL;
+	}
+	return OK;
 }
 
-static void on_tail(const serializer_t* self, int result) {
+static int on_tail(const cdsl_serializer_t* self, const cdsl_serializeTail_t* tail) {
+	if((self == NULL) || (tail == NULL)) {
+		return ERR_INV_PARAM;
+	}
+	uint16_t eof = SERIALIZER_END_OF_FILE;
+	const file_serialzer_t* serializer = container_of(self, file_serialzer_t, handle);
+	if(F_WRITE(serializer->fd, tail, sizeof(cdsl_serializeTail_t)) < 0) {
+		return ERR_WR_OP_FAIL;
+	}
+	if(F_WRITE(serializer->fd, &eof, sizeof(uint16_t)) < 0) {
+		return ERR_WR_OP_FAIL;
+	}
+	return OK;
 
 }

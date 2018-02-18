@@ -6,6 +6,7 @@
  */
 
 #include "base_tree.h"
+#include "serializer.h"
 #include "cdsl_defs.h"
 #include "arch.h"
 
@@ -16,9 +17,15 @@
 	ptr = (base_treeNode_t*) (((__cdsl_uaddr_t) ptr) | v);\
 } while(0)
 
+typedef struct base_tree_serialize_node {
+	cdsl_serializeNode_t   _node;
+	trkey_t                key;
+}base_treeSerNode_t;
+
 struct serialize_argument {
-	const serializer_t* ser_handler;
-	const serializable_callback_t* ser_callback;
+	const cdsl_serializer_t*            ser_handler;
+	const cdsl_serializerUsrCallback_t* ser_callback;
+	cdsl_serializeTail_t                ser_tail;
 	int  result_code;
 };
 
@@ -30,58 +37,80 @@ static int foreach_decremental_rc(base_treeNode_t* current,int* current_order,ba
 static int foreach_serialize_rc(base_treeNode_t* rootp, base_tree_callback_t cb, void* arg);
 static void traverse_target_rc(base_treeNode_t* current, int* order, trkey_t key, base_tree_callback_t cb,void* arg);
 static void print_tab(int cnt);
-static void serialize(const serializable_t* self, const serializer_t* serializer, const serializable_callback_t* cb);
+static DECLARE_FOREACH_CALLBACK(serialize_for_each);
+
+#define GET_DOFFSET(ext_type)    (sizeof(ext_type) - offsetof(cdsl_serializeNode_t, flags))
+#define GET_EOFFSET(data, node)  (((size_t) node) - ((size_t) data))
 
 
+#define IS_NODE_EMBEDDED(data, node, size)   ((((size_t) data) <= ((size_t) node)) && ((((size_t) data) + size) > ((size_t) node)))
 
-void tree_serializer_init(base_treeRoot_t* rootp, serializable_t* serializer) {
-	if(serializer == NULL) {
-		return;
-	}
-	serializer->serialize = serialize;
-	serializer->target = rootp;
-}
-
-DECLARE_FOREACH_CALLBACK(serialize_for_each) {
+static DECLARE_FOREACH_CALLBACK(serialize_for_each) {
 	struct serialize_argument* args = (struct serialize_argument*) arg;
-	const serializer_t* handler = args->ser_handler;
-	serializable_node_t node_header = {
-			.sub_type = SUB_TYPE_PLAIN,
-			.type = order
-	};
+	const cdsl_serializer_t* serializer = args->ser_handler;
+	int res = 0;
+	uint8_t* data;
 
-	size_t size = 0;
-	const uint8_t* data = args->ser_callback->get_data(node, &size);
-	// TODO : check the node is embedded within data or not
-	int res = handler->on_next(handler, &node_header, data, size);
+	base_treeSerNode_t ser_node = {0};
+	if((order & NODE_MSK) == NODE_NULL) {
+		ser_node.key = -1;
+		ser_node._node.flags = NODE_NULL;
+	} else {
+		ser_node._node.d_offset = GET_DOFFSET(base_treeSerNode_t);
+		const cdsl_serializerUsrCallback_t* callback = args->ser_callback;
+		data = callback->on_node_to_data(callback, node, &ser_node._node.d_size);
+		if(data && ser_node._node.d_size) {
+			if (IS_NODE_EMBEDDED(data, node, ser_node._node.d_size)) {
+				ser_node._node.flags |= GET_EOFFSET(data, node);
+			}
+		}
+
+	}
+	res = serializer->on_next(serializer, (cdsl_serializeNode_t*) &ser_node, sizeof(base_treeSerNode_t),data);
 	args->result_code = res;
-	if(res < 0) {
+	if(res < OK) {
 		return FOREACH_BREAK;
 	}
+
 	return FOREACH_CONTINUE;
 }
 
 
-static void serialize(const serializable_t* self, const serializer_t* serializer, const serializable_callback_t* cb) {
-	if((self == NULL) || (serializer == NULL) || (cb == NULL)) {
+void tree_serialize(const base_treeRoot_t* rootp,
+		            const cdsl_serializer_t* serializer,
+					const cdsl_serializerUsrCallback_t* callback)
+{
+
+	if((rootp == NULL)      ||
+	   (serializer == NULL) ||
+	   (callback == NULL)   ||
+	   (callback->on_node_to_data == NULL))
+	{
 		return;
 	}
-	base_treeRoot_t* rootp = (base_treeRoot_t*) self->target;
-	serializable_header_t header;
+	cdsl_serializeHeader_t header;
 
-	struct serialize_argument args;
-	args.result_code = 0;
-	args.ser_callback = cb;
-	args.ser_handler = serializer;
+
+	struct serialize_argument args = {
+			.result_code = 0,
+			.ser_callback = callback,
+			.ser_handler = serializer
+	};
 
 	header.type = TYPE_TREE;
 	header.ver = GET_SER_VERSION();
 
+
 	args.result_code =  serializer->on_head(serializer, &header);
 	if(!(args.result_code < 0)) {
 		foreach_serialize_rc(rootp->entry, serialize_for_each, &args);
+		if(!(args.result_code < 0)) {
+			serializer->on_tail(serializer, &args.ser_tail);
+			if(callback->on_complete) callback->on_complete(callback);
+			return;
+		}
 	}
-	serializer->on_tail(serializer, args.result_code);
+	if(callback->on_error) callback->on_error(callback, args.result_code);
 }
 
 
@@ -101,6 +130,7 @@ void tree_for_each(base_treeRoot_t* rootp, base_tree_callback_t cb,int order, vo
 	}
 	for_each(rootp->entry, &i, cb, arg);
 }
+
 
 void tree_for_each_to_target(base_treeRoot_t* rootp, base_tree_callback_t cb, trkey_t key, void* arg) {
 	if((cb == NULL) || (rootp == NULL) || (GET_PTR(rootp->entry) == NULL))
@@ -209,7 +239,6 @@ base_treeNode_t* tree_update(base_treeRoot_t* rootp, base_treeNode_t* nitem) {
 }
 
 
-
 static int calc_size_rc(base_treeNode_t** root)
 {
 	int cnt = 0;
@@ -262,7 +291,6 @@ static int foreach_incremental_rc(base_treeNode_t* current, int* current_order, 
 	case FOREACH_BREAK:
 		return FOREACH_BREAK;
 	}
-//	*current_order += 1;
 	switch(cb((*current_order)++, GET_PTR(current),arg)) {
 	case FOREACH_BREAK:
 		return FOREACH_BREAK;
@@ -278,7 +306,6 @@ static int foreach_decremental_rc(base_treeNode_t* current, int* current_order, 
 	case FOREACH_BREAK:
 		return FOREACH_BREAK;
 	}
-//	*current_order += 1;
 	switch(cb((*current_order)++,GET_PTR(current), arg)) {
 	case FOREACH_BREAK:
 		return FOREACH_BREAK;
@@ -293,21 +320,19 @@ static int foreach_decremental_rc(base_treeNode_t* current, int* current_order, 
  *       / \
  *      1   4
  */
-static int foreach_serialize_rc(base_treeNode_t* current,base_tree_callback_t cb, void* arg) {
-	if(GET_PTR(current) == NULL || (arg == NULL)) {
-		return cb(NODE_NULL, NULL, 0);
+static int foreach_serialize_rc(base_treeNode_t* current, base_tree_callback_t cb, void* arg) {
+	if(GET_PTR(current) == NULL) {
+		return cb(NODE_NULL, NULL, arg);
 	}
 
-	switch(cb(NODE_VALID, GET_PTR(current) ,arg)) {
+	switch(cb(NODE_NORMAL, GET_PTR(current), arg)) {
 	case FOREACH_BREAK:
 		return FOREACH_BREAK;
 	}
-
 	switch(foreach_serialize_rc(GET_PTR(current)->left, cb, arg)) {
 	case FOREACH_BREAK:
 		return FOREACH_BREAK;
 	}
-
 	return foreach_serialize_rc(GET_PTR(current)->right, cb, arg);
 }
 

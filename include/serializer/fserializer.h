@@ -17,9 +17,8 @@ extern "C" {
 typedef struct file_serializer file_serialzer_t;
 
 struct file_serializer {
-	serializer_t        handle;
-	int                 fd;
-	serializer_tail_t   tail;
+	cdsl_serializer_t        handle;
+	int                      fd;
 };
 
 extern void file_serializerInit(file_serialzer_t* serializer, const char* filename);
