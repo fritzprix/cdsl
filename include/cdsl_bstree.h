@@ -20,6 +20,7 @@ typedef struct bs_treenode bstreeNode_t;
 typedef struct bs_treeroot bstreeRoot_t;
 
 #define cdsl_bstreeMaxDepth(root)                      tree_max_depth((base_treeRoot_t*) root)
+#define cdsl_bstreeSerialize(root, serializer, cb)     tree_serialize((base_treeRoot_t*) root, (cdsl_serializer_t*) serializer, cb)
 #define cdsl_bstreeForEach(root, cb, order,arg)        tree_for_each((base_treeRoot_t*) root, (base_tree_callback_t) cb, order,arg)
 #define cdsl_bstreeForEachToTarget(root, cb, key,arg)  tree_for_each_to_target((baes_treeRoot_t*) root, (base_tree_callback_t) cb, order,arg)
 #define cdsl_bstreeSize(root)                          tree_size((base_treeRoot_t*) root)

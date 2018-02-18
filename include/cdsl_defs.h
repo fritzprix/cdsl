@@ -31,6 +31,10 @@ extern "C" {
 #ifdef BAREMETAL
 #include "baremetal.h"
 #include <stddef.h>
+
+#define FO_RDWR                    02
+#define FO_RDONLY                  03
+#define FO_WRONLY                  04
 #define PRINT(...)
 #define PRINT_ERR(...)
 #define EXIT(n)
@@ -46,12 +50,17 @@ extern "C" {
 #include <string.h>
 #include <stdint.h>
 #include <stddef.h>
+#include <unistd.h>
+#include <fcntl.h>
 
+#define FO_RDWR                    O_RDWR | O_CREAT
+#define FO_RDONLY                  O_RDONLY
+#define FO_WRONLY                  O_WRONLY
 #define PRINT(...)                 printf(__VA_ARGS__)
 #define PRINT_ERR(...)             fprintf(stderr, __VA_ARGS__)
 #define EXIT(n)                    exit(n)
 #define STRCMP(s1,s2)              strcmp(s1,s2)
-#define F_OPEN(filename, mode)     open(filename, mode)
+#define F_OPEN(filename, mode)     open(filename, mode, 0666)
 #define F_WRITE(fd, buffer, size)  write(fd, buffer, size)
 #define F_CLOSE(fd)                close(fd)
 #define F_FDOPEN(fd)               fdopen(fd)
