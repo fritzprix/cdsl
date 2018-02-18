@@ -7,15 +7,12 @@
 
 #include "cdsl_bstree.h"
 #include "cdsl_bstree_test.h"
+#include "fserializer.h"
+#include "cdsl_hash.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
 
-struct compete_req {
-	bstreeRoot_t* root;
-	trkey_t        base;
-	pthread_mutex_t* lock;
-};
 
 
 static bstreeNode_t bst_nodepool[TEST_SIZE];
@@ -24,8 +21,35 @@ static trkey_t repl_key;
 static trkey_t keys[TEST_SIZE];
 
 static int cb_count;
-
 static DECLARE_FOREACH_CALLBACK(onTreeNode);
+
+static DECLARE_SERIALIZER_ON_ERROR(onSerError);
+static DECLARE_SERIALIZER_ON_NODE(onSerNode);
+static DECLARE_SERIALIZER_ON_COMPLETE(onSerDone);
+
+static cdsl_serializerUsrCallback_t callback = {
+		.on_complete = onSerDone,
+		.on_node_to_data = onSerNode,
+		.on_error = onSerError
+};
+
+#define SER_SIZE     5
+
+typedef struct person {
+	bstreeNode_t node;
+	char         name[20];
+}person_t;
+
+const char* names[SER_SIZE] = {
+		"David",
+		"John",
+		"Helen",
+		"Joseph",
+		"Arthur"
+};
+
+static person_t people[SER_SIZE];
+
 
 
 BOOL cdsl_bstreeDoTest(void)
@@ -113,7 +137,39 @@ BOOL cdsl_bstreeDoTest(void)
 	if(cdsl_bstreeTop(&aroot) != NULL)
 		return FALSE;
 
+
+	for(i = 0;i < SER_SIZE;i++) {
+		cdsl_bstreeNodeInit(&people[i].node, sbdm_hash((unsigned char*) names[i]));
+		strcpy(people[i].name, names[i]);
+		cdsl_bstreeInsert(&aroot, &people[i].node);
+	}
+
+	if(cdsl_bstreeSize(&aroot) != SER_SIZE) {
+		return FALSE;
+	}
+	file_serialzer_t fser;
+	file_serializerInit(&fser, "serialize_tree.bin");
+	cdsl_bstreeSerialize(&aroot, &fser, &callback);
+
+
 	return TRUE;
+}
+
+static DECLARE_SERIALIZER_ON_ERROR(onSerError) {
+
+}
+
+static DECLARE_SERIALIZER_ON_NODE(onSerNode) {
+	person_t* person = container_of(node, person_t, node);
+	*size = offsetof(person_t, name) + (strlen(person->name) * sizeof(char));
+	if((*size % 2) != 0) {
+		*size += 1;
+	}
+	return (void*) node;
+}
+
+static DECLARE_SERIALIZER_ON_COMPLETE(onSerDone) {
+	// NOP
 }
 
 
