@@ -53,7 +53,7 @@ struct heap_root {
 
 extern void cdsl_heapRootInit(heapRoot_t* rootp,heapType_t type);
 extern void cdsl_heapNodeInit(heapNode_t* node,trkey_t key);
-extern int cdsl_heapEnqueue(heapRoot_t* rootp,heapNode_t* item);
+extern BOOL cdsl_heapEnqueue(heapRoot_t* rootp,heapNode_t* item);
 extern heapNode_t* cdsl_heapDeqeue(heapRoot_t* rootp);
 
 #if defined(__cplusplus)
