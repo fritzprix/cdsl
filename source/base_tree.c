@@ -6,7 +6,8 @@
  */
 
 #include "base_tree.h"
-#include "serializer.h"
+
+#include "../include/serialization/serializer.h"
 #include "cdsl_defs.h"
 #include "arch.h"
 
@@ -27,6 +28,13 @@ struct serialize_argument {
 	const cdsl_serializerUsrCallback_t* ser_callback;
 	cdsl_serializeTail_t                ser_tail;
 	int  result_code;
+};
+
+struct deserialize_argument {
+	const cdsl_deserializer_t*         desr_handler;
+	const cdsl_alloc_t*                desr_alloc;
+	cdsl_serializeTail_t               desr_tail;
+	int result_code;
 };
 
 static int calc_max_depth_rc(base_treeNode_t** root);
@@ -75,6 +83,30 @@ static DECLARE_FOREACH_CALLBACK(serialize_for_each) {
 	return FOREACH_CONTINUE;
 }
 
+
+void tree_deserialize(base_treeRoot_t* rootp,
+		              const cdsl_deserializer_t* deserializer,
+					  const cdsl_alloc_t* alloc)
+{
+	if((rootp == NULL)        ||
+	   (deserializer == NULL) ||
+	   (alloc == NULL))
+	{
+		return;
+	}
+
+	struct deserialize_argument args = {
+			.desr_handler = deserializer,
+			.desr_alloc = alloc,
+			.desr_tail = {0},
+			.result_code = 0
+	};
+
+	cdsl_serializeHeader_t* ser_header = deserializer->get_head(deserializer, alloc);
+	if(ser_header == NULL) {
+		return;
+	}
+}
 
 void tree_serialize(const base_treeRoot_t* rootp,
 		            const cdsl_serializer_t* serializer,

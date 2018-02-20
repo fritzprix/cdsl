@@ -5,7 +5,7 @@
  *      Author: lucifer
  */
 
-#include "serializer.h"
+#include "../../include/serialization/serializer.h"
 
 uint16_t serializer_calcNodeChecksum(const cdsl_serializeNode_t* node, const void* data) {
 	size_t sz_in_short = node->d_size >> 1;

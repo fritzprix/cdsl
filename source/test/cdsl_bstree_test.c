@@ -7,11 +7,11 @@
 
 #include "cdsl_bstree.h"
 #include "cdsl_bstree_test.h"
-#include "fserializer.h"
 #include "cdsl_hash.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include "../../include/serialization/fserializer.h"
 
 
 
@@ -147,10 +147,10 @@ BOOL cdsl_bstreeDoTest(void)
 	if(cdsl_bstreeSize(&aroot) != SER_SIZE) {
 		return FALSE;
 	}
-	file_serialzer_t fser;
-	file_serializerInit(&fser, "serialize_tree.bin");
+	file_serializer_t fser;
+	file_serializerOpen(&fser, "serialize_tree.bin");
 	cdsl_bstreeSerialize(&aroot, &fser, &callback);
-
+	file_serializerClose(&fser);
 
 	return TRUE;
 }

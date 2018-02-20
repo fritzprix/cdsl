@@ -92,6 +92,11 @@ struct base_tree_node {
 	trkey_t          key;    ///< key value of the node
 };
 
+extern void tree_deserialize(base_treeRoot_t* rootp,
+		                     const cdsl_deserializer_t* deserializer,
+							 const cdsl_alloc_t* malloc);
+
+
 extern void tree_serialize(const base_treeRoot_t* rootp,
 						   const cdsl_serializer_t* serializer,
 						   const cdsl_serializerUsrCallback_t* callback);

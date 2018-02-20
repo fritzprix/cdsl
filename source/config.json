@@ -20,6 +20,6 @@
 	},
 	"SERIALIZER_CONFIG":{
 		"type":"config",
-		"path":"./serializer/config.json"
+		"path":"./serialization/config.json"
 	}
 }

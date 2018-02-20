@@ -62,6 +62,7 @@ extern "C" {
 #define STRCMP(s1,s2)              strcmp(s1,s2)
 #define F_OPEN(filename, mode)     open(filename, mode, 0666)
 #define F_WRITE(fd, buffer, size)  write(fd, buffer, size)
+#define F_READ(fd, buffer, size)   read(fd, buffer, size)
 #define F_CLOSE(fd)                close(fd)
 #define F_FDOPEN(fd)               fdopen(fd)
 #define F_FCLOSE(fp)               fclose(fp)

@@ -5,8 +5,8 @@
  *      Author: innocentevil
  */
 
-#ifndef INCLUDE_SERIALIZER_SERIALIZER_H_
-#define INCLUDE_SERIALIZER_SERIALIZER_H_
+#ifndef INCLUDE_SERIALIZATION_SERIALIZER_H_
+#define INCLUDE_SERIALIZATION_SERIALIZER_H_
 
 #include "cdsl_defs.h"
 
@@ -119,8 +119,18 @@ struct cdsl_serializer_interface {
 	int (*on_head)(const cdsl_serializer_t* self, const cdsl_serializeHeader_t* head);
 	int (*on_next)(const cdsl_serializer_t* self, const cdsl_serializeNode_t* node, size_t nsz, const uint8_t* data);
 	int (*on_tail)(const cdsl_serializer_t* self, const cdsl_serializeTail_t* tail);
+	int (*close)(const cdsl_serializer_t* self);
 };
 
+
+typedef struct cdsl_deserializer_interface cdsl_deserializer_t;
+struct cdsl_deserializer_interface {
+	const cdsl_serializeHeader_t* (*get_head)(const cdsl_deserializer_t* self, cdsl_alloc_t* alloc);
+	const cdsl_serializeNode_t* (*get_next)(const cdsl_deserializer_t* self, cdsl_alloc_t* alloc);
+	BOOL (*has_next)(const cdsl_deserializer_t* self);
+	const cdsl_serializeTail_t* (*get_tail)(const cdsl_deserializer_t* self, cdsl_alloc_t* alloc);
+	int (*close)(const cdsl_deserializer_t* self);
+};
 
 
 extern uint16_t serializer_calcNodeChecksum(const cdsl_serializeNode_t* node, const void* data);
@@ -131,4 +141,4 @@ extern uint16_t serializer_calcNodeChecksum(const cdsl_serializeNode_t* node, co
 }
 #endif
 
-#endif /* INCLUDE_SERIALIZER_SERIALIZER_H_ */
+#endif /* INCLUDE_SERIALIZATION_SERIALIZER_H_ */

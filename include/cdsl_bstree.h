@@ -9,7 +9,7 @@
 #define CDSL_BSTREE_H_
 
 #include "base_tree.h"
-#include "serializer/serializer.h"
+#include "serialization/serializer.h"
 
 #if defined(__cplusplus)
 extern "C"{
