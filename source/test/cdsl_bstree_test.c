@@ -50,6 +50,8 @@ const char* names[SER_SIZE] = {
 
 static person_t people[SER_SIZE];
 
+const static char* SERIALIZE_FILE_NAME = "serialize_tree.bin";
+
 
 
 BOOL cdsl_bstreeDoTest(void)
@@ -148,9 +150,17 @@ BOOL cdsl_bstreeDoTest(void)
 		return FALSE;
 	}
 	file_serializer_t fser;
-	file_serializerOpen(&fser, "serialize_tree.bin");
+	file_serializerOpen(&fser, SERIALIZE_FILE_NAME);
 	cdsl_bstreeSerialize(&aroot, &fser, &callback);
 	file_serializerClose(&fser);
+
+
+	file_deserializer_t desr;
+	if(file_deserializerOpen(&desr, SERIALIZE_FILE_NAME) != OK) {
+		PRINT("OPEN Failed \n");
+	}
+	cdsl_bstreeDeserialize(&aroot, &desr, malloc);
+	file_deserializerClose(&desr);
 
 	return TRUE;
 }

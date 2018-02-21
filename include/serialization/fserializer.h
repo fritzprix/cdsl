@@ -20,6 +20,7 @@ typedef struct file_deserializer file_deserializer_t;
 struct file_deserializer {
 	cdsl_deserializer_t     handle;
 	int                     fd;
+	BOOL                    is_eos_reached;
 };
 
 struct file_serializer {
@@ -27,10 +28,10 @@ struct file_serializer {
 	int                      fd;
 };
 
-extern void file_serializerOpen(file_serializer_t* serializer, const char* filename);
+extern int file_serializerOpen(file_serializer_t* serializer, const char* filename);
 extern void file_serializerClose(file_serializer_t* serializer);
 
-extern void file_deserializerOpen(file_deserializer_t* deserializer, const char* filename);
+extern int file_deserializerOpen(file_deserializer_t* deserializer, const char* filename);
 extern void file_deserializerClose(file_deserializer_t* deserializer);
 
 

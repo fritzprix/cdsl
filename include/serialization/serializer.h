@@ -24,7 +24,7 @@ extern "C" {
 #define __MINOR__   0
 #endif
 
-#define GET_SER_VERSION()  (((__MAJOR__ * 10) + (__MINOR__)) | (SER_MAGIC << 8))
+
 
 typedef struct cdsl_serializer_interface cdsl_serializer_t;
 typedef struct cdsl_serializable cdsl_serializable_t;
@@ -33,10 +33,15 @@ typedef struct cdsl_serialize_header cdsl_serializeHeader_t;
 typedef struct cdsl_serialize_node cdsl_serializeNode_t;
 typedef struct cdsl_serialize_tail cdsl_serializeTail_t;
 
+#define GET_SER_VERSION()  (((__MAJOR__ * 10) + (__MINOR__)) | (SER_MAGIC << 8))
+#define SER_DOFFSET_BASE   offsetof(cdsl_serializeNode_t, flags)
+#define SER_GET_DATA(ser_node)     (void*) ((size_t) ser_node + ser_node->d_offset + SER_DOFFSET_BASE)
+
 #define OK               ((int) 0)
 #define ERR_INV_PARAM    ((int) -0x0001)
 #define ERR_WR_OP_FAIL   ((int) -0x0002)
 #define ERR_RD_OP_FAIL   ((int) -0x0003)
+#define ERR_OPEN_FAIL    ((int) -0x0004)
 
 #define SERIALIZER_START_OF_FILE ((uint32_t) 0x0F0F)
 #define SERIALIZER_DELIM         ((uint16_t) 0x00FF)
@@ -125,10 +130,10 @@ struct cdsl_serializer_interface {
 
 typedef struct cdsl_deserializer_interface cdsl_deserializer_t;
 struct cdsl_deserializer_interface {
-	const cdsl_serializeHeader_t* (*get_head)(const cdsl_deserializer_t* self, cdsl_alloc_t* alloc);
-	const cdsl_serializeNode_t* (*get_next)(const cdsl_deserializer_t* self, cdsl_alloc_t* alloc);
+	int (*get_head)(const cdsl_deserializer_t* self, cdsl_serializeHeader_t* headerp);
+	const cdsl_serializeNode_t* (*get_next)(const cdsl_deserializer_t* self, cdsl_alloc_t alloc);
 	BOOL (*has_next)(const cdsl_deserializer_t* self);
-	const cdsl_serializeTail_t* (*get_tail)(const cdsl_deserializer_t* self, cdsl_alloc_t* alloc);
+	int (*get_tail)(const cdsl_deserializer_t* self, cdsl_serializeTail_t* tail);
 	int (*close)(const cdsl_deserializer_t* self);
 };
 

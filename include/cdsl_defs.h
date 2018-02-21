@@ -63,6 +63,8 @@ extern "C" {
 #define F_OPEN(filename, mode)     open(filename, mode, 0666)
 #define F_WRITE(fd, buffer, size)  write(fd, buffer, size)
 #define F_READ(fd, buffer, size)   read(fd, buffer, size)
+#define MEMCPY(dest,src,sz)        memcpy(dest, src, sz)
+#define MALLOC                     malloc
 #define F_CLOSE(fd)                close(fd)
 #define F_FDOPEN(fd)               fdopen(fd)
 #define F_FCLOSE(fp)               fclose(fp)
@@ -86,7 +88,7 @@ extern "C" {
 
 typedef void* (*cdsl_generic_compare_t)(void*, void*);
 typedef void (*cdsl_generic_printer_t) (void*);
-typedef void* (*cdsl_alloc_t)(size_t);
+typedef void* (*cdsl_alloc_t)(unsigned long sz);
 
 #ifndef NULL
 #define NULL 	((void*) 0)

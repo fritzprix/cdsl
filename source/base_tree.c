@@ -32,7 +32,7 @@ struct serialize_argument {
 
 struct deserialize_argument {
 	const cdsl_deserializer_t*         desr_handler;
-	const cdsl_alloc_t*                desr_alloc;
+	const cdsl_alloc_t                 desr_alloc;
 	cdsl_serializeTail_t               desr_tail;
 	int result_code;
 };
@@ -83,10 +83,26 @@ static DECLARE_FOREACH_CALLBACK(serialize_for_each) {
 	return FOREACH_CONTINUE;
 }
 
+static base_treeNode_t* build_tree_rc(base_treeNode_t* parent, struct deserialize_argument* args);
+
+
+static base_treeNode_t* build_tree_rc(base_treeNode_t* parent, struct deserialize_argument* args) {
+	if((args == NULL) || (args->desr_handler == NULL)) {
+		return NULL;
+	}
+	const cdsl_deserializer_t* desr = args->desr_handler;
+
+	if(GET_PTR(parent) == NULL) {
+		if(desr->has_next(desr)) {
+			const cdsl_serializeNode_t* node = desr->get_next(desr, args->desr_alloc);
+		}
+	}
+	return NULL;
+}
 
 void tree_deserialize(base_treeRoot_t* rootp,
-		              const cdsl_deserializer_t* deserializer,
-					  const cdsl_alloc_t* alloc)
+		              cdsl_deserializer_t* deserializer,
+					  cdsl_alloc_t alloc)
 {
 	if((rootp == NULL)        ||
 	   (deserializer == NULL) ||
@@ -102,9 +118,26 @@ void tree_deserialize(base_treeRoot_t* rootp,
 			.result_code = 0
 	};
 
-	cdsl_serializeHeader_t* ser_header = deserializer->get_head(deserializer, alloc);
-	if(ser_header == NULL) {
+	cdsl_serializeHeader_t ser_header = {0};
+	if(deserializer->get_head(deserializer, &ser_header) != OK) {
 		return;
+	}
+
+	if(ser_header.type != TYPE_TREE) {
+		PRINT("NOT TREE TYPE\n");
+		return;
+	}
+
+//	rootp->entry = build_tree_rc(rootp->entry, &args);
+
+	while(deserializer->has_next(deserializer)) {
+		const cdsl_serializeNode_t* node = deserializer->get_next(deserializer, alloc);
+		if(node == NULL) {
+			PRINT("INVALID NODE \n");
+			return;
+		}
+
+		PRINT("VALID NODE\n");
 	}
 }
 

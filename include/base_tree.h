@@ -93,8 +93,8 @@ struct base_tree_node {
 };
 
 extern void tree_deserialize(base_treeRoot_t* rootp,
-		                     const cdsl_deserializer_t* deserializer,
-							 const cdsl_alloc_t* malloc);
+		                     cdsl_deserializer_t* deserializer,
+							 cdsl_alloc_t malloc);
 
 
 extern void tree_serialize(const base_treeRoot_t* rootp,
