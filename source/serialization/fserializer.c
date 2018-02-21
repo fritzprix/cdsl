@@ -9,6 +9,25 @@
 #include "cdsl_defs.h"
 
 
+#define END_OF_ITEMS        ((uint8_t) 0xf0)
+#define HAS_NEXT            ((uint8_t) 0x1f)
+
+
+struct serializer_delim {
+	uint16_t                 node_chs; // cyclic checksum
+	uint16_t                 delim;    // SERIALIZER_DELIM
+};
+
+struct deserializer_header {
+	cdsl_serializeHeader_t  ser_header;
+	uint8_t has_next;
+} __attribute__((packed));
+
+struct deserializer_delim {
+	struct serializer_delim ser_delim;
+	uint8_t has_next;
+} __attribute__((packed));
+
 static int ser_on_head(const cdsl_serializer_t* self, const cdsl_serializeHeader_t* head);
 static int ser_on_next(const cdsl_serializer_t* self, const cdsl_serializeNode_t* node, size_t nsz, const uint8_t* data);
 static int ser_on_tail(const cdsl_serializer_t* self, const cdsl_serializeTail_t* tail);
@@ -98,10 +117,6 @@ static int ser_on_head(const cdsl_serializer_t* self, const cdsl_serializeHeader
 	return OK;
 }
 
-struct serializer_delim {
-	uint16_t                 node_chs; // cyclic checksum
-	uint16_t                 delim;    // SERIALIZER_DELIM
-};
 
 static int ser_on_next(const cdsl_serializer_t* self, const cdsl_serializeNode_t* node, size_t nsz, const uint8_t* data){
 	if((self == NULL) ||
@@ -111,6 +126,10 @@ static int ser_on_next(const cdsl_serializer_t* self, const cdsl_serializeNode_t
 	const file_serializer_t* serializer = container_of(self, file_serializer_t, handle);
 	if(serializer->fd < 0) {
 		return ERR_INV_PARAM;
+	}
+	uint8_t has_next = HAS_NEXT;
+	if(F_WRITE(serializer->fd, &has_next, sizeof(uint8_t)) < 0) {
+		return ERR_WR_OP_FAIL;
 	}
 	if(F_WRITE(serializer->fd, node, nsz) < 0){
 		return ERR_WR_OP_FAIL;
@@ -129,12 +148,17 @@ static int ser_on_next(const cdsl_serializer_t* self, const cdsl_serializeNode_t
 	return OK;
 }
 
+
 static int ser_on_tail(const cdsl_serializer_t* self, const cdsl_serializeTail_t* tail) {
 	if((self == NULL) || (tail == NULL)) {
 		return ERR_INV_PARAM;
 	}
 	uint16_t eof = SERIALIZER_END_OF_FILE;
 	const file_serializer_t* serializer = container_of(self, file_serializer_t, handle);
+	uint8_t has_next = END_OF_ITEMS;
+	if(F_WRITE(serializer->fd, &has_next, sizeof(uint8_t)) < 0) {
+		return ERR_WR_OP_FAIL;
+	}
 	if(F_WRITE(serializer->fd, tail, sizeof(cdsl_serializeTail_t)) < 0) {
 		return ERR_WR_OP_FAIL;
 	}
@@ -177,15 +201,19 @@ static int desr_get_header(const cdsl_deserializer_t* self, cdsl_serializeHeader
 		}
 	} while(sof != SERIALIZER_START_OF_FILE);
 
-	if(F_READ(desr->fd, header, sizeof(cdsl_serializeHeader_t)) <= 0) {
+	struct deserializer_header desr_header;
+	if(F_READ(desr->fd, &desr_header, sizeof(struct deserializer_header)) <= 0) {
 		// fail to read header
 		desr->is_eos_reached = TRUE;
 		return ERR_RD_OP_FAIL;
 	}
-
+	desr->has_next = (desr_header.has_next == HAS_NEXT);
+	MEMCPY(header, &desr_header, sizeof(cdsl_serializeHeader_t));
 	PRINT("Valid Header!!\n");
 	return OK;
 }
+
+
 
 static const cdsl_serializeNode_t* desr_get_next(const cdsl_deserializer_t* self, cdsl_alloc_t alloc) {
 	if(self == NULL || alloc == NULL) {
@@ -220,21 +248,22 @@ static const cdsl_serializeNode_t* desr_get_next(const cdsl_deserializer_t* self
 		desr->is_eos_reached = TRUE;
 		return NULL;
 	}
-	struct serializer_delim node_delim;
-	if(F_READ(desr->fd, &node_delim, sizeof(struct serializer_delim)) < 0) {
+	struct deserializer_delim node_delim;
+	if(F_READ(desr->fd, &node_delim, sizeof(struct deserializer_delim)) < 0) {
 		desr->is_eos_reached = TRUE;
 		return NULL;
 	}
-	if(node_delim.delim != SERIALIZER_DELIM) {
-		PRINT("DELIM NOK %d \n", node_delim.delim);
+	if(node_delim.ser_delim.delim != SERIALIZER_DELIM) {
+		PRINT("DELIM NOK %d \n", node_delim.ser_delim.delim);
 		return NULL;
 	}
 	PRINT("DELIM OK!\n");
 	void* data = SER_GET_DATA(ptr_node);
 	const uint16_t chs = serializer_calcNodeChecksum(ptr_node, data);
-	if(node_delim.node_chs != chs) {
+	if(node_delim.ser_delim.node_chs != chs) {
 		return NULL;
 	}
+	desr->has_next = node_delim.has_next == HAS_NEXT;
 	return ptr_node;
 }
 
@@ -246,7 +275,7 @@ static BOOL desr_has_next(const cdsl_deserializer_t* self) {
 	if(desr->fd < 0) {
 		return FALSE;
 	}
-	return !desr->is_eos_reached;
+	return desr->has_next;
 }
 
 static int desr_get_tail(const cdsl_deserializer_t* self, cdsl_serializeTail_t* tailp) {

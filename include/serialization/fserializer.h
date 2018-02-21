@@ -8,7 +8,7 @@
 #ifndef INCLUDE_SERIALIZATION_FSERIALIZER_H_
 #define INCLUDE_SERIALIZATION_FSERIALIZER_H_
 
-#include "../serialization/serializer.h"
+#include "serializer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -21,6 +21,7 @@ struct file_deserializer {
 	cdsl_deserializer_t     handle;
 	int                     fd;
 	BOOL                    is_eos_reached;
+	BOOL                    has_next;
 };
 
 struct file_serializer {
