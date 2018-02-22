@@ -7,7 +7,6 @@
 
 
 #include "cdsl_heap.h"
-#include <stddef.h>
 
 #define DIR_LEFT  1
 #define DIR_RIGHT !DIR_LEFT

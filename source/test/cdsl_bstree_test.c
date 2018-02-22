@@ -7,11 +7,11 @@
 
 #include "cdsl_bstree.h"
 #include "cdsl_bstree_test.h"
-#include "fserializer.h"
 #include "cdsl_hash.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include "../../include/serialization/fserializer.h"
 
 
 
@@ -49,6 +49,8 @@ const char* names[SER_SIZE] = {
 };
 
 static person_t people[SER_SIZE];
+
+const static char* SERIALIZE_FILE_NAME = "serialize_tree.bin";
 
 
 
@@ -147,10 +149,19 @@ BOOL cdsl_bstreeDoTest(void)
 	if(cdsl_bstreeSize(&aroot) != SER_SIZE) {
 		return FALSE;
 	}
-	file_serialzer_t fser;
-	file_serializerInit(&fser, "serialize_tree.bin");
+	file_serializer_t fser;
+	file_serializerOpen(&fser, SERIALIZE_FILE_NAME);
 	cdsl_bstreeSerialize(&aroot, &fser, &callback);
+	file_serializerClose(&fser);
 
+
+	file_deserializer_t desr;
+	if(file_deserializerOpen(&desr, SERIALIZE_FILE_NAME) != OK) {
+		PRINT("OPEN Failed \n");
+	}
+	const cdsl_memoryMngt_t mmngt = GET_DEFAULT_MMNGT();
+	cdsl_bstreeDeserialize(&aroot, &desr, &mmngt);
+	file_deserializerClose(&desr);
 
 	return TRUE;
 }

@@ -5,8 +5,8 @@
  *      Author: innocentevil
  */
 
-#ifndef INCLUDE_SERIALIZER_SERIALIZER_H_
-#define INCLUDE_SERIALIZER_SERIALIZER_H_
+#ifndef INCLUDE_SERIALIZATION_SERIALIZER_H_
+#define INCLUDE_SERIALIZATION_SERIALIZER_H_
 
 #include "cdsl_defs.h"
 
@@ -24,7 +24,7 @@ extern "C" {
 #define __MINOR__   0
 #endif
 
-#define GET_SER_VERSION()  (((__MAJOR__ * 10) + (__MINOR__)) | (SER_MAGIC << 8))
+
 
 typedef struct cdsl_serializer_interface cdsl_serializer_t;
 typedef struct cdsl_serializable cdsl_serializable_t;
@@ -33,10 +33,15 @@ typedef struct cdsl_serialize_header cdsl_serializeHeader_t;
 typedef struct cdsl_serialize_node cdsl_serializeNode_t;
 typedef struct cdsl_serialize_tail cdsl_serializeTail_t;
 
+#define GET_SER_VERSION()  (((__MAJOR__ * 10) + (__MINOR__)) | (SER_MAGIC << 8))
+#define SER_DOFFSET_BASE   offsetof(cdsl_serializeNode_t, flags)
+#define SER_GET_DATA(ser_node)     (void*) ((size_t) ser_node + ser_node->d_offset + SER_DOFFSET_BASE)
+
 #define OK               ((int) 0)
 #define ERR_INV_PARAM    ((int) -0x0001)
 #define ERR_WR_OP_FAIL   ((int) -0x0002)
 #define ERR_RD_OP_FAIL   ((int) -0x0003)
+#define ERR_OPEN_FAIL    ((int) -0x0004)
 
 #define SERIALIZER_START_OF_FILE ((uint32_t) 0x0F0F)
 #define SERIALIZER_DELIM         ((uint16_t) 0x00FF)
@@ -72,7 +77,7 @@ struct cdsl_serialize_node {
 #define NODE_MSK                ((uint16_t) 1)          ///< null node used to mark terminating node of the branch with given traversal order
 #define NODE_NULL               ((uint16_t) 0)
 #define NODE_NORMAL             ((uint16_t) 1)
-#define IS_NULL_NODE(nodep)     ((nodep->flags & NODE_MSK) == NODE_NORMAL)
+#define IS_NULL_NODE(nodep)     ((((cdsl_serializeNode_t*) nodep)->flags & NODE_MSK) != NODE_NORMAL)
 #define EMBEDDED_MSK            ((uint16_t) (1 << 1))
 #define IS_EMBEDDED_NODE(nodep) ((nodep->flags & EMBEDDED_MSK) == EMBEDDED_MSK)
 #define SPEC_MSK                ((uint16_t) (7 << 2))   ///< Type Specific value (ex. red / black for red-black tree)
@@ -119,8 +124,18 @@ struct cdsl_serializer_interface {
 	int (*on_head)(const cdsl_serializer_t* self, const cdsl_serializeHeader_t* head);
 	int (*on_next)(const cdsl_serializer_t* self, const cdsl_serializeNode_t* node, size_t nsz, const uint8_t* data);
 	int (*on_tail)(const cdsl_serializer_t* self, const cdsl_serializeTail_t* tail);
+	int (*close)(const cdsl_serializer_t* self);
 };
 
+
+typedef struct cdsl_deserializer_interface cdsl_deserializer_t;
+struct cdsl_deserializer_interface {
+	int (*read_head)(const cdsl_deserializer_t* self, cdsl_serializeHeader_t* headerp);
+	void* (*get_next)(const cdsl_deserializer_t* self, cdsl_serializeNode_t* node, size_t nsz, const cdsl_memoryMngt_t* m_mngt);
+	BOOL (*has_next)(const cdsl_deserializer_t* self);
+	int (*read_tail)(const cdsl_deserializer_t* self, cdsl_serializeTail_t* tail);
+	int (*close)(const cdsl_deserializer_t* self);
+};
 
 
 extern uint16_t serializer_calcNodeChecksum(const cdsl_serializeNode_t* node, const void* data);
@@ -131,4 +146,4 @@ extern uint16_t serializer_calcNodeChecksum(const cdsl_serializeNode_t* node, co
 }
 #endif
 
-#endif /* INCLUDE_SERIALIZER_SERIALIZER_H_ */
+#endif /* INCLUDE_SERIALIZATION_SERIALIZER_H_ */
