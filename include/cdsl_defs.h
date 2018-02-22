@@ -65,6 +65,12 @@ extern "C" {
 #define F_READ(fd, buffer, size)   read(fd, buffer, size)
 #define MEMCPY(dest,src,sz)        memcpy(dest, src, sz)
 #define MALLOC                     malloc
+#define FREE                       free
+#define GET_DEFAULT_MMNGT()        {\
+		.alloc       =    MALLOC,\
+		.free        =    FREE\
+}
+
 #define F_CLOSE(fd)                close(fd)
 #define F_FDOPEN(fd)               fdopen(fd)
 #define F_FCLOSE(fp)               fclose(fp)
@@ -89,6 +95,12 @@ extern "C" {
 typedef void* (*cdsl_generic_compare_t)(void*, void*);
 typedef void (*cdsl_generic_printer_t) (void*);
 typedef void* (*cdsl_alloc_t)(unsigned long sz);
+typedef void (*cdsl_free_t) (void* ptr);
+
+typedef struct {
+	cdsl_alloc_t     alloc;
+	cdsl_free_t      free;
+}cdsl_memoryMngt_t;
 
 #ifndef NULL
 #define NULL 	((void*) 0)

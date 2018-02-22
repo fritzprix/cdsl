@@ -159,7 +159,8 @@ BOOL cdsl_bstreeDoTest(void)
 	if(file_deserializerOpen(&desr, SERIALIZE_FILE_NAME) != OK) {
 		PRINT("OPEN Failed \n");
 	}
-	cdsl_bstreeDeserialize(&aroot, &desr, malloc);
+	const cdsl_memoryMngt_t mmngt = GET_DEFAULT_MMNGT();
+	cdsl_bstreeDeserialize(&aroot, &desr, &mmngt);
 	file_deserializerClose(&desr);
 
 	return TRUE;

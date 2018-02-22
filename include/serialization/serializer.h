@@ -77,7 +77,7 @@ struct cdsl_serialize_node {
 #define NODE_MSK                ((uint16_t) 1)          ///< null node used to mark terminating node of the branch with given traversal order
 #define NODE_NULL               ((uint16_t) 0)
 #define NODE_NORMAL             ((uint16_t) 1)
-#define IS_NULL_NODE(nodep)     ((nodep->flags & NODE_MSK) == NODE_NORMAL)
+#define IS_NULL_NODE(nodep)     ((((cdsl_serializeNode_t*) nodep)->flags & NODE_MSK) != NODE_NORMAL)
 #define EMBEDDED_MSK            ((uint16_t) (1 << 1))
 #define IS_EMBEDDED_NODE(nodep) ((nodep->flags & EMBEDDED_MSK) == EMBEDDED_MSK)
 #define SPEC_MSK                ((uint16_t) (7 << 2))   ///< Type Specific value (ex. red / black for red-black tree)
@@ -130,10 +130,10 @@ struct cdsl_serializer_interface {
 
 typedef struct cdsl_deserializer_interface cdsl_deserializer_t;
 struct cdsl_deserializer_interface {
-	int (*get_head)(const cdsl_deserializer_t* self, cdsl_serializeHeader_t* headerp);
-	const cdsl_serializeNode_t* (*get_next)(const cdsl_deserializer_t* self, cdsl_alloc_t alloc);
+	int (*read_head)(const cdsl_deserializer_t* self, cdsl_serializeHeader_t* headerp);
+	void* (*get_next)(const cdsl_deserializer_t* self, cdsl_serializeNode_t* node, size_t nsz, const cdsl_memoryMngt_t* m_mngt);
 	BOOL (*has_next)(const cdsl_deserializer_t* self);
-	int (*get_tail)(const cdsl_deserializer_t* self, cdsl_serializeTail_t* tail);
+	int (*read_tail)(const cdsl_deserializer_t* self, cdsl_serializeTail_t* tail);
 	int (*close)(const cdsl_deserializer_t* self);
 };
 

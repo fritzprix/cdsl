@@ -34,10 +34,10 @@ static int ser_on_tail(const cdsl_serializer_t* self, const cdsl_serializeTail_t
 static int ser_close(const cdsl_serializer_t* self);
 
 
-static int desr_get_header(const cdsl_deserializer_t* self, cdsl_serializeHeader_t* header);
-static const cdsl_serializeNode_t* desr_get_next(const cdsl_deserializer_t* self, cdsl_alloc_t alloc);
+static int desr_read_header(const cdsl_deserializer_t* self, cdsl_serializeHeader_t* header);
+static void* desr_get_next(const cdsl_deserializer_t* self, cdsl_serializeNode_t* node, size_t nsz, const cdsl_memoryMngt_t* m_mngt);
 static BOOL desr_has_next(const cdsl_deserializer_t* self);
-static int desr_get_tail(const cdsl_deserializer_t* self, cdsl_serializeTail_t* tailp);
+static int desr_read_tail(const cdsl_deserializer_t* self, cdsl_serializeTail_t* tailp);
 static int desr_close(const cdsl_deserializer_t* self);
 
 int file_serializerOpen(file_serializer_t* serializer, const char* filename) {
@@ -74,9 +74,9 @@ int file_deserializerOpen(file_deserializer_t* deserializer, const char* filenam
 		return ERR_INV_PARAM;
 	}
 
-	deserializer->handle.get_head = desr_get_header;
+	deserializer->handle.read_head = desr_read_header;
 	deserializer->handle.get_next = desr_get_next;
-	deserializer->handle.get_tail = desr_get_tail;
+	deserializer->handle.read_tail = desr_read_tail;
 	deserializer->handle.has_next = desr_has_next;
 	deserializer->handle.close = desr_close;
 
@@ -183,7 +183,7 @@ static int ser_close(const cdsl_serializer_t* self) {
 
 
 // caller should free
-static int desr_get_header(const cdsl_deserializer_t* self, cdsl_serializeHeader_t* header) {
+static int desr_read_header(const cdsl_deserializer_t* self, cdsl_serializeHeader_t* header) {
 	if(self == NULL) {
 		return ERR_INV_PARAM;
 	}
@@ -215,8 +215,11 @@ static int desr_get_header(const cdsl_deserializer_t* self, cdsl_serializeHeader
 
 
 
-static const cdsl_serializeNode_t* desr_get_next(const cdsl_deserializer_t* self, cdsl_alloc_t alloc) {
-	if(self == NULL || alloc == NULL) {
+static void* desr_get_next(const cdsl_deserializer_t* self,
+		                 cdsl_serializeNode_t* nodep,
+						 size_t nsz,
+						 const cdsl_memoryMngt_t* m_mngt) {
+	if(self == NULL || m_mngt == NULL) {
 		return NULL;
 	}
 	file_deserializer_t* desr = container_of(self, file_deserializer_t, handle);
@@ -224,47 +227,50 @@ static const cdsl_serializeNode_t* desr_get_next(const cdsl_deserializer_t* self
 		desr->is_eos_reached = TRUE;
 		return NULL;
 	}
-	cdsl_serializeNode_t node_head = {0};
-	if(F_READ(desr->fd, &node_head, sizeof(cdsl_serializeNode_t)) < 0) {
+	if(F_READ(desr->fd, nodep, nsz) < 0) {
 		desr->is_eos_reached = TRUE;
 		return NULL;
 	}
 
-	size_t node_sz = node_head.d_size + node_head.d_offset + offsetof(cdsl_serializeNode_t, flags);
-	cdsl_serializeNode_t* ptr_node = alloc(node_sz);
-	uint8_t* cursor = ((uint8_t*) (&ptr_node[1]));
-	MEMCPY(ptr_node, &node_head, sizeof(cdsl_serializeNode_t));
-	PRINT("NODE Header (E_OFFSET : %u / DSIZE : %u /  D_OFFSET : %u)\n", ptr_node->e_offset, ptr_node->d_size, ptr_node->d_offset);
-	size_t ext_sz = ptr_node->d_offset - sizeof(ptr_node->flags);
-	if(ext_sz > sizeof(ptr_node->flags)) {
-		if(F_READ(desr->fd, cursor, sizeof(ext_sz)) < 0) {
-			desr->is_eos_reached = TRUE;
-			return NULL;
+
+	PRINT("NODE Header (E_OFFSET : %u / DSIZE : %u /  D_OFFSET : %u)\n", nodep->e_offset, nodep->d_size, nodep->d_offset);
+	void* data = NULL;
+	if(nodep->d_size > 0) {
+		uint8_t ext_sz = nodep->d_offset + offsetof(cdsl_serializeNode_t, flags) - nsz;
+		if(ext_sz > 0) {
+			PRINT("READOUT %d\n", ext_sz);
+			uint8_t _readout_buffer[ext_sz];
+			if(F_READ(desr->fd, _readout_buffer, ext_sz) < 0) {
+				desr->is_eos_reached = TRUE;
+				return NULL;
+			}
 		}
-		cursor = &cursor[ext_sz];
-	}
-	int res;
-	if((res = F_READ(desr->fd, cursor, ptr_node->d_size)) < 0) {
-		desr->is_eos_reached = TRUE;
-		return NULL;
+		data = m_mngt->alloc(nodep->d_size);
+		if (F_READ(desr->fd, data, nodep->d_size) < 0) {
+			desr->is_eos_reached = TRUE;
+			goto FREE_AND_RETURN_NULL;
+		}
 	}
 	struct deserializer_delim node_delim;
 	if(F_READ(desr->fd, &node_delim, sizeof(struct deserializer_delim)) < 0) {
 		desr->is_eos_reached = TRUE;
-		return NULL;
+		goto FREE_AND_RETURN_NULL;
 	}
 	if(node_delim.ser_delim.delim != SERIALIZER_DELIM) {
 		PRINT("DELIM NOK %d \n", node_delim.ser_delim.delim);
-		return NULL;
+		goto FREE_AND_RETURN_NULL;
 	}
 	PRINT("DELIM OK!\n");
-	void* data = SER_GET_DATA(ptr_node);
-	const uint16_t chs = serializer_calcNodeChecksum(ptr_node, data);
-	if(node_delim.ser_delim.node_chs != chs) {
-		return NULL;
+	if(node_delim.ser_delim.node_chs != serializer_calcNodeChecksum(nodep, data)) {
+		goto FREE_AND_RETURN_NULL;
 	}
-	desr->has_next = node_delim.has_next == HAS_NEXT;
-	return ptr_node;
+
+	desr->has_next = (node_delim.has_next == HAS_NEXT);
+	return data;
+
+FREE_AND_RETURN_NULL:
+	if(data) m_mngt->free(data);
+	return NULL;
 }
 
 static BOOL desr_has_next(const cdsl_deserializer_t* self) {
@@ -278,7 +284,7 @@ static BOOL desr_has_next(const cdsl_deserializer_t* self) {
 	return desr->has_next;
 }
 
-static int desr_get_tail(const cdsl_deserializer_t* self, cdsl_serializeTail_t* tailp) {
+static int desr_read_tail(const cdsl_deserializer_t* self, cdsl_serializeTail_t* tailp) {
 	return OK;
 }
 

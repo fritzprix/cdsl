@@ -32,7 +32,7 @@ struct serialize_argument {
 
 struct deserialize_argument {
 	const cdsl_deserializer_t*         desr_handler;
-	const cdsl_alloc_t                 desr_alloc;
+	const cdsl_memoryMngt_t*           desr_mmngt;
 	cdsl_serializeTail_t               desr_tail;
 	int result_code;
 };
@@ -91,54 +91,67 @@ static base_treeNode_t* build_tree_rc(base_treeNode_t* parent, struct deserializ
 		return NULL;
 	}
 	const cdsl_deserializer_t* desr = args->desr_handler;
+	base_treeNode_t* bnode;
+	base_treeSerNode_t ser_node;
 
-	if(GET_PTR(parent) == NULL) {
-		if(desr->has_next(desr)) {
-			const cdsl_serializeNode_t* node = desr->get_next(desr, args->desr_alloc);
-		}
+	if(desr->has_next(desr)) {
+		uint8_t* data = desr->get_next(desr,
+				                       &ser_node._node,
+									   sizeof(base_treeSerNode_t),
+									   args->desr_mmngt);
+
+		bnode = (base_treeNode_t*) &data[ser_node._node.e_offset];
 	}
+
 	return NULL;
 }
 
 void tree_deserialize(base_treeRoot_t* rootp,
 		              cdsl_deserializer_t* deserializer,
-					  cdsl_alloc_t alloc)
+					  const cdsl_memoryMngt_t* m_mngt)
 {
 	if((rootp == NULL)        ||
 	   (deserializer == NULL) ||
-	   (alloc == NULL))
+	   (m_mngt == NULL))
 	{
 		return;
 	}
 
 	struct deserialize_argument args = {
 			.desr_handler = deserializer,
-			.desr_alloc = alloc,
+			.desr_mmngt = m_mngt,
 			.desr_tail = {0},
 			.result_code = 0
 	};
 
 	cdsl_serializeHeader_t ser_header = {0};
-	if(deserializer->get_head(deserializer, &ser_header) != OK) {
+	cdsl_serializeTail_t ser_tail = {0};
+	if(deserializer->read_head(deserializer, &ser_header) != OK) {
 		return;
 	}
 
-	if(ser_header.type != TYPE_TREE) {
+	if(!(ser_header.type & TYPE_TREE)) {
 		PRINT("NOT TREE TYPE\n");
 		return;
 	}
 
 //	rootp->entry = build_tree_rc(rootp->entry, &args);
-
+	base_treeSerNode_t ser_node;
 	while(deserializer->has_next(deserializer)) {
-		const cdsl_serializeNode_t* node = deserializer->get_next(deserializer, alloc);
-		if(node == NULL) {
+		void* data = deserializer->get_next(deserializer, &ser_node._node, sizeof(base_treeSerNode_t), m_mngt);
+		if(IS_NULL_NODE(&ser_node)) {
+			continue;
+		}
+		if(data == NULL) {
 			PRINT("INVALID NODE \n");
 			return;
 		}
-
 		PRINT("VALID NODE\n");
 	}
+	if(deserializer->read_tail(deserializer, &ser_tail) != OK){
+		PRINT("INVALID TAIL\n");
+	}
+	PRINT("VALID TAIL\n");
 }
 
 void tree_serialize(const base_treeRoot_t* rootp,
