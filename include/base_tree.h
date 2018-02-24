@@ -101,6 +101,11 @@ extern void tree_serialize(const base_treeRoot_t* rootp,
 						   const cdsl_serializer_t* serializer,
 						   const cdsl_serializerUsrCallback_t* callback);
 
+extern int tree_compare(const base_treeRoot_t* arootp, const base_treeRoot_t* brootp);
+
+
+extern void tree_deleteAll(base_treeRoot_t* roop, base_tree_callback_t free);
+
 
 /*!
  * \brief traverse tree

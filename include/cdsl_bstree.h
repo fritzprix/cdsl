@@ -26,6 +26,7 @@ typedef struct bs_treeroot bstreeRoot_t;
 #define cdsl_bstreeForEachToTarget(root, cb, key,arg)  tree_for_each_to_target((baes_treeRoot_t*) root, (base_tree_callback_t) cb, order,arg)
 #define cdsl_bstreeSize(root)                          tree_size((base_treeRoot_t*) root)
 #define cdsl_bstreePrint(root, print)                  tree_print((base_treeRoot_t*) root, print)
+#define cdsl_bstreeCompare(aroot, broot)               tree_compare((base_treeRoot_t*) aroot, (base_treeRoot_t*) broot)
 #define cdsl_bstreeIsEmpty(root)                       tree_is_empty((base_treeRoot_t*) root)
 #define cdsl_bstreeTop(root)                           (bstreeNode_t*) tree_top((base_treeRoot_t*) root)
 #define cdsl_bstreeGoLeft(cur)                         (bstreeNode_t*) tree_go_left((base_treeNode_t*) cur)

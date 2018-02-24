@@ -46,40 +46,40 @@ int main(void){
 	{
 		exit(-1);
 	}
-//	printf("Splay tree Test Result : %s\n",RESULT_STRING[result = cdsl_spltreeDoTest()]);
-//	if(result == FALSE)
-//	{
-//		exit(-1);
-//	}
-//	printf("Singly-Linked List Test Result : %s\n",RESULT_STRING[result = cdsl_slistDoTest()]);
-//	if(result == FALSE)
-//	{
-//		exit(-1);
-//	}
-//
-//	printf("Doubly-Linked List Test Result : %s\n",RESULT_STRING[result = cdsl_listDoTest()]);
-//	if(result == FALSE)
-//	{
-//		exit(-1);
-//	}
-//	printf("Red Black Tree Test Result : %s\n",RESULT_STRING[result = cdsl_rbtreeDoTest()]);
-//	if(result == FALSE)
-//	{
-//		exit(-1);
-//	}
-//	printf("Hash Tree Test Result : %s\n",RESULT_STRING[result = cdsl_hashtreeDoTest()]);
-//	if(result == FALSE)
-//	{
-//		exit(-1);
-//	}
-//	printf("AVL Tree Test Result : %s\n",RESULT_STRING[result = cdsl_avltreeDoTest()]);
-//	if(result == FALSE)
-//	{
-//		exit(-1);
-//	}
-//
-//	perform_avltree_benchmark();
-//	perform_rbtree_benchmark();
+	printf("Splay tree Test Result : %s\n",RESULT_STRING[result = cdsl_spltreeDoTest()]);
+	if(result == FALSE)
+	{
+		exit(-1);
+	}
+	printf("Singly-Linked List Test Result : %s\n",RESULT_STRING[result = cdsl_slistDoTest()]);
+	if(result == FALSE)
+	{
+		exit(-1);
+	}
+
+	printf("Doubly-Linked List Test Result : %s\n",RESULT_STRING[result = cdsl_listDoTest()]);
+	if(result == FALSE)
+	{
+		exit(-1);
+	}
+	printf("Red Black Tree Test Result : %s\n",RESULT_STRING[result = cdsl_rbtreeDoTest()]);
+	if(result == FALSE)
+	{
+		exit(-1);
+	}
+	printf("Hash Tree Test Result : %s\n",RESULT_STRING[result = cdsl_hashtreeDoTest()]);
+	if(result == FALSE)
+	{
+		exit(-1);
+	}
+	printf("AVL Tree Test Result : %s\n",RESULT_STRING[result = cdsl_avltreeDoTest()]);
+	if(result == FALSE)
+	{
+		exit(-1);
+	}
+
+	perform_avltree_benchmark();
+	perform_rbtree_benchmark();
 	return 0;
 }
 

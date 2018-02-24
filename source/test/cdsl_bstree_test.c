@@ -11,7 +11,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include "../../include/serialization/fserializer.h"
+
+#include "../../include/serialization/file_serializer.h"
 
 
 
@@ -22,7 +23,6 @@ static trkey_t keys[TEST_SIZE];
 
 static int cb_count;
 static DECLARE_FOREACH_CALLBACK(onTreeNode);
-
 static DECLARE_SERIALIZER_ON_ERROR(onSerError);
 static DECLARE_SERIALIZER_ON_NODE(onSerNode);
 static DECLARE_SERIALIZER_ON_COMPLETE(onSerDone);
@@ -146,6 +146,7 @@ BOOL cdsl_bstreeDoTest(void)
 		cdsl_bstreeInsert(&aroot, &people[i].node);
 	}
 
+
 	if(cdsl_bstreeSize(&aroot) != SER_SIZE) {
 		return FALSE;
 	}
@@ -154,14 +155,26 @@ BOOL cdsl_bstreeDoTest(void)
 	cdsl_bstreeSerialize(&aroot, &fser, &callback);
 	file_serializerClose(&fser);
 
+	bstreeRoot_t nroot;
+	cdsl_bstreeRootInit(&nroot);
+
 
 	file_deserializer_t desr;
 	if(file_deserializerOpen(&desr, SERIALIZE_FILE_NAME) != OK) {
 		PRINT("OPEN Failed \n");
 	}
 	const cdsl_memoryMngt_t mmngt = GET_DEFAULT_MMNGT();
-	cdsl_bstreeDeserialize(&aroot, &desr, &mmngt);
+	cdsl_bstreeDeserialize(&nroot, &desr, &mmngt);
 	file_deserializerClose(&desr);
+
+	if(cdsl_bstreeCompare(&nroot, &aroot) != 0) {
+		return FALSE;
+	}
+
+	cdsl_bstreeDeleteMin(&aroot);
+	if(cdsl_bstreeCompare(&nroot, &aroot) == 0) {
+		return FALSE;
+	}
 
 	return TRUE;
 }

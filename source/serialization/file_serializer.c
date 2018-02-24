@@ -5,7 +5,7 @@
  *      Author: innocentevil
  */
 
-#include "fserializer.h"
+#include "file_serializer.h"
 #include "cdsl_defs.h"
 
 
@@ -209,16 +209,16 @@ static int desr_read_header(const cdsl_deserializer_t* self, cdsl_serializeHeade
 	}
 	desr->has_next = (desr_header.has_next == HAS_NEXT);
 	MEMCPY(header, &desr_header, sizeof(cdsl_serializeHeader_t));
-	PRINT("Valid Header!!\n");
 	return OK;
 }
 
 
 
 static void* desr_get_next(const cdsl_deserializer_t* self,
-		                 cdsl_serializeNode_t* nodep,
-						 size_t nsz,
-						 const cdsl_memoryMngt_t* m_mngt) {
+                          cdsl_serializeNode_t* nodep,
+                          size_t nsz,
+                          const cdsl_memoryMngt_t* m_mngt) {
+
 	if(self == NULL || m_mngt == NULL) {
 		return NULL;
 	}
@@ -231,22 +231,24 @@ static void* desr_get_next(const cdsl_deserializer_t* self,
 		desr->is_eos_reached = TRUE;
 		return NULL;
 	}
+	size_t node_hole_size = 0; //   if serialized data doesn't contain space which tree node struct is inserted into, \
+                                    then allocate more size for that purpose
 
-
-	PRINT("NODE Header (E_OFFSET : %u / DSIZE : %u /  D_OFFSET : %u)\n", nodep->e_offset, nodep->d_size, nodep->d_offset);
+	if(!(nodep->flags & EMBEDDED_MSK)) {
+		node_hole_size = nsz;
+	}
 	void* data = NULL;
 	if(nodep->d_size > 0) {
 		uint8_t ext_sz = nodep->d_offset + offsetof(cdsl_serializeNode_t, flags) - nsz;
 		if(ext_sz > 0) {
-			PRINT("READOUT %d\n", ext_sz);
 			uint8_t _readout_buffer[ext_sz];
 			if(F_READ(desr->fd, _readout_buffer, ext_sz) < 0) {
 				desr->is_eos_reached = TRUE;
 				return NULL;
 			}
 		}
-		data = m_mngt->alloc(nodep->d_size);
-		if (F_READ(desr->fd, data, nodep->d_size) < 0) {
+		data = m_mngt->alloc(nodep->d_size + node_hole_size);
+		if (F_READ(desr->fd, &data[node_hole_size], nodep->d_size) < 0) {
 			desr->is_eos_reached = TRUE;
 			goto FREE_AND_RETURN_NULL;
 		}
@@ -257,10 +259,8 @@ static void* desr_get_next(const cdsl_deserializer_t* self,
 		goto FREE_AND_RETURN_NULL;
 	}
 	if(node_delim.ser_delim.delim != SERIALIZER_DELIM) {
-		PRINT("DELIM NOK %d \n", node_delim.ser_delim.delim);
 		goto FREE_AND_RETURN_NULL;
 	}
-	PRINT("DELIM OK!\n");
 	if(node_delim.ser_delim.node_chs != serializer_calcNodeChecksum(nodep, data)) {
 		goto FREE_AND_RETURN_NULL;
 	}
@@ -285,9 +285,27 @@ static BOOL desr_has_next(const cdsl_deserializer_t* self) {
 }
 
 static int desr_read_tail(const cdsl_deserializer_t* self, cdsl_serializeTail_t* tailp) {
+	if(!self || !tailp) {
+		return ERR_INV_PARAM;
+	}
+	file_deserializer_t* desr = container_of(self, file_deserializer_t, handle);
+	if(desr->fd <= 0) {
+		return ERR_INV_PARAM;
+	}
+	if(F_READ(desr->fd, tailp, sizeof(cdsl_serializeTail_t))) {
+		return ERR_RD_OP_FAIL;
+	}
 	return OK;
 }
 
 static int desr_close(const cdsl_deserializer_t* self) {
+	if(!self) {
+		return ERR_INV_PARAM;
+	}
+	file_deserializer_t* desr = container_of(self,file_deserializer_t, handle);
+	if(desr->fd <= 0) {
+		return ERR_INV_PARAM;
+	}
+	F_CLOSE(desr->fd);
 	return OK;
 }
