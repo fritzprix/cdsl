@@ -5,8 +5,8 @@
  *      Author: innocentevil
  */
 
-#ifndef INCLUDE_SERIALIZATION_FSERIALIZER_H_
-#define INCLUDE_SERIALIZATION_FSERIALIZER_H_
+#ifndef INCLUDE_SERIALIZATION_FILE_SERIALIZER_H_
+#define INCLUDE_SERIALIZATION_FILE_SERIALIZER_H_
 
 #include "serializer.h"
 
@@ -40,4 +40,4 @@ extern void file_deserializerClose(file_deserializer_t* deserializer);
 }
 #endif
 
-#endif /* INCLUDE_SERIALIZATION_FSERIALIZER_H_ */
+#endif /* INCLUDE_SERIALIZATION_FILE_SERIALIZER_H_ */

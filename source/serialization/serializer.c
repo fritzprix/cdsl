@@ -5,7 +5,7 @@
  *      Author: lucifer
  */
 
-#include "../../include/serialization/serializer.h"
+#include "serializer.h"
 
 uint16_t serializer_calcNodeChecksum(const cdsl_serializeNode_t* node, const void* data) {
 	if(data == NULL) {

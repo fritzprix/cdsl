@@ -6,8 +6,7 @@
  */
 
 #include "base_tree.h"
-
-#include "../include/serialization/serializer.h"
+#include "serializer.h"
 #include "cdsl_defs.h"
 #include "arch.h"
 
@@ -23,9 +22,15 @@ typedef struct base_tree_serialize_node {
 	trkey_t                key;
 }base_treeSerNode_t;
 
+typedef struct {
+	base_treeSerNode_t* (*ext_node)(size_t* node_sz);
+} serialize_inherit_t;
+
+
 struct serialize_argument {
 	const cdsl_serializer_t*            ser_handler;
 	const cdsl_serializerUsrCallback_t* ser_callback;
+	serialize_inherit_t                 ser_inherit;
 	cdsl_serializeTail_t                ser_tail;
 	int  result_code;
 };
@@ -37,6 +42,7 @@ struct deserialize_argument {
 	int result_code;
 };
 
+
 static int calc_max_depth_rc(base_treeNode_t** root);
 static int calc_size_rc(base_treeNode_t** root);
 static void print_rc(base_treeNode_t* current,cdsl_generic_printer_t prt,int depth);
@@ -45,6 +51,12 @@ static int foreach_decremental_rc(base_treeNode_t* current,int* current_order,ba
 static int foreach_serialize_rc(base_treeNode_t* rootp, base_tree_callback_t cb, void* arg);
 static void traverse_target_rc(base_treeNode_t* current, int* order, trkey_t key, base_tree_callback_t cb,void* arg);
 static void print_tab(int cnt);
+static void delete_rc(base_treeNode_t* nodep, base_tree_callback_t free_fn);
+static int compare_rc(const base_treeNode_t* anext, const base_treeNode_t* bnext);
+
+static base_treeNode_t* build_tree_rc(base_treeNode_t* parent, struct deserialize_argument* args);
+
+
 static DECLARE_FOREACH_CALLBACK(serialize_for_each);
 
 #define GET_DOFFSET(ext_type)    (sizeof(ext_type) - offsetof(cdsl_serializeNode_t, flags))
@@ -53,14 +65,44 @@ static DECLARE_FOREACH_CALLBACK(serialize_for_each);
 
 #define IS_NODE_EMBEDDED(data, node, size)   ((((size_t) data) <= ((size_t) node)) && ((((size_t) data) + size) > ((size_t) node)))
 
+
+static DECLARE_FOREACH_CALLBACK(serialize_for_each_ext) {
+	struct serialize_argument* args = (struct serialize_argument*) arg;
+		const cdsl_serializer_t* serializer = args->ser_handler;
+		uint8_t* data;
+		size_t nsz = 0;
+		base_treeSerNode_t* ser_node =  args->ser_inherit.ext_node(&nsz);
+
+		if((order & NODE_MSK) == NODE_NULL) {
+			ser_node->key = -1;
+			ser_node->_node.flags = NODE_NULL;
+		} else {
+			ser_node->_node.d_offset = GET_DOFFSET(base_treeSerNode_t) + (nsz - sizeof(base_treeSerNode_t));
+			ser_node->_node.flags = NODE_NORMAL;
+			const cdsl_serializerUsrCallback_t* callback = args->ser_callback;
+			data = callback->on_node_to_data(callback, node, &ser_node->_node.d_size);
+			if(data && ser_node->_node.d_size) {
+				if (IS_NODE_EMBEDDED(data, node, ser_node->_node.d_size)) {
+					ser_node->_node.flags |= EMBEDDED_MSK;
+					ser_node->_node.e_offset = GET_EOFFSET(data, node);
+				}
+			}
+		}
+
+		args->result_code = serializer->on_next(serializer, (cdsl_serializeNode_t*) ser_node, nsz, data);
+		if(args->result_code) {
+			return FOREACH_BREAK;
+		}
+
+		return FOREACH_CONTINUE;
+}
+
 static DECLARE_FOREACH_CALLBACK(serialize_for_each) {
 	struct serialize_argument* args = (struct serialize_argument*) arg;
 	const cdsl_serializer_t* serializer = args->ser_handler;
-	int res = 0;
 	uint8_t* data;
-
-	//TODO: Optimize more
 	base_treeSerNode_t ser_node = {0};
+
 	if((order & NODE_MSK) == NODE_NULL) {
 		ser_node.key = -1;
 		ser_node._node.flags = NODE_NULL;
@@ -71,21 +113,41 @@ static DECLARE_FOREACH_CALLBACK(serialize_for_each) {
 		data = callback->on_node_to_data(callback, node, &ser_node._node.d_size);
 		if(data && ser_node._node.d_size) {
 			if (IS_NODE_EMBEDDED(data, node, ser_node._node.d_size)) {
-				ser_node._node.flags |= GET_EOFFSET(data, node);
+				ser_node._node.flags |= EMBEDDED_MSK;
+				ser_node._node.e_offset = GET_EOFFSET(data, node);
 			}
 		}
-
 	}
-	res = serializer->on_next(serializer, (cdsl_serializeNode_t*) &ser_node, sizeof(base_treeSerNode_t),data);
-	args->result_code = res;
-	if(res < OK) {
+
+	args->result_code = serializer->on_next(serializer, (cdsl_serializeNode_t*) &ser_node, sizeof(base_treeSerNode_t), data);
+	if(args->result_code) {
 		return FOREACH_BREAK;
 	}
 
 	return FOREACH_CONTINUE;
 }
 
-static base_treeNode_t* build_tree_rc(base_treeNode_t* parent, struct deserialize_argument* args);
+static int compare_rc(const base_treeNode_t* anext, const base_treeNode_t* bnext) {
+	if(!anext && !bnext) {
+		return 0;
+	}
+
+	if(!anext || !bnext) {
+		return -1;
+	}
+
+	int result = compare_rc(GET_PTR(anext)->left, GET_PTR(bnext)->left) | compare_rc(GET_PTR(anext)->right, GET_PTR(bnext)->right);
+	return result | (anext->key != bnext->key);
+}
+
+static void delete_rc(base_treeNode_t* nodep, base_tree_callback_t free_fn) {
+	if(!GET_PTR(nodep)) {
+		return;
+	}
+	delete_rc(GET_PTR(nodep)->left, free_fn);
+	delete_rc(GET_PTR(nodep)->right, free_fn);
+	free_fn(0, nodep, NULL);
+}
 
 
 static base_treeNode_t* build_tree_rc(base_treeNode_t* parent, struct deserialize_argument* args) {
@@ -95,12 +157,9 @@ static base_treeNode_t* build_tree_rc(base_treeNode_t* parent, struct deserializ
 	const cdsl_deserializer_t* desr = args->desr_handler;
 	base_treeNode_t* bnode;
 	base_treeSerNode_t ser_node;
-
+	// TODO: implement inheritance interface for other tree type
 	if(desr->has_next(desr)) {
-		uint8_t* data = desr->get_next(desr,
-				                       &ser_node._node,
-									   sizeof(base_treeSerNode_t),
-									   args->desr_mmngt);
+		uint8_t* data = desr->get_next(desr, &ser_node._node, sizeof(base_treeSerNode_t), args->desr_mmngt);
 		if(IS_NULL_NODE(&ser_node)) {
 			return NULL;
 		}
@@ -113,6 +172,24 @@ static base_treeNode_t* build_tree_rc(base_treeNode_t* parent, struct deserializ
 
 	return NULL;
 }
+
+
+int tree_compare(const base_treeRoot_t* arootp, const base_treeRoot_t* brootp) {
+	if(!arootp || !brootp) {
+		return -1;
+	}
+	return compare_rc(arootp->entry, brootp->entry);
+}
+
+
+
+void tree_deleteAll(base_treeRoot_t* rootp, base_tree_callback_t free_fn) {
+	if(free_fn) {
+		delete_rc(rootp->entry, free_fn);
+	}
+	rootp->entry = NULL;
+}
+
 
 void tree_deserialize(base_treeRoot_t* rootp,
 		              cdsl_deserializer_t* deserializer,
@@ -139,33 +216,13 @@ void tree_deserialize(base_treeRoot_t* rootp,
 	}
 
 	if(!(ser_header.type & TYPE_TREE)) {
-		PRINT("NOT TREE TYPE\n");
 		return;
 	}
 
 	rootp->entry = build_tree_rc(rootp->entry, &args);
 	if(deserializer->read_tail(deserializer, &ser_tail) != OK) {
-		PRINT("NOT VALID TAIL\n");
 		return;
 	}
-	PRINT("VALID TAIL\n");
-//	base_treeSerNode_t ser_node;
-//	while(deserializer->has_next(deserializer)) {
-//		void* data = deserializer->get_next(deserializer, &ser_node._node, sizeof(base_treeSerNode_t), m_mngt);
-//		if(IS_NULL_NODE(&ser_node)) {
-//			continue;
-//		}
-//		if(data == NULL) {
-//			PRINT("INVALID NODE \n");
-//			return;
-//		}
-//		FREE(data);
-//		PRINT("VALID NODE\n");
-//	}
-//	if(deserializer->read_tail(deserializer, &ser_tail) != OK){
-//		PRINT("INVALID TAIL\n");
-//	}
-//	PRINT("VALID TAIL\n");
 }
 
 void tree_serialize(const base_treeRoot_t* rootp,
