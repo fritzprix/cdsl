@@ -84,7 +84,7 @@ defconf : $(CONFIG_DIR)
 
 
 ifeq ($(DEFCONF),)
-config : $(CONFIG_PY)
+config : $(CONFIG_PY) $(TOOL_DIR)
 	$(PYTHON) $(CONFIG_PY) -c -i config.json
 else
 ifeq ($(ARCH),)
@@ -199,7 +199,7 @@ clean :
 			$(TEST_TARGET) $(REL_SH_OBJS) $(DBG_SH_OBJS) $(DEV_TEST_TARGET)
 			
 config_clean:
-	rm -rf $(CONFIG_TARGET) $(CONFIG_AUTOGEN) $(AUTOGEN_DIR) $(REPO-y) $(LDIR-y) .config 
+	rm -rf $(CONFIG_TARGET) $(CONFIG_AUTOGEN) $(AUTOGEN_DIR) $(TOOL_DIR) $(REPO-y) $(LDIR-y) .config 
 
 .PHONY = $(PHONY)
 

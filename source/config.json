@@ -17,5 +17,9 @@
 	"ARCH_CONFIG":{
 		"type":"config",
 		"path":"./arch/config.json"
+	},
+	"SERIALIZER_CONFIG":{
+		"type":"config",
+		"path":"./serialization/config.json"
 	}
 }

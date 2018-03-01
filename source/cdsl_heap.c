@@ -7,7 +7,6 @@
 
 
 #include "cdsl_heap.h"
-#include <stddef.h>
 
 #define DIR_LEFT  1
 #define DIR_RIGHT !DIR_LEFT
@@ -39,14 +38,14 @@ void cdsl_heapNodeInit(heapNode_t* node, trkey_t key) {
 	node->key = key;
 }
 
-int cdsl_heapEnqueue(heapRoot_t* rootp,heapNode_t* item){
+BOOL cdsl_heapEnqueue(heapRoot_t* rootp,heapNode_t* item){
 	item->left = item->right = NULL;
 	if(!rootp) {
-		return (1 < 0);
+		return FALSE;
 	}
 	rootp->entry = insert_from_bottom_rc(rootp,rootp->entry,item);
 	rootp->dir = !rootp->dir;
-	return (1 > 0);
+	return TRUE;
 }
 
 heapNode_t* cdsl_heapDeqeue(heapRoot_t* rootp){
@@ -119,7 +118,6 @@ static heapNode_t* heapify(heapNode_t* current,heapNode_t* child) {
 		child->right = current;
 		current->left = left;
 		current->right = right;
-		child->right = current;
 		return child;
 	} else {
 		left = child->left;
@@ -128,7 +126,6 @@ static heapNode_t* heapify(heapNode_t* current,heapNode_t* child) {
 		child->right = current->right;
 		current->left = left;
 		current->right = right;
-		child->left = current;
 		return child;
 	}
 }

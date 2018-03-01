@@ -9,7 +9,7 @@
 #define CDSL_BSTREE_H_
 
 #include "base_tree.h"
-#include "serializer/serializer.h"
+#include "serialization/serializer.h"
 
 #if defined(__cplusplus)
 extern "C"{
@@ -20,10 +20,13 @@ typedef struct bs_treenode bstreeNode_t;
 typedef struct bs_treeroot bstreeRoot_t;
 
 #define cdsl_bstreeMaxDepth(root)                      tree_max_depth((base_treeRoot_t*) root)
+#define cdsl_bstreeSerialize(root, serializer, cb)     tree_serialize((base_treeRoot_t*) root, (cdsl_serializer_t*) serializer, cb)
+#define cdsl_bstreeDeserialize(root, desrl, alloc)     tree_deserialize((base_treeRoot_t*) root,(cdsl_deserializer_t*) desrl, alloc)
 #define cdsl_bstreeForEach(root, cb, order,arg)        tree_for_each((base_treeRoot_t*) root, (base_tree_callback_t) cb, order,arg)
 #define cdsl_bstreeForEachToTarget(root, cb, key,arg)  tree_for_each_to_target((baes_treeRoot_t*) root, (base_tree_callback_t) cb, order,arg)
 #define cdsl_bstreeSize(root)                          tree_size((base_treeRoot_t*) root)
 #define cdsl_bstreePrint(root, print)                  tree_print((base_treeRoot_t*) root, print)
+#define cdsl_bstreeCompare(aroot, broot)               tree_compare((base_treeRoot_t*) aroot, (base_treeRoot_t*) broot)
 #define cdsl_bstreeIsEmpty(root)                       tree_is_empty((base_treeRoot_t*) root)
 #define cdsl_bstreeTop(root)                           (bstreeNode_t*) tree_top((base_treeRoot_t*) root)
 #define cdsl_bstreeGoLeft(cur)                         (bstreeNode_t*) tree_go_left((base_treeNode_t*) cur)

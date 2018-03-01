@@ -9,8 +9,8 @@
 #define BASE_TREE_H_
 
 #include "arch.h"
-#include "serializer/serializer.h"
 #include "cdsl_defs.h"
+#include "serializer.h"
 
 #if defined(__cplusplus)
 extern "C" {
@@ -53,6 +53,7 @@ extern "C" {
  * \brief key type for tree
  */
 typedef __cdsl_uaddr_t  trkey_t;
+
 typedef struct base_tree_node base_treeNode_t;  ///< Base tree node type
 typedef struct base_tree_root base_treeRoot_t;  ///< Base tree root type
 
@@ -91,7 +92,20 @@ struct base_tree_node {
 	trkey_t          key;    ///< key value of the node
 };
 
-extern void tree_serializer_init(base_treeRoot_t* rootp, serializable_t* serializer);
+extern void tree_deserialize(base_treeRoot_t* rootp,
+		                     cdsl_deserializer_t* deserializer,
+							 const cdsl_memoryMngt_t* m_mngt);
+
+
+extern void tree_serialize(const base_treeRoot_t* rootp,
+						   const cdsl_serializer_t* serializer,
+						   const cdsl_serializerUsrCallback_t* callback);
+
+extern int tree_compare(const base_treeRoot_t* arootp, const base_treeRoot_t* brootp);
+
+
+extern void tree_deleteAll(base_treeRoot_t* roop, base_tree_callback_t free);
+
 
 /*!
  * \brief traverse tree
