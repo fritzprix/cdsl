@@ -8,11 +8,13 @@
 #include "cdsl_bstree.h"
 #include "cdsl_bstree_test.h"
 #include "cdsl_hash.h"
+#include "file_serializer.h"
+#include "serializer_test.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
 
-#include "../../include/serialization/file_serializer.h"
 
 
 
@@ -33,25 +35,14 @@ static cdsl_serializerUsrCallback_t callback = {
 		.on_error = onSerError
 };
 
-#define SER_SIZE     5
 
 typedef struct person {
 	bstreeNode_t node;
 	char         name[20];
 }person_t;
 
-const char* names[SER_SIZE] = {
-		"David",
-		"John",
-		"Helen",
-		"Joseph",
-		"Arthur"
-};
 
 static person_t people[SER_SIZE];
-
-const static char* SERIALIZE_FILE_NAME = "serialize_tree.bin";
-
 
 
 BOOL cdsl_bstreeDoTest(void)

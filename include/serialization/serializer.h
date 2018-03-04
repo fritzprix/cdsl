@@ -32,6 +32,8 @@ typedef struct cdsl_serializer_usr_callback cdsl_serializerUsrCallback_t;
 typedef struct cdsl_serialize_header cdsl_serializeHeader_t;
 typedef struct cdsl_serialize_node cdsl_serializeNode_t;
 typedef struct cdsl_serialize_tail cdsl_serializeTail_t;
+typedef struct cdsl_serialize_ext_interface cdsl_serializeExtInterface_t;
+typedef struct cdsl_deserializer_interface cdsl_deserializer_t;
 
 #define GET_SER_VERSION()  (((__MAJOR__ * 10) + (__MINOR__)) | (SER_MAGIC << 8))
 #define SER_DOFFSET_BASE   offsetof(cdsl_serializeNode_t, flags)
@@ -80,7 +82,9 @@ struct cdsl_serialize_node {
 #define IS_NULL_NODE(nodep)     ((((cdsl_serializeNode_t*) nodep)->flags & NODE_MSK) != NODE_NORMAL)
 #define EMBEDDED_MSK            ((uint16_t) (1 << 1))
 #define IS_EMBEDDED_NODE(nodep) ((nodep->flags & EMBEDDED_MSK) == EMBEDDED_MSK)
-#define SPEC_MSK                ((uint16_t) (7 << 2))   ///< Type Specific value (ex. red / black for red-black tree)
+#define SPEC_MSK                ((uint16_t) (0xff << 2))   ///< Type Specific value (ex. red / black for red-black tree)
+#define SET_SPEC(nodep, val)    ((cdsl_serializeNode_t*) nodep)->flags |= ((val & 0xff) << 2)
+#define GET_SPEC(nodep)         ((((cdsl_serializeNode_t*) nodep)->flags & SPEC_MSK) >> 2)
 	uint32_t flags;
 	// there can be extension fields after the end of the struct
 };
@@ -128,7 +132,6 @@ struct cdsl_serializer_interface {
 };
 
 
-typedef struct cdsl_deserializer_interface cdsl_deserializer_t;
 struct cdsl_deserializer_interface {
 	int (*read_head)(const cdsl_deserializer_t* self, cdsl_serializeHeader_t* headerp);
 	void* (*get_next)(const cdsl_deserializer_t* self, cdsl_serializeNode_t* node, size_t nsz, const cdsl_memoryMngt_t* m_mngt);
@@ -136,6 +139,22 @@ struct cdsl_deserializer_interface {
 	int (*read_tail)(const cdsl_deserializer_t* self, cdsl_serializeTail_t* tail);
 	int (*close)(const cdsl_deserializer_t* self);
 };
+
+struct cdsl_serialize_ext_interface {
+	/*!
+	 * \brief inherited data structure which require extended structure should return its own structure, otherwise return NULL
+	 * \param[in] node_sz : size of extended node structure
+	 * \return : extended node structure
+	 */
+
+	void (*write_serialize_header)(cdsl_serializeHeader_t* header);
+	cdsl_serializeNode_t* (*alloc_ext_node)(size_t* node_sz);
+	void (*write_node_haeder)(cdsl_serializeNode_t* node_head, const void* node);
+	void (*on_node_build)(const cdsl_serializeNode_t* node_header, void* node);
+
+};
+
+
 
 
 extern uint16_t serializer_calcNodeChecksum(const cdsl_serializeNode_t* node, const void* data);

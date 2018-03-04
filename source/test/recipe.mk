@@ -11,4 +11,6 @@ OBJ-y+=cdsl_bstree_test\
 		cdsl_avltree_test\
 		rbtree_benchmark\
 		avltree_benchmark\
-		baremetal_test
+		baremetal_test\
+		serializer_test
+		

@@ -9,8 +9,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <pthread.h>
-#include "../../include/cdsl_rbtree.h"
-#include "../../include/test/cdsl_rbtree_test.h"
+
+#include "cdsl_hash.h"
+#include "cdsl_rbtree.h"
+#include "cdsl_rbtree_test.h"
+#include "file_serializer.h"
+#include "serializer_test.h"
 
 static rbtreeNode_t node_pool[TEST_SIZE];
 static rbtreeNode_t replace;
@@ -22,7 +26,30 @@ struct compete_req {
 	pthread_mutex_t* lock;
 };
 
+
+typedef struct person {
+	rbtreeNode_t node;
+	char         name[20];
+}person_t;
+
+static person_t people[SER_SIZE];
+
+
 static BOOL is_match(base_treeNode_t* node, trkey_t key);
+
+
+static DECLARE_SERIALIZER_ON_ERROR(onSerError);
+static DECLARE_SERIALIZER_ON_NODE(onSerNode);
+static DECLARE_SERIALIZER_ON_COMPLETE(onSerDone);
+
+
+static cdsl_serializerUsrCallback_t callback = {
+		.on_complete = onSerDone,
+		.on_node_to_data = onSerNode,
+		.on_error = onSerError
+};
+
+
 
 BOOL cdsl_rbtreeDoTest(void) {
 	rbtreeRoot_t root, aroot;
@@ -151,8 +178,86 @@ BOOL cdsl_rbtreeDoTest(void) {
 		return FALSE;
 	}
 
+
+	for(i = 0;i < SER_SIZE;i++) {
+		cdsl_rbtreeNodeInit(&people[i].node, sbdm_hash((unsigned char*) names[i]));
+		strcpy(people[i].name, names[i]);
+		cdsl_rbtreeInsert(&aroot, &people[i].node, FALSE);
+	}
+
+
+	if(cdsl_rbtreeSize(&aroot) != SER_SIZE) {
+		return FALSE;
+	}
+	file_serializer_t fser;
+	file_serializerOpen(&fser, SERIALIZE_FILE_NAME);
+	cdsl_rbtreeSerialize(&aroot, &fser, &callback);
+	file_serializerClose(&fser);
+
+	rbtreeRoot_t nroot;
+	cdsl_rbtreeRootInit(&nroot);
+
+
+	file_deserializer_t desr;
+	if(file_deserializerOpen(&desr, SERIALIZE_FILE_NAME) != OK) {
+		PRINT("OPEN Failed \n");
+	}
+	const cdsl_memoryMngt_t mmngt = GET_DEFAULT_MMNGT();
+	cdsl_rbtreeDeserialize(&nroot, &desr, &mmngt);
+	file_deserializerClose(&desr);
+
+	person_t apeople[5];
+	person_t npeople[5];
+	const char* another_names[5] = {
+			"Alice",
+			"Bob",
+			"Smith",
+			"Sam",
+			"Jack"
+	};
+
+	for(i = 0;i < 5;i++) {
+		cdsl_rbtreeNodeInit(&apeople[i].node, sbdm_hash((unsigned char*) another_names[i]));
+		cdsl_rbtreeNodeInit(&npeople[i].node, sbdm_hash((unsigned char*) another_names[i]));
+
+		strcpy(apeople[i].name, another_names[i]);
+		strcpy(npeople[i].name, another_names[i]);
+		cdsl_rbtreeInsert(&aroot, &apeople[i].node, FALSE);
+		cdsl_rbtreeInsert(&nroot, &npeople[i].node, FALSE);
+	}
+
+
+	if(cdsl_rbtreeCompare(&nroot, &aroot) != 0) {
+		return FALSE;
+	}
+
+	cdsl_rbtreeDeleteMin(&aroot);
+	if(cdsl_rbtreeCompare(&nroot, &aroot) == 0) {
+		return FALSE;
+	}
+
 	return TRUE;
 }
+
+
+
+static DECLARE_SERIALIZER_ON_ERROR(onSerError) {
+
+}
+
+static DECLARE_SERIALIZER_ON_NODE(onSerNode) {
+	person_t* person = container_of(node, person_t, node);
+	*size = offsetof(person_t, name) + (strlen(person->name) * sizeof(char));
+	if((*size % 2) != 0) {
+		*size += 1;
+	}
+	return (void*) node;
+}
+
+static DECLARE_SERIALIZER_ON_COMPLETE(onSerDone) {
+	// NOP
+}
+
 
 
 static BOOL is_match(base_treeNode_t* node, trkey_t key) {
