@@ -20,10 +20,24 @@ extern "C" {
  * \brief Red-black Tree (Recursive Version)
  * @{
  */
+/**
+struct cdsl_serialize_ext_interface {
+	 cdsl_serializeNode_t* (*alloc_ext_node)(size_t* node_sz);
+	 void (*write_node_haeder)(cdsl_serializeNode_t* node_head, const void* node);
+
+};
+**/
+
+
+
+
 
 #define cdsl_rbtreeMaxDepth(root)                       tree_max_depth((base_treeRoot_t*) root)
 #define cdsl_rbtreeForEach(root, cb, order, arg)        tree_for_each((base_treeRoot_t*) root, (base_tree_callback_t) cb, order, arg)
 #define cdsl_rbtreeForEachToTarget(root, cb, key, arg)  tree_for_each_to_target((base_treeRoot_t*) root, (base_tree_callback_t) cb, key, arg)
+#define cdsl_rbtreeSerialize(root, serializer, cb)      tree_serialize((base_treeRoot_t*) root, (cdsl_serializer_t*) serializer, cb, &_cdsl_rbtree_serializer_ext)
+#define cdsl_rbtreeDeserialize(root, desrl, alloc)      tree_deserialize((base_treeRoot_t*) root,(cdsl_deserializer_t*) desrl, alloc, &_cdsl_rbtree_serializer_ext)
+#define cdsl_rbtreeCompare(aroot, broot)                tree_compare((base_treeRoot_t*) aroot, (base_treeRoot_t*) broot)
 #define cdsl_rbtreeSize(root)                           tree_size((base_treeRoot_t*) root)
 #define cdsl_rbtreePrint(root, print)                   tree_print((base_treeRoot_t*) root, print)
 #define cdsl_rbtreeIsEmpty(root)                        tree_is_empty((base_treeRoot_t*) root)
@@ -238,6 +252,7 @@ extern rbtreeNode_t* cdsl_rbtreeDeleteMinReplace(rbtreeRoot_t* rootp, base_tree_
  */
 extern rbtreeNode_t* cdsl_rbtreeDeleteMaxReplace(rbtreeRoot_t* rootp, base_tree_replacer_t replacer, void* cb_arg);
 
+extern const cdsl_serializeExtInterface_t _cdsl_rbtree_serializer_ext;
 
 #ifdef __DBG
 extern void cdsl_rbtreePrint_dev(rbtreeRoot_t* root);
