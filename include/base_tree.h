@@ -92,14 +92,21 @@ struct base_tree_node {
 	trkey_t          key;    ///< key value of the node
 };
 
+typedef struct base_tree_serialize_node {
+	cdsl_serializeNode_t   _node;
+	trkey_t                key;
+}base_treeSerNode_t;
+
 extern void tree_deserialize(base_treeRoot_t* rootp,
 		                     cdsl_deserializer_t* deserializer,
-							 const cdsl_memoryMngt_t* m_mngt);
+							 const cdsl_memoryMngt_t* m_mngt,
+							 const cdsl_serializeExtInterface_t* ext);
 
 
 extern void tree_serialize(const base_treeRoot_t* rootp,
 						   const cdsl_serializer_t* serializer,
-						   const cdsl_serializerUsrCallback_t* callback);
+						   const cdsl_serializerUsrCallback_t* callback,
+						   const cdsl_serializeExtInterface_t* ext);
 
 extern int tree_compare(const base_treeRoot_t* arootp, const base_treeRoot_t* brootp);
 

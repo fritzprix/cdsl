@@ -85,6 +85,32 @@ void cdsl_rbtreeRootInit(rbtreeRoot_t* rootp) {
 	rootp->entry = NULL;
 }
 
+static void _rbtree_write_ser_node_header (cdsl_serializeNode_t* node_head, const void* node) {
+	if(node_head == NULL) return;
+	rbtreeNode_t* rbnode = (rbtreeNode_t*) node;
+	SET_SPEC(node_head,(GET_COLOR(rbnode->left) << 1 | GET_COLOR(rbnode->right)));
+}
+
+static void _rbtree_write_serialize_header(cdsl_serializeHeader_t* header) {
+	header->type |= SUB_TYPE_REDBLACK;
+}
+
+static void _rbtree_on_node_build(const cdsl_serializeNode_t* node_header, void* node) {
+	uint8_t spec = GET_SPEC(node_header);
+	rbtreeNode_t* rb_node = (rbtreeNode_t*) node;
+	PAINT_COLOR(rb_node->left, spec >> 1);
+	PAINT_COLOR(rb_node->right, (spec & 1));
+}
+
+
+
+const cdsl_serializeExtInterface_t _cdsl_rbtree_serializer_ext = {
+	.alloc_ext_node = NULL,
+	.write_node_haeder = _rbtree_write_ser_node_header,
+	.write_serialize_header = _rbtree_write_serialize_header,
+	.on_node_build = _rbtree_on_node_build
+};
+
 void cdsl_rbtreeNodeInit(rbtreeNode_t* node, trkey_t key) {
 	if (node == NULL)
 		return;
