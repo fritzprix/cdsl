@@ -5,7 +5,7 @@
  *      Author: innocentevil
  */
 
-#include "../include/cdsl_rbtree.h"
+#include "cdsl_rbtree.h"
 #include "arch.h"
 
 #define GET_PTR(node)                         ((rbtreeNode_t*)(((__cdsl_uaddr_t) node) & ~1))
@@ -142,6 +142,7 @@ rbtreeNode_t* cdsl_rbtreeInsert(rbtreeRoot_t* rootp, rbtreeNode_t* item, BOOL is
 	rbtreeNode_t* replaced = NULL;
 	rootp->entry = insert_rc(rootp->entry, item, &color, &dir,
 			(is_set ? &replaced : NULL));
+	PAINT_BLACK(rootp->entry);
 	__dev_log("ROTATE_COUNT : %d\n",rot_count);
 	__dev_log("stack usage : %lu\n",stack_top - stack_bottom);
 	return replaced;

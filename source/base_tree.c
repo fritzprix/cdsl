@@ -52,11 +52,13 @@ static base_treeNode_t* build_tree_rc(base_treeNode_t* parent, struct deserializ
 
 static DECLARE_FOREACH_CALLBACK(serialize_for_each);
 
-#define GET_DOFFSET(node_head_size, ext_type)    (node_head_size - offsetof(cdsl_serializeNode_t, flags))
-#define GET_EOFFSET(data, node)  (((size_t) node) - ((size_t) data))
+#define GET_DOFFSET(node_head_size, ext_type)  \
+	(node_head_size - offsetof(cdsl_serializeNode_t, flags))
+#define GET_EOFFSET(data, node)  \
+	(((size_t) node) - ((size_t) data))
 
-
-#define IS_NODE_EMBEDDED(data, node, size)   ((((size_t) data) <= ((size_t) node)) && ((((size_t) data) + size) > ((size_t) node)))
+#define IS_NODE_EMBEDDED(data, node, size) \
+	((((size_t) data) <= ((size_t) node)) && ((((size_t) data) + size) > ((size_t) node)))
 
 
 static DECLARE_FOREACH_CALLBACK(serialize_for_each) {
@@ -75,11 +77,11 @@ static DECLARE_FOREACH_CALLBACK(serialize_for_each) {
 	}
 
 	if((order & NODE_MSK) == NODE_NULL) {
-		ser_node.key = -1;
-		ser_node._node.flags = NODE_NULL;
+		ser_nodep->key = -1;
+		ser_nodep->_node.flags = NODE_NULL;
 	} else {
-		ser_node._node.d_offset = GET_DOFFSET(node_sz,base_treeSerNode_t);
-		ser_node._node.flags = NODE_NORMAL;
+		ser_nodep->_node.d_offset = GET_DOFFSET(node_sz,base_treeSerNode_t);
+		ser_nodep->_node.flags = NODE_NORMAL;
 		if(ext_interface && ext_interface->write_node_haeder) {
 			ext_interface->write_node_haeder((cdsl_serializeNode_t*) ser_nodep, node);
 		}
@@ -90,12 +92,12 @@ static DECLARE_FOREACH_CALLBACK(serialize_for_each) {
 			// callback SHOULD be provided
 			return FOREACH_BREAK;
 		}
-		data = callback->on_node_to_data(callback, node, &ser_node._node.d_size);
+		data = callback->on_node_to_data(callback, node, &ser_nodep->_node.d_size);
 
-		if(data && ser_node._node.d_size) {
-			if (IS_NODE_EMBEDDED(data, node, ser_node._node.d_size)) {
-				ser_node._node.flags |= EMBEDDED_MSK;
-				ser_node._node.e_offset = GET_EOFFSET(data, node);
+		if(data && ser_nodep->_node.d_size) {
+			if (IS_NODE_EMBEDDED(data, node, ser_nodep->_node.d_size)) {
+				ser_nodep->_node.flags |= EMBEDDED_MSK;
+				ser_nodep->_node.e_offset = GET_EOFFSET(data, node);
 			}
 		}
 	}
