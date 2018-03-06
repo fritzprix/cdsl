@@ -41,6 +41,11 @@ extern "C" {
 #define STRCMP(s1,s2)              baremetal_strcmp(s1,s2)
 #define F_OPEN(filename, mode)     ((int) -1)
 #define F_WRITE(fd, buffer, size)  ((int) -1)
+#define F_READ(fd, buffer, size)   ((int) -1)
+#define MEMCPY(dest,src,sz)         {}
+#define MALLOC                     NULL
+#define FREE
+#define GET_DEFAULT_MMNGT()          {}
 #define F_CLOSE(fd)                ((int) -1)
 #define F_FDOPEN(fd)               NULL
 #define F_FCLOSE(fp)               ((int) -1)
