@@ -55,6 +55,7 @@ struct cdsl_serialize_header {
 #define TYPE_TREE           ((uint16_t) (1 << 8))
 #define SUB_TYPE_PLAIN      ((uint16_t) 0)
 #define SUB_TYPE_REDBLACK   ((uint16_t) 1)
+#define SUB_TYPE_AVLNODE    ((uint16_t) 2)
 #define TYPE_LIST           ((uint16_t) (2 << 8))
 	uint16_t type;
 };
@@ -149,6 +150,7 @@ struct cdsl_serialize_ext_interface {
 
 	void (*write_serialize_header)(cdsl_serializeHeader_t* header);
 	cdsl_serializeNode_t* (*alloc_ext_node)(size_t* node_sz);
+	void (*free_ext_node) (cdsl_serializeNode_t* allocated);
 	void (*write_node_haeder)(cdsl_serializeNode_t* node_head, const void* node);
 	void (*on_node_build)(const cdsl_serializeNode_t* node_header, void* node);
 
