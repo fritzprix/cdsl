@@ -8,14 +8,16 @@
 #include "cdsl_avltree.h"
 
 
-#define DIR_LEFT          ((uint8_t) 1)
-#define DIR_RIGHT         ((uint8_t) 2)
+#define DIR_LEFT                   ((uint8_t) 1)
+#define DIR_RIGHT                  ((uint8_t) 2)
 
-#define PATTERN_MASK      ((uint8_t) 0x0F)
-#define LEFTRIGTH_PATTERN ((uint8_t) (DIR_RIGHT << 2) | DIR_LEFT)
-#define LEFTLEFT_PATTERN  ((uint8_t) (DIR_LEFT << 2) | DIR_LEFT)
-#define RIGHTLEFT_PATTERN ((uint8_t) (DIR_LEFT << 2) | DIR_RIGHT)
-#define RIGHTRIGHT_PATTERN ((uint8_t) (DIR_RIGHT << 2) | DIR_RIGHT)
+#define HEIGHT_COMPRESSION_RATE    ((uint8_t) 4)
+
+#define PATTERN_MASK               ((uint8_t) 0x0F)
+#define LEFTRIGTH_PATTERN          ((uint8_t) (DIR_RIGHT << 2) | DIR_LEFT)
+#define LEFTLEFT_PATTERN           ((uint8_t) (DIR_LEFT << 2) | DIR_LEFT)
+#define RIGHTLEFT_PATTERN          ((uint8_t) (DIR_LEFT << 2) | DIR_RIGHT)
+#define RIGHTRIGHT_PATTERN         ((uint8_t) (DIR_RIGHT << 2) | DIR_RIGHT)
 
 static avltreeNode_t* insert_rc(int bal, avltreeNode_t* sub_root_c, avltreeNode_t* item, uint8_t *rc_dir, avltreeNode_t** replaced);
 static avltreeNode_t* delete_rc(int bal, avltreeNode_t* sub_root_c, avltreeNode_t** deleteed,trkey_t key, base_tree_replacer_t replacer, void* args);
@@ -30,9 +32,20 @@ static avltreeNode_t* rotate_left(avltreeNode_t* sub_root);
 static int max_child_height(avltreeNode_t* node);
 
 
+static void _write_ser_node_header (cdsl_serializeNode_t* node_head, const void* node);
+static void _write_serialize_header(cdsl_serializeHeader_t* header);
+static void _build_node(const cdsl_serializeNode_t* node_header, void* node);
 
 
-void cdsl_avltreeRootInit(avltreeRoot_t* rootp, int bal) {
+const cdsl_serializeExtInterface_t _cdsl_avltree_serializer_ext = {
+		.free_ext_node = NULL,
+		.alloc_ext_node = NULL,
+		.write_node_haeder = _write_ser_node_header,
+		.write_serialize_header = _write_serialize_header,
+		.on_node_build = _build_node
+};
+
+void cdsl_avltreeRootInit(avltreeRoot_t* rootp, uint8_t bal) {
 	if(!rootp) {
 		return;
 	}
@@ -548,6 +561,22 @@ static int max_child_height(avltreeNode_t* node) {
 
 	}
 	return 0;
+}
+
+static void _write_ser_node_header (cdsl_serializeNode_t* node_head, const void* node) {
+	if(node_head == NULL) return;
+	avltreeNode_t* avlnode = (avltreeNode_t*) node;
+	SET_SPEC(node_head,avlnode->height);
+}
+
+static void _write_serialize_header(cdsl_serializeHeader_t* header) {
+	header->type |= SUB_TYPE_AVLNODE;
+}
+
+static void _build_node(const cdsl_serializeNode_t* node_header, void* node) {
+	uint8_t spec = GET_SPEC(node_header);
+	avltreeNode_t* avlnode = (avltreeNode_t*) node;
+	avlnode->height = spec;
 }
 
 

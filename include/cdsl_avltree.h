@@ -26,6 +26,9 @@ extern "C" {
 #define cdsl_avltreeMaxDepth(root)                       tree_max_depth((base_treeRoot_t*) root)
 #define cdsl_avltreeForEach(root, cb, order, arg)        tree_for_each((base_treeRoot_t*) root, (base_tree_callback_t) cb, order, arg)
 #define cdsl_avltreeForEachToTarget(root,cb,key, arg)    tree_for_each_to_target((base_treeRoot_t*) root, (base_tree_callback_t) cb, key, arg)
+#define cdsl_avltreeSerialize(root, serializer, cb)      tree_serialize((base_treeRoot_t*) root, (cdsl_serializer_t*) serializer, cb, &_cdsl_avltree_serializer_ext)
+#define cdsl_avltreeDeserialize(root, desrl, alloc)      tree_deserialize((base_treeRoot_t*) root,(cdsl_deserializer_t*) desrl, alloc, &_cdsl_avltree_serializer_ext)
+#define cdsl_avltreeCompare(aroot, broot)                tree_compare((base_treeRoot_t*) aroot, (base_treeRoot_t*) broot)
 #define cdsl_avltreeSize(root)                           tree_size((base_treeRoot_t*) root)
 #define cdsl_avltreePrint(root, print)                   tree_print((base_treeRoot_t*) root, print)
 #define cdsl_avltreeIsEmpty(root)                        tree_is_empty((base_treeRoot_t*) root)
@@ -164,7 +167,7 @@ struct cdsl_avlnode {
  * \param[in] rootp pointer to root of the tree
  * \param[in] bal balance factor for the AVL tree management
  */
-extern void cdsl_avltreeRootInit(avltreeRoot_t* rootp, int bal);
+extern void cdsl_avltreeRootInit(avltreeRoot_t* rootp, uint8_t bal);
 
 /*!
  * \brief Initialize tree node with key value
@@ -235,9 +238,13 @@ extern avltreeNode_t* cdsl_avltreeDeleteMinReplace(avltreeRoot_t* rootp, base_tr
  */
 extern avltreeNode_t* cdsl_avltreeDeleteMaxReplace(avltreeRoot_t* rootp, base_tree_replacer_t replacer, void* cb_arg);
 
+
 /*!
  * @}
  */
+
+extern const cdsl_serializeExtInterface_t _cdsl_avltree_serializer_ext;
+
 
 
 #if defined(__cplusplus)

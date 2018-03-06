@@ -70,7 +70,9 @@ static DECLARE_FOREACH_CALLBACK(serialize_for_each) {
 	base_treeSerNode_t ser_node = {0};
 	base_treeSerNode_t* ser_nodep = NULL;
 	size_t node_sz = sizeof(base_treeSerNode_t);
-	if(ext_interface && ext_interface->alloc_ext_node) {
+	if(ext_interface && \
+			ext_interface->alloc_ext_node && \
+			ext_interface->free_ext_node) {
 		ser_nodep = (base_treeSerNode_t*) ext_interface->alloc_ext_node(&node_sz);
 	} else {
 		ser_nodep = &ser_node;
@@ -102,7 +104,13 @@ static DECLARE_FOREACH_CALLBACK(serialize_for_each) {
 		}
 	}
 
-	args->result_code = serializer->on_next(serializer, (cdsl_serializeNode_t*) &ser_node, sizeof(base_treeSerNode_t), data);
+
+	args->result_code = serializer->on_next(serializer, (cdsl_serializeNode_t*) ser_nodep, sizeof(base_treeSerNode_t), data);
+	if(ext_interface && \
+			ext_interface->alloc_ext_node && \
+			ext_interface->free_ext_node) {
+		ext_interface->free_ext_node((cdsl_serializeNode_t*)  ser_nodep);
+	}
 	if(args->result_code) {
 		return FOREACH_BREAK;
 	}
