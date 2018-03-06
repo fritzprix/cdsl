@@ -8,6 +8,7 @@
 #ifndef INCLUDE_SERIALIZATION_SERIALIZER_H_
 #define INCLUDE_SERIALIZATION_SERIALIZER_H_
 
+#include "arch.h"
 #include "cdsl_defs.h"
 
 #ifdef __cplusplus
