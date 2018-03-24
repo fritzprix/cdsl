@@ -10,7 +10,7 @@
 #include "cdsl_hash.h"
 #include "cdsl_hashtree.h"
 
-#include "../include/cdsl_rbtree.h"
+#include "cdsl_rbtree.h"
 #include "cdsl_slist.h"
 
 #define REPLACER_ARG_INIT      {0,}

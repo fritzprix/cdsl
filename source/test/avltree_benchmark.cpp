@@ -14,8 +14,8 @@
 #include <sys/types.h>
 
 #include "base_tree.h"
-#include "../../include/cdsl_avltree.h"
-#include "../../include/test/avltree_benchmark.h"
+#include "cdsl_avltree.h"
+#include "avltree_benchmark.h"
 
 
 #define TEST_CNT  2000000
@@ -72,4 +72,5 @@ bool perform_avltree_benchmark(void) {
 	printf("avg.insert test for avltree : %f\n",insert_avg);
 	printf("avg.lookup test for avltree : %f\n",lookup_avg);
 	printf("avg.delete test for avltree : %f\n",remove_avg);
+	return true;
 }

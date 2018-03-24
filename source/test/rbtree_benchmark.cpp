@@ -14,8 +14,8 @@
 #include <sys/types.h>
 
 #include "base_tree.h"
-#include "../../include/cdsl_rbtree.h"
-#include "../../include/test/rbtree_benchmark.h"
+#include "cdsl_rbtree.h"
+#include "rbtree_benchmark.h"
 
 
 #define TEST_CNT  2000000

@@ -2,10 +2,11 @@ CONFIG_TEST=n
 CONFIG_BAREMETAL=y
 CONFIG_ARCH=arm
 CONFIG_SUB_ARCH=cortex-m3
-include /home/innocentevil/my_work/cdsl-tachyos/recipe.mk
-include /home/innocentevil/my_work/cdsl-tachyos/source/recipe.mk
-include /home/innocentevil/my_work/cdsl-tachyos/source/arch/arm/baremetal.mk
-include /home/innocentevil/my_work/cdsl-tachyos/source/arch/arm/recipe.mk
-include /home/innocentevil/my_work/cdsl-tachyos/source/arch/arm/cortex-m3/recipe.mk
+include /home/lucifer/my_work/cdsl/recipe.mk
+include /home/lucifer/my_work/cdsl/source/recipe.mk
+include /home/lucifer/my_work/cdsl/source/serialization/recipe.mk
+include /home/lucifer/my_work/cdsl/source/arch/arm/baremetal.mk
+include /home/lucifer/my_work/cdsl/source/arch/arm/recipe.mk
+include /home/lucifer/my_work/cdsl/source/arch/arm/cortex-m3/recipe.mk
 
 DEF+= BAREMETAL=y SUB_ARCH=cortex-m3

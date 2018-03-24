@@ -206,6 +206,10 @@ BOOL cdsl_rbtreeDoTest(void) {
 	cdsl_rbtreeDeserialize(&nroot, &desr, &mmngt);
 	file_deserializerClose(&desr);
 
+	if(cdsl_rbtreeCompare(&nroot, &aroot) != 0) {
+		return FALSE;
+	}
+
 	person_t apeople[5];
 	person_t npeople[5];
 	const char* another_names[5] = {
@@ -222,10 +226,10 @@ BOOL cdsl_rbtreeDoTest(void) {
 
 		strcpy(apeople[i].name, another_names[i]);
 		strcpy(npeople[i].name, another_names[i]);
+
 		cdsl_rbtreeInsert(&aroot, &apeople[i].node, FALSE);
 		cdsl_rbtreeInsert(&nroot, &npeople[i].node, FALSE);
 	}
-
 
 	if(cdsl_rbtreeCompare(&nroot, &aroot) != 0) {
 		return FALSE;

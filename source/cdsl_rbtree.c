@@ -5,7 +5,7 @@
  *      Author: innocentevil
  */
 
-#include "../include/cdsl_rbtree.h"
+#include "cdsl_rbtree.h"
 #include "arch.h"
 
 #define GET_PTR(node)                         ((rbtreeNode_t*)(((__cdsl_uaddr_t) node) & ~1))
@@ -67,6 +67,12 @@ static rbtreeNode_t* resolve_black_black(rbtreeNode_t* parent_c, uint8_t dir_ctx
 static rbtreeNode_t* up_from_rightmost_rc(rbtreeNode_t* node,	rbtreeNode_t** rm, uint8_t* ctx);
 static rbtreeNode_t* up_from_leftmost_rc(rbtreeNode_t* node, rbtreeNode_t** lm, uint8_t* ctx);
 
+
+static void _write_ser_node_header (cdsl_serializeNode_t* node_head, const void* node);
+static void _write_serialize_header(cdsl_serializeHeader_t* header);
+static void _build_node(const cdsl_serializeNode_t* node_header, void* node);
+
+
 static void print_tab(int cnt);
 static void node_print_rc(rbtreeNode_t* node, int level);
 
@@ -85,30 +91,15 @@ void cdsl_rbtreeRootInit(rbtreeRoot_t* rootp) {
 	rootp->entry = NULL;
 }
 
-static void _rbtree_write_ser_node_header (cdsl_serializeNode_t* node_head, const void* node) {
-	if(node_head == NULL) return;
-	rbtreeNode_t* rbnode = (rbtreeNode_t*) node;
-	SET_SPEC(node_head,(GET_COLOR(rbnode->left) << 1 | GET_COLOR(rbnode->right)));
-}
 
-static void _rbtree_write_serialize_header(cdsl_serializeHeader_t* header) {
-	header->type |= SUB_TYPE_REDBLACK;
-}
-
-static void _rbtree_on_node_build(const cdsl_serializeNode_t* node_header, void* node) {
-	uint8_t spec = GET_SPEC(node_header);
-	rbtreeNode_t* rb_node = (rbtreeNode_t*) node;
-	PAINT_COLOR(rb_node->left, spec >> 1);
-	PAINT_COLOR(rb_node->right, (spec & 1));
-}
 
 
 
 const cdsl_serializeExtInterface_t _cdsl_rbtree_serializer_ext = {
 	.alloc_ext_node = NULL,
-	.write_node_haeder = _rbtree_write_ser_node_header,
-	.write_serialize_header = _rbtree_write_serialize_header,
-	.on_node_build = _rbtree_on_node_build
+	.write_node_haeder = _write_ser_node_header,
+	.write_serialize_header = _write_serialize_header,
+	.on_node_build = _build_node
 };
 
 void cdsl_rbtreeNodeInit(rbtreeNode_t* node, trkey_t key) {
@@ -142,6 +133,7 @@ rbtreeNode_t* cdsl_rbtreeInsert(rbtreeRoot_t* rootp, rbtreeNode_t* item, BOOL is
 	rbtreeNode_t* replaced = NULL;
 	rootp->entry = insert_rc(rootp->entry, item, &color, &dir,
 			(is_set ? &replaced : NULL));
+	PAINT_BLACK(rootp->entry);
 	__dev_log("ROTATE_COUNT : %d\n",rot_count);
 	__dev_log("stack usage : %lu\n",stack_top - stack_bottom);
 	return replaced;
@@ -525,26 +517,26 @@ static rbtreeNode_t* resolve_red_red(rbtreeNode_t* gparent_c,	uint8_t color_ctx,
 
 static rbtreeNode_t* insert_rc(rbtreeNode_t* sub_root_c, rbtreeNode_t* item, uint8_t* rc_color, uint8_t* rc_dir, rbtreeNode_t** replaced) {
 	rbtreeNode_t* bare_ptr = GET_PTR(sub_root_c);
-	if(!GET_PTR(sub_root_c)) {
+	if (!GET_PTR(sub_root_c)) {
 		PAINT_RED(item);
 #ifdef __DBG
 		stack_bottom = (__cdsl_uaddr_t) &sub_root_c;
 #endif
 		return item;
 	}
-	if(bare_ptr->key < item->key) {
+	if (bare_ptr->key < item->key) {
 		bare_ptr->right = insert_rc(bare_ptr->right, item, rc_color, rc_dir, replaced);
 		*rc_color <<= 1;
 		*rc_dir <<= 1;
 		*rc_color |= GET_COLOR(bare_ptr->right);
 		*rc_dir |= CTX_RIGHT;
-		if((*rc_color & RCC_CTX_PATTERN) == RCC_CTX_PATTERN_REDRED) {
+		if ((*rc_color & RCC_CTX_PATTERN) == RCC_CTX_PATTERN_REDRED) {
 			sub_root_c = resolve_red_red(sub_root_c, *rc_color, *rc_dir);
 			*rc_color = GET_COLOR(bare_ptr->right);
 		}
 		return sub_root_c;
 	} else {
-		if(replaced && (bare_ptr->key == item->key)) {
+		if (replaced && (bare_ptr->key == item->key)) {
 			// if the key value of new item collides to another and the insert operation is performed with (is_set == true)
 			// replace old one with new item
 			*replaced = bare_ptr;
@@ -911,3 +903,20 @@ static rbtreeNode_t* up_from_leftmost_rc(rbtreeNode_t* node, rbtreeNode_t** lm, 
 	return node;
 }
 
+
+static void _write_ser_node_header (cdsl_serializeNode_t* node_head, const void* node) {
+	if(node_head == NULL) return;
+	rbtreeNode_t* rbnode = (rbtreeNode_t*) node;
+	SET_SPEC(node_head,(GET_COLOR(rbnode->left) << 1 | GET_COLOR(rbnode->right)));
+}
+
+static void _write_serialize_header(cdsl_serializeHeader_t* header) {
+	header->type |= SUB_TYPE_REDBLACK;
+}
+
+static void _build_node(const cdsl_serializeNode_t* node_header, void* node) {
+	uint8_t spec = GET_SPEC(node_header);
+	rbtreeNode_t* rb_node = (rbtreeNode_t*) node;
+	PAINT_COLOR(rb_node->left, spec >> 1);
+	PAINT_COLOR(rb_node->right, (spec & 1));
+}
