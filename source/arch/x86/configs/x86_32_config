@@ -2,10 +2,11 @@ CONFIG_TEST=y
 CONFIG_BAREMETAL=n
 CONFIG_ARCH=x86
 CONFIG_SUB_ARCH=x86_32
-include /home/innocentevil/my_work/cdsl-tachyos/recipe.mk
-include /home/innocentevil/my_work/cdsl-tachyos/source/recipe.mk
-include /home/innocentevil/my_work/cdsl-tachyos/source/test/recipe.mk
-include /home/innocentevil/my_work/cdsl-tachyos/source/arch/x86/recipe.mk
-include /home/innocentevil/my_work/cdsl-tachyos/source/arch/x86/x86_32/recipe.mk
+include /home/lucifer/my_work/cdsl/recipe.mk
+include /home/lucifer/my_work/cdsl/source/recipe.mk
+include /home/lucifer/my_work/cdsl/source/serialization/recipe.mk
+include /home/lucifer/my_work/cdsl/source/test/recipe.mk
+include /home/lucifer/my_work/cdsl/source/arch/x86/recipe.mk
+include /home/lucifer/my_work/cdsl/source/arch/x86/x86_32/recipe.mk
 
 DEF+=
