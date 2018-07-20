@@ -12,22 +12,25 @@
 #define CDSL_DLIST_H_
 
 #include "base_list.h"
+#include "sort.h"
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
 
-#define cdsl_dlistIsEmpty(lhead) 			(((dlistEntry_t*) lhead)->head== NULL)
+#define cdsl_dlistIsEmpty(lhead)                      (((dlistEntry_t*) lhead)->head== NULL)
 
-#define cdsl_dlistSize(lentry)				cdsl_listSize((listEntry_t*) lentry)
-#define cdsl_dlistContain(lentry, item)		cdsl_listContain((listEntry_t*) lentry, (listNode_t*) item)
-#define cdsl_dlistPrint(lentry,print) 		cdsl_listPrint((listEntry_t*) lentry, print)
+#define cdsl_dlistSize(lentry)                        cdsl_listSize((listEntry_t*) lentry)
+#define cdsl_dlistContain(lentry, item)               cdsl_listContain((listEntry_t*) lentry, (listNode_t*) item)
+#define cdsl_dlistPrint(lentry,print)                 cdsl_listPrint((listEntry_t*) lentry, print)
 
 
-#define cdsl_dlistIterInit(lentry, iter)	cdsl_iterInit((listEntry_t*) lentry, iter)
-#define cdsl_dlistIterHasNext(iter)			cdsl_iterHasNext(iter)
-#define cdsl_dlistIterNext(iter)			cdsl_iterNext(iter)
+#define cdsl_dlistIterInit(lentry, iter)              cdsl_iterInit((listEntry_t*) lentry, iter)
+#define cdsl_dlistIterHasNext(iter)                   cdsl_iterHasNext(iter)
+#define cdsl_dlistIterNext(iter)                      cdsl_iterNext(iter)
+
+#define cdsl_dlistSort(lentry, order, compare)        cdsl_listMergeSort((listEntry_t*) lentry, order, compare, TRUE)
 
 typedef struct cdsl_dlnode dlistNode_t;
 typedef struct cdsl_dlentry dlistEntry_t;

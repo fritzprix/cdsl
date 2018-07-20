@@ -9,13 +9,14 @@
 #include <stdio.h>
 #include "cdsl_dlist.h"
 #include "cdsl_list_test.h"
-
+#include "sort.h"
 struct card {
 	dlistNode_t list_node;
 	int num;
 };
 
 static DECLARE_COMPARE_FN(compare);
+static int compare_sort(void* one, void* the_other);
 static struct card cards[TEST_SIZE];
 
 BOOL cdsl_listDoTest(void)
@@ -45,7 +46,31 @@ BOOL cdsl_listDoTest(void)
 		}
 	}
 
+	// test sort
+	for(idx = 0; idx < TEST_SIZE; idx++) {
+		cdsl_dlistNodeInit(&cards[idx].list_node);
+		cards[idx].num = idx;
+		cdsl_dlistPutHead(&list_entry, &(cards[idx].list_node));
+	}
+	cdsl_dlistSort(&list_entry, DESC, compare_sort);
+	listIter_t iter;
+	cdsl_iterInit((listEntry_t*) &list_entry, &iter);
+	int prev_num = TEST_SIZE;
+	while(cdsl_iterHasNext(&iter)) {
+		void* node = (void*) cdsl_iterNext(&iter);
+		struct card* cp = container_of(node, struct card, list_node);
+		if(prev_num < cp->num) {
+			return FALSE;
+		}
+		prev_num = cp->num;
+	}
 	return TRUE;
+}
+
+static int compare_sort(void* one, void* the_other) {
+	struct card* this_card = container_of(one, struct card, list_node);
+	struct card* that_card = container_of(the_other, struct card, list_node);
+	return this_card->num - that_card->num;
 }
 
 

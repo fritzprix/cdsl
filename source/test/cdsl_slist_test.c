@@ -21,6 +21,7 @@ typedef struct card {
 static card_t Cards[TEST_SIZE];
 static DECLARE_COMPARE_FN(card_compare);
 static slistEntry_t listEntry;
+static int compare_sort(void* one, void* the_other);
 
 
 BOOL cdsl_slistDoTest(void){
@@ -57,7 +58,31 @@ BOOL cdsl_slistDoTest(void){
 		if(!card)
 			return FALSE;
 	}
+	for(i = 0; i < TEST_SIZE; i++) {
+			cdsl_slistNodeInit(&Cards[i].list_head);
+			Cards[i].card_num = i;
+			cdsl_slistPutHead(&listEntry, &Cards[i].list_head);
+		}
+		cdsl_slistSort(&listEntry, DESC, compare_sort);
+		listIter_t iter;
+		cdsl_iterInit((listEntry_t*) &listEntry, &iter);
+		int prev_num = TEST_SIZE;
+		while(cdsl_iterHasNext(&iter)) {
+			void* node = (void*) cdsl_iterNext(&iter);
+			struct card* cp = container_of(node, struct card, list_head);
+			if(prev_num < cp->card_num) {
+				return FALSE;
+			}
+			prev_num = cp->card_num;
+		}
 	return TRUE;
+}
+
+
+static int compare_sort(void* one, void* the_other) {
+	struct card* this_card = container_of(one, struct card, list_head);
+	struct card* that_card = container_of(the_other, struct card, list_head);
+	return this_card->card_num - that_card->card_num;
 }
 
 

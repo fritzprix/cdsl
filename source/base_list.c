@@ -76,7 +76,8 @@ listNode_t* cdsl_iterNext(listIter_t* iter)
 		return NULL;
 	if(!iter->prev)
 		iter->prev = (listNode_t*) iter->entry;
-	return iter->prev->next;
+	iter->prev = iter->prev->next;
+	return iter->prev;
 }
 
 listNode_t* cdsl_iterRemove(listIter_t* iter)
