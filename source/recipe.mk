@@ -11,6 +11,7 @@ OBJ-y+= base_list\
 		cdsl_spltree\
 		cdsl_rbtree\
 		cdsl_hashtree\
-		baremetal
+		baremetal\
+		sort
 
 		

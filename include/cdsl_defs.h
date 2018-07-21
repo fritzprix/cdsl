@@ -97,6 +97,9 @@ extern "C" {
 #define DECLARE_PRINTER(fn)    void fn(void* node)
 #endif
 
+/**!
+ *
+ */
 typedef void* (*cdsl_generic_compare_t)(void*, void*);
 typedef void (*cdsl_generic_printer_t) (void*);
 typedef void* (*cdsl_alloc_t)(unsigned long sz);
