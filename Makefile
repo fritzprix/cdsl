@@ -97,7 +97,7 @@ config : $(CONFIG_PY)
 endif
 
 $(CONFIG_PY):
-	$(PIP) install jconfigpy --system -t $(TOOL_DIR)
+	$(PIP) install jconfigpy -t $(TOOL_DIR)
 
 $(DBG_CACHE_DIR) $(REL_CACHE_DIR) $(CONFIG_DIR) :
 	$(MKDIR) $@
