@@ -2,14 +2,14 @@
 include version
 
 ifeq ($(CLANG),)
-CLANG:=clang-3.6
+CLANG:=clang
 endif
 
 VERSION=-D__MAJOR__=$(MAJOR) -D__MINOR__=$(MINOR)
 
 CC=$(CLANG)
 CXX=g++
-AR=llvm-ar-3.6
+AR=llvm-ar
 PYTHON=python
 PIP=pip
 MKDIR=mkdir
@@ -67,9 +67,9 @@ SILENT+= $(DBG_SH_OBJS) $(REL_SH_OBJS)
 SILENT+= $(TEST_TARGET) $(REL_CACHE_DIR)/main.o  $(DEV_TEST_TARGET) $(DBG_CACHE_DIR)/main.do
 
 
-.SILENT :  $(SILENT) clean 
+.SILENT :  $(SILENT) clean reset
 
-PHONY+= all debug release clean test
+PHONY+= all debug release clean test 
 
 all : debug 
 
@@ -198,7 +198,8 @@ clean :
 			$(REL_CACHE_DIR) $(REL_STATIC_TARGET) $(REL_DYNAMIC_TARGET)\
 			$(TEST_TARGET) $(REL_SH_OBJS) $(DBG_SH_OBJS) $(DEV_TEST_TARGET)
 			
-config_clean:
+reset : clean
+	@echo 'reset config ... '
 	rm -rf $(CONFIG_TARGET) $(CONFIG_AUTOGEN) $(AUTOGEN_DIR) $(TOOL_DIR) $(REPO-y) $(LDIR-y) .config 
 
 .PHONY = $(PHONY)
