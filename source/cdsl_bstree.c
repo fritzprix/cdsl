@@ -10,19 +10,20 @@
 #include "cdsl_defs.h"
 #include <stddef.h>
 
-static bstreeNode_t* move_up_rightmost_rc(bstreeNode_t* node);
-static bstreeNode_t* take_rightmost_rc(bstreeNode_t* node);
-static bstreeNode_t* move_up_leftmost_rc(bstreeNode_t* node);
-static bstreeNode_t* take_leftmost_rc(bstreeNode_t* node);
+static bstreeNode_t *move_up_rightmost_rc(bstreeNode_t *node);
+static bstreeNode_t *take_rightmost_rc(bstreeNode_t *node);
+static bstreeNode_t *move_up_leftmost_rc(bstreeNode_t *node);
+static bstreeNode_t *take_leftmost_rc(bstreeNode_t *node);
 
-
-void cdsl_bstreeRootInit(bstreeRoot_t* rootp) {
+void cdsl_bstreeRootInit(bstreeRoot_t *rootp)
+{
 	if (rootp == NULL)
 		return;
 	rootp->entry = NULL;
 }
 
-void cdsl_bstreeNodeInit(bstreeNode_t* node, trkey_t key) {
+void cdsl_bstreeNodeInit(bstreeNode_t *node, trkey_t key)
+{
 	if (node == NULL)
 		return;
 	node->key = key;
@@ -30,27 +31,35 @@ void cdsl_bstreeNodeInit(bstreeNode_t* node, trkey_t key) {
 	node->right = NULL;
 }
 
-bstreeNode_t* cdsl_bstreeInsert(bstreeRoot_t* rootp, bstreeNode_t* item) {
+bstreeNode_t *cdsl_bstreeInsert(bstreeRoot_t *rootp, bstreeNode_t *item)
+{
 	if ((rootp == NULL) || (item == NULL))
 		return NULL;
-	if (rootp->entry == NULL) {
+	if (rootp->entry == NULL)
+	{
 		rootp->entry = item;
 		return rootp->entry;
 	}
 
 	item->left = NULL;
 	item->right = NULL;
-	bstreeNode_t* current = rootp->entry;
+	bstreeNode_t *current = rootp->entry;
 
-	while (current) {
-		if (current->key < item->key) {
-			if (!current->right) {
+	while (current)
+	{
+		if (current->key < item->key)
+		{
+			if (!current->right)
+			{
 				current->right = item;
 				return item;
 			}
 			current = current->right;
-		} else {
-			if (!current->left) {
+		}
+		else
+		{
+			if (!current->left)
+			{
 				current->left = item;
 				return item;
 			}
@@ -60,11 +69,13 @@ bstreeNode_t* cdsl_bstreeInsert(bstreeRoot_t* rootp, bstreeNode_t* item) {
 	return NULL;
 }
 
-bstreeNode_t* cdsl_bstreeLookup(bstreeRoot_t* rootp, trkey_t key) {
+bstreeNode_t *cdsl_bstreeLookup(bstreeRoot_t *rootp, trkey_t key)
+{
 	if (rootp == NULL)
 		return NULL;
-	bstreeNode_t* current = rootp->entry;
-	while (current) {
+	bstreeNode_t *current = rootp->entry;
+	while (current)
+	{
 		if (current->key < key)
 			current = current->right;
 		else if (current->key > key)
@@ -75,128 +86,166 @@ bstreeNode_t* cdsl_bstreeLookup(bstreeRoot_t* rootp, trkey_t key) {
 	return NULL;
 }
 
-bstreeNode_t* cdsl_bstreeConidtionalLookup(bstreeRoot_t* rootp, trkey_t key, condition_t match) {
-	if(!rootp) {
+bstreeNode_t *cdsl_bstreeConidtionalLookup(bstreeRoot_t *rootp, trkey_t key, condition_t match)
+{
+	if (!rootp)
+	{
 		return NULL;
 	}
-	bstreeNode_t* current = rootp->entry;
-	while(current) {
-		if(match(&current->node, key)) {
+	bstreeNode_t *current = rootp->entry;
+	while (current)
+	{
+		if (match(&current->node, key))
+		{
 			return current;
 		}
-		if(current->key < key) {
+		if (current->key < key)
+		{
 			current = current->right;
-		} else {
+		}
+		else
+		{
 			current = current->left;
 		}
 	}
 	return NULL;
 }
 
-
-bstreeNode_t* cdsl_bstreeDelete(bstreeRoot_t* rootp, trkey_t key) {
-	bstreeNode_t* todelete = NULL;
+bstreeNode_t *cdsl_bstreeDelete(bstreeRoot_t *rootp, trkey_t key)
+{
+	bstreeNode_t *todelete = NULL;
 	if ((rootp == NULL) || (rootp->entry == NULL))
 		return NULL;
-	bstreeNode_t** current = &rootp->entry;
-	while ((*current) && ((*current)->key != key)) {
-		if ((*current)->key < key) {
+	bstreeNode_t **current = &rootp->entry;
+	while ((*current) && ((*current)->key != key))
+	{
+		if ((*current)->key < key)
+		{
 			current = &(*current)->right;
-		} else {
+		}
+		else
+		{
 			current = &(*current)->left;
 		}
 	}
 
 	todelete = *current;
-	if (todelete->left) {
+	if (todelete->left)
+	{
 		*current = take_rightmost_rc(todelete->left);
-		if(*current != todelete->left) {
+		if (*current != todelete->left)
+		{
 			(*current)->left = todelete->left;
 		}
 
 		(*current)->right = todelete->right;
-	} else if (todelete->right) {
+	}
+	else if (todelete->right)
+	{
 		*current = take_leftmost_rc(todelete->right);
-		if(*current != todelete->right) {
+		if (*current != todelete->right)
+		{
 			(*current)->right = todelete->right;
 		}
 		(*current)->left = todelete->left;
-	} else {
+	}
+	else
+	{
 		*current = NULL;
 	}
 	return todelete;
 }
 
-bstreeNode_t* cdsl_bstreeDeleteMin(bstreeRoot_t* rootp) {
-	if (!rootp) {
+bstreeNode_t *cdsl_bstreeDeleteMin(bstreeRoot_t *rootp)
+{
+	if (!rootp)
+	{
 		return NULL;
 	}
 
-	bstreeNode_t* lm = rootp->entry;
-	bstreeNode_t** lmp = &rootp->entry;
+	bstreeNode_t *lm = rootp->entry;
+	bstreeNode_t **lmp = &rootp->entry;
 
-	while (lm->left) {
+	while (lm->left)
+	{
 		lmp = &lm->left;
 		lm = lm->left;
 	}
-	if (lm->right) {
+	if (lm->right)
+	{
 		*lmp = move_up_leftmost_rc(lm->right);
-	} else {
+	}
+	else
+	{
 		*lmp = NULL;
 	}
 	return lm;
 }
 
-bstreeNode_t* cdsl_bstreeDeleteMax(bstreeRoot_t* rootp) {
-	if (!rootp) {
+bstreeNode_t *cdsl_bstreeDeleteMax(bstreeRoot_t *rootp)
+{
+	if (!rootp)
+	{
 		return NULL;
 	}
-	bstreeNode_t* rm = rootp->entry;
-	bstreeNode_t** rmp = &rootp->entry;
+	bstreeNode_t *rm = rootp->entry;
+	bstreeNode_t **rmp = &rootp->entry;
 
-	while (rm->right) {
+	while (rm->right)
+	{
 		rmp = &rm->right;
 		rm = rm->right;
 	}
-	if (rm->left) {
+	if (rm->left)
+	{
 		*rmp = move_up_rightmost_rc(rm->left);
-	} else {
+	}
+	else
+	{
 		*rmp = NULL;
 	}
 	return rm;
 }
 
-
-static bstreeNode_t* take_rightmost_rc(bstreeNode_t* node) {
-	if (!node->right) {
+static bstreeNode_t *take_rightmost_rc(bstreeNode_t *node)
+{
+	if (!node->right)
+	{
 		return node;
 	}
-	bstreeNode_t* leaf = take_rightmost_rc(node->right);
-	if (leaf == node->right) {
+	bstreeNode_t *leaf = take_rightmost_rc(node->right);
+	if (leaf == node->right)
+	{
 		node->right = leaf->left;
 		leaf->left = NULL;
 	}
 	return leaf;
 }
 
-static bstreeNode_t* take_leftmost_rc(bstreeNode_t* node) {
-	if (!node->left) {
+static bstreeNode_t *take_leftmost_rc(bstreeNode_t *node)
+{
+	if (!node->left)
+	{
 		return node;
 	}
-	bstreeNode_t* leaf = take_leftmost_rc(node->left);
-	if (leaf == node->left) {
+	bstreeNode_t *leaf = take_leftmost_rc(node->left);
+	if (leaf == node->left)
+	{
 		node->left = leaf->right;
 		leaf->right = NULL;
 	}
 	return leaf;
 }
 
-static bstreeNode_t* move_up_rightmost_rc(bstreeNode_t* node) {
-	if (!node) {
+static bstreeNode_t *move_up_rightmost_rc(bstreeNode_t *node)
+{
+	if (!node)
+	{
 		return NULL;
 	}
 
-	if (!node->right) {
+	if (!node->right)
+	{
 		return node;
 	}
 
@@ -207,17 +256,20 @@ static bstreeNode_t* move_up_rightmost_rc(bstreeNode_t* node) {
 	 *        / \       / \
 	 *       c   0     a   c
 	 */
-	bstreeNode_t* rightmost = move_up_rightmost_rc(node->right);
+	bstreeNode_t *rightmost = move_up_rightmost_rc(node->right);
 	node->right = rightmost->left;
 	rightmost->left = node;
 	return rightmost;
 }
 
-static bstreeNode_t* move_up_leftmost_rc(bstreeNode_t* node) {
-	if (!node) {
+static bstreeNode_t *move_up_leftmost_rc(bstreeNode_t *node)
+{
+	if (!node)
+	{
 		return NULL;
 	}
-	if (!node->left) {
+	if (!node->left)
+	{
 		return node;
 	}
 
@@ -228,9 +280,8 @@ static bstreeNode_t* move_up_leftmost_rc(bstreeNode_t* node) {
 	 *     / \                / \
 	 *    0   d              d   b
 	 */
-	bstreeNode_t* leftmost = move_up_leftmost_rc(node->left);
+	bstreeNode_t *leftmost = move_up_leftmost_rc(node->left);
 	node->left = leftmost->right;
 	leftmost->right = node;
 	return leftmost;
 }
-

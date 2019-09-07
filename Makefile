@@ -15,8 +15,8 @@ PIP=pip
 MKDIR=mkdir
 
 
-DBG_CFLAG = -O0 -g3 -fmessage-length=0  $(CFLAG) -D__DBG $(VERSION)
-REL_CFLAG = -O2 -g0 -fmessage-length=0  $(CFLAG) $(VERSION)
+DBG_CFLAG = -O0 -g3 -fmessage-length=0  $(CFLAG) -D__DBG $(VERSION) -fPIC
+REL_CFLAG = -O2 -g0 -fmessage-length=0  $(CFLAG) $(VERSION) -fPIC
 DYNAMIC_FLAG = -fPIC
 
 LIBDIR=/usr/local/lib
@@ -177,7 +177,6 @@ install_include :
 	install -d $(INCDIR) 
 	install ./include/*.* $(INCDIR)
 	install ./$(AUTOGEN_DIR)/autogen.h $(INCDIR)
-	install ./include/arch/$(shell uname -m)/arch.h $(INCDIR)
 
 install_lib : $(REL_STATIC_TARGET)
 	install $(REL_STATIC_TARGET) $(LIBDIR)

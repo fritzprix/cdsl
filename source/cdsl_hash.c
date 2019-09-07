@@ -7,10 +7,10 @@
 
 #include "cdsl_hash.h"
 
+#define DJB2_MAGIC ((unsigned long)5381)
 
-#define DJB2_MAGIC		((unsigned long) 5381)
-
-unsigned long sbdm_hash(unsigned char* str){
+unsigned long sbdm_hash(unsigned char *str)
+{
 	unsigned long hash = 0;
 	int c;
 	while ((c = *str++))
@@ -18,10 +18,11 @@ unsigned long sbdm_hash(unsigned char* str){
 	return hash;
 }
 
-unsigned long djb2_hash(unsigned char* str){
+unsigned long djb2_hash(unsigned char *str)
+{
 	unsigned long hash = DJB2_MAGIC;
 	char c;
-	while((c = *str++))
+	while ((c = *str++))
 		hash = ((hash << 5) + hash) + c;
 	return hash;
 }

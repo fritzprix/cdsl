@@ -1,0 +1,10 @@
+{
+    "HOSTING_CONFIG":{
+        "type":"recipe",
+        "path":"recipe.mk"
+    },
+    "TEST_CONFIG":{
+        "type":"config",
+        "path":"./test/config.json"
+    }
+}
