@@ -1,6 +1,0 @@
-{
-	"CM4_RECIPE":{
-		"type":"recipe",
-		"path":"recipe.mk"
-	}
-}

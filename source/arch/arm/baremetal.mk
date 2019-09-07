@@ -1,2 +1,0 @@
-CFLAG+= -ffreestanding
-BAREMETAL:=y

@@ -1,6 +1,0 @@
-{
-	"CM0_RECIPE":{
-		"type":"recipe",
-		"path":"recipe.mk"
-	}
-}

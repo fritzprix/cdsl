@@ -15,3 +15,5 @@ cdsl
 Debug/
 Release/
 tools/
+cdsl_*
+*.bin

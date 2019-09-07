@@ -15,11 +15,10 @@
 #include "cdsl_spltree_test.h"
 #include "cdsl_hashtree_test.h"
 #include "cdsl_avltree_test.h"
-#include "baremetal_test.h"
 
-#include "include/test/rbtree_benchmark.h"
-#include "include/test/avltree_benchmark.h"
-#include "include/test/cdsl_rbtree_test.h"
+#include "rbtree_benchmark.h"
+#include "avltree_benchmark.h"
+#include "cdsl_rbtree_test.h"
 
 const char* RESULT_STRING[] = {
 		"FAIL",
@@ -30,11 +29,6 @@ const char* RESULT_STRING[] = {
 int main(void){
 	setbuf(stdout,NULL);
 	BOOL result;
-	printf("Common Utility Test : %s\n", RESULT_STRING[result = cdsl_baremetal_dep_test()]);
-	if(result == FALSE)
-	{
-		exit(-1);
-	}
 	printf("Heap Test Result : %s\n",RESULT_STRING[result = cdsl_heapDoTest()]);
 	if(result == FALSE)
 	{

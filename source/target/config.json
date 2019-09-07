@@ -1,0 +1,14 @@
+{
+    "TARGET": {
+        "type":"enum",
+        "enum":[
+            "baremetal",
+            "hosting"
+        ],
+        "default":0
+    },
+    "TARGET_SUB_CONFIG":{
+        "type":"config",
+        "path":"./$TARGET/config.json"
+    }
+}
