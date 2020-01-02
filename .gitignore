@@ -17,3 +17,4 @@ Release/
 tools/
 cdsl_*
 *.bin
+autogen.*

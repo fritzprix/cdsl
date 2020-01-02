@@ -15,8 +15,8 @@ PIP=pip
 MKDIR=mkdir
 
 
-DBG_CFLAG = -O0 -g3 -fmessage-length=0  $(CFLAG) -D__DBG $(VERSION) -fPIC
-REL_CFLAG = -O2 -g0 -fmessage-length=0  $(CFLAG) $(VERSION) -fPIC
+DBG_CFLAG = -O0 -g3 -fmessage-length=0  $(CFLAG) -D__DBG $(VERSION)
+REL_CFLAG = -O2 -g0 -fmessage-length=0  $(CFLAG) $(VERSION)
 DYNAMIC_FLAG = -fPIC
 
 LIBDIR=/usr/local/lib
@@ -52,12 +52,6 @@ REL_SH_OBJS=$(OBJ-y:%=$(REL_CACHE_DIR)/%.s.o)
 
 DBG_CACHE_DIR=Debug
 REL_CACHE_DIR=Release
-
-DEF-y+=$(DEF)
-DEFS=$(DEF-y:%=-D%)
-
-DBG_CFLAG+=$(DEFS)
-REL_CFLAG+=$(DEFS)
 
 CONFIG_DIR=./source/arch/$(ARCH)/configs
 
@@ -130,14 +124,14 @@ $(REL_DYNAMIC_TARGET) :
 	@echo 'Shared Object is skipped for baremetal'
 endif
 	
-$(TEST_TARGET) : $(REL_CACHE_DIR)/main.o $(REL_OBJS) 
+$(TEST_TARGET) : $(REL_CACHE_DIR)/main.o $(REL_SH_OBJS)
 	@echo 'Building unit-test executable... for $(ARCH) $@'
-	$(CXX) -o $@ $(REL_CFLAG) $< $(REL_OBJS) $(LIBS)
+	$(CXX) -o $@ $(REL_CFLAG) $< $(REL_SH_OBJS) $(LIBS)
 	
 
-$(DEV_TEST_TARGET) : $(DBG_CACHE_DIR)/main.do $(DBG_OBJS) 
+$(DEV_TEST_TARGET) : $(DBG_CACHE_DIR)/main.do $(DBG_SH_OBJS)
 	@echo 'Building unit-test executable... for $(ARCH) $@'
-	$(CXX) -o $@ $(DBG_CFLAG) $< $(DBG_OBJS) $(LIBS)
+	$(CXX) -o $@ $(DBG_CFLAG) $< $(DBG_SH_OBJS) $(LIBS)
 	
 $(DBG_CACHE_DIR)/%.do : %.c
 	@echo '$(ARCH) compile...$@'

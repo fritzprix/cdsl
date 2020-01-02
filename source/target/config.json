@@ -5,7 +5,11 @@
             "baremetal",
             "hosting"
         ],
-        "default":0
+        "default":0,
+        "gen-list":{
+            "TARGET":"to_string(this)",
+            "TARGET_VAL":"to_int(this)"
+        }
     },
     "TARGET_SUB_CONFIG":{
         "type":"config",
