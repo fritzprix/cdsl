@@ -7,6 +7,11 @@
         "type":"config",
         "path":"./arch/config.json"
     },
+    "BAREMETAL":{
+        "type":"bool",
+        "default":"n",
+        "force":"y"
+    },
     "TEST_CONFIG":{
         "type":"config",
         "path":"./test/config.json"
