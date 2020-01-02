@@ -4,7 +4,7 @@
 	"output":["libcdsl.a","libcdsl.so"],
 	"version":"0.1",
 	"buildcmd":[
-		"make config DEFCONF=hosting",
+		"make config DEFCONF=x86_x86_64_hosting",
 		"make release"
 	]
 }

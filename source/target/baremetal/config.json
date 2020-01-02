@@ -3,6 +3,10 @@
         "type":"recipe",
         "path":"recipe.mk"
     },
+    "ARCH_CONFIG":{
+        "type":"config",
+        "path":"./arch/config.json"
+    },
     "TEST_CONFIG":{
         "type":"config",
         "path":"./test/config.json"

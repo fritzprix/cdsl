@@ -1,0 +1,14 @@
+CONFIG_BAREMETAL=n
+CONFIG_XCOMPILE_PREFIX=arm-none-eabi
+CONFIG_ARCH=arm
+CONFIG_TARGET=baremetal
+CONFIG_SUB_ARCH=cortex-m4
+include /home/lucifer/my_work/cdsl/recipe.mk
+include /home/lucifer/my_work/cdsl/source/recipe.mk
+include /home/lucifer/my_work/cdsl/source/serialization/recipe.mk
+include /home/lucifer/my_work/cdsl/source/target/baremetal/recipe.mk
+include /home/lucifer/my_work/cdsl/source/target/baremetal/test/recipe.mk
+include /home/lucifer/my_work/cdsl/source/target/baremetal/arch/arm/recipe.mk
+include /home/lucifer/my_work/cdsl/source/target/baremetal/arch/arm/cortex-m4/recipe.mk
+
+DEF+= TARGET_VAL=0 TARGET="baremetal" CROSS_COMPILE_PREFIX="arm-none-eabi" SUB_ARCH="cortex-m4"

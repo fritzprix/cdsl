@@ -1,0 +1,17 @@
+{
+	"SUB_ARCH":{
+		"type":"enum",
+		"enum":[
+			"x86_32",
+			"x86_64"
+		]
+	},
+	"x86_RECIPE":{
+		"type":"recipe",
+		"path":"recipe.mk"
+	},
+	"SUB_ARCH_CONFIG":{
+		"type":"config",
+		"path":"./$SUB_ARCH/config.json"
+	}
+}

@@ -1,5 +1,6 @@
 # makefile for cdsl
 include version
+-include .config
 
 ifeq ($(CLANG),)
 CLANG:=clang
@@ -7,8 +8,12 @@ endif
 
 VERSION=-D__MAJOR__=$(MAJOR) -D__MINOR__=$(MINOR)
 
+ifeq ($(CONFIG_XCOMPILE_PREFIX),)
 CC=$(CLANG)
-CXX=g++
+else
+CC=$(CONFIG_XCOMPILE_PREFIX)-gcc
+endif
+CXX=$(CONFIG_XCOMPILE_PREFIX)-g++
 AR=llvm-ar
 PYTHON=python
 PIP=pip
@@ -38,7 +43,6 @@ DBG_DYNAMIC_TARGET=libcdsld.so
 REL_STATIC_TARGET=libcdsl.a
 REL_DYNAMIC_TARGET=libcdsl.so
 
--include .config
 
 VPATH=$(SRC-y)
 INCS=$(INC-y:%=-I%)
@@ -74,7 +78,7 @@ release : $(REL_CACHE_DIR) $(REL_STATIC_TARGET) $(REL_DYNAMIC_TARGET)
 test : $(REL_CACHE_DIR) $(DBG_CACHE_DIR) $(TEST_TARGET) $(DEV_TEST_TARGET)
 
 defconf : $(CONFIG_DIR)
-	cp -rf .config $(CONFIG_DIR)/$(CONFIG_TARGET)_config
+	cp -rf .config $(CONFIG_DIR)/$(ARCH)_$(SUB_ARCH)_$(CONFIG_TARGET)_config
 
 
 ifeq ($(DEFCONF),)
@@ -99,7 +103,7 @@ $(DBG_STATIC_TARGET) : $(DBG_OBJS)
 ifneq ($(BAREMETAL),y)
 $(DBG_DYNAMIC_TARGET) : $(DBG_SH_OBJS)
 	@echo 'Generating Share Library File for $(ARCH) .... $@'
-	$(CC) -o $@ -shared $(DBG_CFLAG) $(DYNAMIC_FLAG) $(DBG_SH_OBJS)
+	$(CC) $(TARGET_TRIPPLE) -o $@ -shared $(DBG_CFLAG) $(DYNAMIC_FLAG) $(DBG_SH_OBJS)
 else
 PHONY+=$(DBG_DYNMAIC_TARGET)
 $(DBG_DYNAMIC_TARGET) : 
@@ -113,7 +117,7 @@ $(REL_STATIC_TARGET) : $(REL_OBJS)
 ifneq ($(BAREMETAL),y)
 $(REL_DYNAMIC_TARGET) : $(REL_SH_OBJS)
 	@echo 'Generating Share Library File for $(ARCH) .... $@'
-	$(CC) -o $@ -shared $(REL_CFLAG) $(DYNAMIC_FLAG) $(REL_SH_OBJS)
+	$(CC) $(TARGET_TRIPPLE) -o $@ -shared $(REL_CFLAG) $(DYNAMIC_FLAG) $(REL_SH_OBJS)
 else
 PHONY+=$(REL_DYNAMIC_TARGET)
 $(REL_DYNAMIC_TARGET) :

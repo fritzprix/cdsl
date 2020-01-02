@@ -7,7 +7,6 @@
 
 #include "target.h"
 #include "baremetal_test.h"
-#include "assert.h"
 
 BOOL cdsl_baremetal_dep_test(void)
 {

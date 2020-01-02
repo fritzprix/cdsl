@@ -4,7 +4,7 @@
 	"output":["libcdsl.a"],
 	"version":"0.1",
 	"buildcmd":[
-		"make config DEFCONF=baremetal",
+		"make config DEFCONF=arm_cortex-m4_baremetal",
 		"make release"
 	]
 }
