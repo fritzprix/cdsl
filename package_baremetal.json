@@ -1,6 +1,6 @@
 {
 	"name":"cdsl",
-	"include":["./include","./","./include/arch/arm","./include/serialization"],
+	"include":["./include","./","./include/target/baremetal","./include/serialization"],
 	"output":["libcdsl.a"],
 	"version":"0.1",
 	"buildcmd":[
