@@ -1,10 +1,6 @@
 
 #ifndef __CDSL_TARGET_H
 #define __CDSL_TARGET_H
-/*
- *
- * for baremetal application, you can provide your own implementation of dependencies
- */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
