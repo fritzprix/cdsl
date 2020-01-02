@@ -1,10 +1,10 @@
 {
 	"name":"cdsl",
-	"include":["./include","./","./include/arch/arm","./include/serialization"],
+	"include":["./include","./","./include/target/hosting","./include/serialization"],
 	"output":["libcdsl.a"],
 	"version":"0.1",
 	"buildcmd":[
-		"make config DEFCONF=baremetal",
+		"make config DEFCONF=hosting",
 		"make release"
 	]
 }
