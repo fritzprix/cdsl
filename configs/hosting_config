@@ -1,0 +1,8 @@
+CONFIG_TARGET=hosting
+include /home/lucifer/my_work/cdsl/recipe.mk
+include /home/lucifer/my_work/cdsl/source/recipe.mk
+include /home/lucifer/my_work/cdsl/source/serialization/recipe.mk
+include /home/lucifer/my_work/cdsl/source/target/hosting/recipe.mk
+include /home/lucifer/my_work/cdsl/source/target/hosting/test/recipe.mk
+
+DEF+= TARGET_VAL=1 TARGET="hosting"

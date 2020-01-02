@@ -53,7 +53,7 @@ REL_SH_OBJS=$(OBJ-y:%=$(REL_CACHE_DIR)/%.s.o)
 DBG_CACHE_DIR=Debug
 REL_CACHE_DIR=Release
 
-CONFIG_DIR=./source/arch/$(ARCH)/configs
+CONFIG_DIR=./configs
 
 SILENT+= $(REL_STATIC_TARGET) $(REL_DYNAMIC_TARGET) $(DBG_OBJS)
 SILENT+= $(DBG_STATIC_TARGET) $(DBG_DYNAMIC_TARGET) $(REL_OBJS)
@@ -74,17 +74,13 @@ release : $(REL_CACHE_DIR) $(REL_STATIC_TARGET) $(REL_DYNAMIC_TARGET)
 test : $(REL_CACHE_DIR) $(DBG_CACHE_DIR) $(TEST_TARGET) $(DEV_TEST_TARGET)
 
 defconf : $(CONFIG_DIR)
-	cp -rf .config $(CONFIG_DIR)/$(SUB_ARCH)_config
+	cp -rf .config $(CONFIG_DIR)/$(CONFIG_TARGET)_config
 
 
 ifeq ($(DEFCONF),)
 config : $(CONFIG_PY) $(TOOL_DIR)
 	$(PYTHON) $(CONFIG_PY) -c -i config.json
 else
-ifeq ($(ARCH),)
-config :
-	$(error "ARCH must be specified!!")	
-endif
 config : $(CONFIG_PY)
 	@echo 'config path $(CONFIG_DIR)'
 	$(PYTHON) $(CONFIG_PY) -s -i $(CONFIG_DIR)/$(DEFCONF)_config -t ./config.json -o ./.config 
