@@ -1,0 +1,14 @@
+{
+	"CDSL_RECIPE":{
+		"type":"recipe",
+		"path":"recipe.mk"
+	},
+	"SERIALIZER_CONFIG":{
+		"type":"config",
+		"path":"./serialization/config.json"
+	},
+	"TARGET_CONFIG":{
+		"type":"config",
+		"path":"./target/config.json"
+	}
+}
