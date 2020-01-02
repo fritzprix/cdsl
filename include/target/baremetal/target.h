@@ -5,7 +5,11 @@
  *
  * for baremetal application, you can provide your own implementation of dependencies
  */
-extern int strcmp(const char* s1, const char* s2);
+
+
+#include <stdint.h>
+#include <stddef.h>
+extern int baremetal_strcmp(const char *s1, const char *s2);
 
 #define FO_RDWR                    02
 #define FO_RDONLY                  03

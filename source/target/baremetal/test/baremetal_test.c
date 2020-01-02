@@ -11,16 +11,16 @@
 
 BOOL cdsl_baremetal_dep_test(void)
 {
-	if (strcmp("Hello", "Hello"))
+	if (STRCMP("Hello", "Hello"))
 	{
 		return FALSE;
 	}
 
-	if (strcmp("Hello", "Hello World") > 0)
+	if (STRCMP("Hello", "Hello World") > 0)
 	{
 		return FALSE;
 	}
-	if (strcmp("Hello World", "Hello") < 0)
+	if (STRCMP("Hello World", "Hello") < 0)
 	{
 		return FALSE;
 	}
