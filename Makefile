@@ -8,12 +8,8 @@ endif
 
 VERSION=-D__MAJOR__=$(MAJOR) -D__MINOR__=$(MINOR)
 
-ifeq ($(CONFIG_XCOMPILE_PREFIX),)
 CC=$(CLANG)
-else
-CC=$(CONFIG_XCOMPILE_PREFIX)-gcc
-endif
-CXX=$(CONFIG_XCOMPILE_PREFIX)-g++
+CXX=g++
 AR=llvm-ar
 PYTHON=python
 PIP=pip
@@ -100,7 +96,7 @@ $(DBG_STATIC_TARGET) : $(DBG_OBJS)
 	@echo 'Generating Archive File for $(ARCH) ....$@'
 	$(AR) rcs  $@  $(DBG_OBJS)
 
-ifneq ($(BAREMETAL),y)
+ifneq ($(CONFIG_BAREMETAL),y)
 $(DBG_DYNAMIC_TARGET) : $(DBG_SH_OBJS)
 	@echo 'Generating Share Library File for $(ARCH) .... $@'
 	$(CC) $(TARGET_TRIPPLE) -o $@ -shared $(DBG_CFLAG) $(DYNAMIC_FLAG) $(DBG_SH_OBJS)
@@ -114,7 +110,7 @@ $(REL_STATIC_TARGET) : $(REL_OBJS)
 	@echo 'Generating Archive File for $(ARCH) ....$@'
 	$(AR) rcs  $@ $(REL_OBJS)
 
-ifneq ($(BAREMETAL),y)
+ifneq ($(CONFIG_BAREMETAL),y)
 $(REL_DYNAMIC_TARGET) : $(REL_SH_OBJS)
 	@echo 'Generating Share Library File for $(ARCH) .... $@'
 	$(CC) $(TARGET_TRIPPLE) -o $@ -shared $(REL_CFLAG) $(DYNAMIC_FLAG) $(REL_SH_OBJS)
