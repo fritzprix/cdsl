@@ -15,3 +15,7 @@ cdsl
 Debug/
 Release/
 tools/
+*.bin
+autogen.*
+cdsl_dev
+cdsl

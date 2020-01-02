@@ -1,0 +1,8 @@
+CONFIG_TARGET=baremetal
+include /home/lucifer/my_work/cdsl/recipe.mk
+include /home/lucifer/my_work/cdsl/source/recipe.mk
+include /home/lucifer/my_work/cdsl/source/serialization/recipe.mk
+include /home/lucifer/my_work/cdsl/source/target/baremetal/recipe.mk
+include /home/lucifer/my_work/cdsl/source/target/baremetal/test/recipe.mk
+
+DEF+= TARGET_VAL=0 TARGET="baremetal"
