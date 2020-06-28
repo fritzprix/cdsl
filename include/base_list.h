@@ -39,6 +39,9 @@ extern int cdsl_listSize(listEntry_t* lentry);
 extern BOOL cdsl_listContain(listEntry_t* lentry,listNode_t* item);
 extern void cdsl_listPrint(listEntry_t* lentry,cdsl_generic_printer_t prt);
 
+extern listNode_t* cdsl_listGetHead(listEntry_t* lentry);
+extern listNode_t* cdsl_listGetLast(listEntry_t* lentry);
+
 
 #ifdef __cplusplus
 }

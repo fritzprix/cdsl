@@ -31,6 +31,7 @@ extern "C" {
 #define cdsl_dlistIterNext(iter)                      cdsl_iterNext(iter)
 
 #define cdsl_dlistSort(lentry, order, compare)        cdsl_listMergeSort((listEntry_t*) lentry, order, compare, TRUE)
+#define cdsl_dlistGetHead(lentry)                     cdsl_listGetHead((listEntry_t*) lentry)
 
 typedef struct cdsl_dlnode dlistNode_t;
 typedef struct cdsl_dlentry dlistEntry_t;
@@ -65,6 +66,8 @@ extern dlistNode_t* cdsl_dlistRemoveTail(dlistEntry_t* lentry);
 extern BOOL cdsl_dlistRemove(dlistNode_t* item);
 extern void cdsl_dlistReplace(dlistNode_t* old, dlistNode_t* nu);
 extern void cdsl_dlistIterRemove(listIter_t* iter);
+
+extern dlistNode_t* cdsl_dlistGetLast(dlistEntry_t* lentry);
 
 
 #if defined(__cplusplus)

@@ -159,6 +159,14 @@ void cdsl_dlistReplace(dlistNode_t* old, dlistNode_t* nu)
 	old->next = old->prev = NULL;
 }
 
+dlistNode_t* cdsl_dlistGetLast(dlistEntry_t* lentry)
+{
+	if(!lentry)
+	{
+		return NULL;
+	}
+	return lentry->tail;
+}
 
 void cdsl_dlistIterRemove(listIter_t* iter)
 {
