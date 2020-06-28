@@ -56,15 +56,18 @@ BOOL cdsl_listDoTest(void)
 	listIter_t iter;
 	cdsl_iterInit((listEntry_t*) &list_entry, &iter);
 	int prev_num = TEST_SIZE;
+	int count = 0;
 	while(cdsl_iterHasNext(&iter)) {
 		void* node = (void*) cdsl_iterNext(&iter);
+		count++;
 		struct card* cp = container_of(node, struct card, list_node);
 		if(prev_num < cp->num) {
 			return FALSE;
 		}
 		prev_num = cp->num;
 	}
-	return TRUE;
+	printf("count %d == TEST_SIZE %d\n", count, TEST_SIZE);
+	return count == TEST_SIZE;
 }
 
 static int compare_sort(void* one, void* the_other) {

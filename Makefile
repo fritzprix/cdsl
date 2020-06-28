@@ -131,11 +131,11 @@ $(DEV_TEST_TARGET) : $(DBG_CACHE_DIR)/main.do $(DBG_SH_OBJS)
 	
 $(DBG_CACHE_DIR)/%.do : %.c
 	@echo '$(ARCH) compile...$@'
-	$(CC) -c -o $@ $(DBG_CFLAG)  $< $(INCS) 
+	$(CC) -c -o $@ $(DBG_CFLAG) -fPIC  $< $(INCS) 
 	
 $(REL_CACHE_DIR)/%.o : %.c
 	@echo '$(ARCH) compile...$@'
-	$(CC) -c -o $@ $(REL_CFLAG)  $< $(INCS)
+	$(CC) -c -o $@ $(REL_CFLAG) -fPIC $< $(INCS)
 	
 $(DBG_CACHE_DIR)/%.s.do : %.c
 	@echo '$(ARCH) compile...$@'
@@ -147,11 +147,11 @@ $(REL_CACHE_DIR)/%.s.o : %.c
 	
 $(DBG_CACHE_DIR)/%.do : %.cpp
 	@echo '$(ARCH) compile...$@'
-	$(CXX) -c -o $@ $(DBG_CFLAG)  $< $(INCS)
+	$(CXX) -c -o $@ $(DBG_CFLAG) -fPIC $< $(INCS)
 	
 $(REL_CACHE_DIR)/%.o : %.cpp
 	@echo '$(ARCH) compile...$@'
-	$(CXX) -c -o $@ $(REL_CFLAG)  $< $(INCS)
+	$(CXX) -c -o $@ $(REL_CFLAG) -fPIC $< $(INCS)
 	
 $(DBG_CACHE_DIR)/%.s.do : %.cpp
 	@echo '$(ARCH) compile...$@'

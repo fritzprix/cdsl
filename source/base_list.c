@@ -66,10 +66,10 @@ void cdsl_iterInit(listEntry_t *lentry, listIter_t *iter)
 BOOL cdsl_iterHasNext(listIter_t *iter)
 {
 	if (!iter->prev) // at the first position, test entry
+	{
 		return (iter->entry->head != NULL);
-	else if (!iter->prev->next) // current is null, return false
-		return FALSE;
-	return (iter->prev->next->next != NULL); // test if next of current is null
+	}
+	return iter->prev->next != NULL; // current is null, return false
 }
 
 listNode_t *cdsl_iterNext(listIter_t *iter)
@@ -85,7 +85,9 @@ listNode_t *cdsl_iterNext(listIter_t *iter)
 listNode_t *cdsl_iterRemove(listIter_t *iter)
 {
 	if (!iter)
+	{
 		return NULL;
+	}
 	listNode_t *cur;
 	if (!iter->prev)
 	{
@@ -94,5 +96,28 @@ listNode_t *cdsl_iterRemove(listIter_t *iter)
 	cur = iter->prev->next;
 	iter->prev->next = cur->next;
 	cur->next = NULL;
+	return cur;
+}
+
+listNode_t *cdsl_listGetHead(listEntry_t *lentry)
+{
+	if (!lentry)
+	{
+		return NULL;
+	}
+	return lentry->head;
+}
+
+listNode_t *cdsl_listGetLast(listEntry_t *lentry)
+{
+	if (!lentry)
+	{
+		return NULL;
+	}
+	listNode_t *cur = lentry->head;
+	while (cur->next)
+	{
+		cur = cur->next;
+	}
 	return cur;
 }
