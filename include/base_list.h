@@ -8,7 +8,6 @@
 #ifndef INCLUDE_TEST_BASE_LIST_H_
 #define INCLUDE_TEST_BASE_LIST_H_
 
-#include "arch.h"
 #include "cdsl_defs.h"
 
 #ifdef __cplusplus

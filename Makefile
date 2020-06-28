@@ -1,5 +1,6 @@
 # makefile for cdsl
 include version
+-include .config
 
 ifeq ($(CLANG),)
 CLANG:=clang
@@ -38,7 +39,6 @@ DBG_DYNAMIC_TARGET=libcdsld.so
 REL_STATIC_TARGET=libcdsl.a
 REL_DYNAMIC_TARGET=libcdsl.so
 
--include .config
 
 VPATH=$(SRC-y)
 INCS=$(INC-y:%=-I%)
@@ -53,13 +53,7 @@ REL_SH_OBJS=$(OBJ-y:%=$(REL_CACHE_DIR)/%.s.o)
 DBG_CACHE_DIR=Debug
 REL_CACHE_DIR=Release
 
-DEF-y+=$(DEF)
-DEFS=$(DEF-y:%=-D%)
-
-DBG_CFLAG+=$(DEFS)
-REL_CFLAG+=$(DEFS)
-
-CONFIG_DIR=./source/arch/$(ARCH)/configs
+CONFIG_DIR=./configs
 
 SILENT+= $(REL_STATIC_TARGET) $(REL_DYNAMIC_TARGET) $(DBG_OBJS)
 SILENT+= $(DBG_STATIC_TARGET) $(DBG_DYNAMIC_TARGET) $(REL_OBJS)
@@ -80,17 +74,13 @@ release : $(REL_CACHE_DIR) $(REL_STATIC_TARGET) $(REL_DYNAMIC_TARGET)
 test : $(REL_CACHE_DIR) $(DBG_CACHE_DIR) $(TEST_TARGET) $(DEV_TEST_TARGET)
 
 defconf : $(CONFIG_DIR)
-	cp -rf .config $(CONFIG_DIR)/$(SUB_ARCH)_config
+	cp -rf .config $(CONFIG_DIR)/$(ARCH)_$(SUB_ARCH)_$(CONFIG_TARGET)_config
 
 
 ifeq ($(DEFCONF),)
 config : $(CONFIG_PY) $(TOOL_DIR)
 	$(PYTHON) $(CONFIG_PY) -c -i config.json
 else
-ifeq ($(ARCH),)
-config :
-	$(error "ARCH must be specified!!")	
-endif
 config : $(CONFIG_PY)
 	@echo 'config path $(CONFIG_DIR)'
 	$(PYTHON) $(CONFIG_PY) -s -i $(CONFIG_DIR)/$(DEFCONF)_config -t ./config.json -o ./.config 
@@ -106,10 +96,10 @@ $(DBG_STATIC_TARGET) : $(DBG_OBJS)
 	@echo 'Generating Archive File for $(ARCH) ....$@'
 	$(AR) rcs  $@  $(DBG_OBJS)
 
-ifneq ($(BAREMETAL),y)
+ifneq ($(CONFIG_BAREMETAL),y)
 $(DBG_DYNAMIC_TARGET) : $(DBG_SH_OBJS)
 	@echo 'Generating Share Library File for $(ARCH) .... $@'
-	$(CC) -o $@ -shared $(DBG_CFLAG) $(DYNAMIC_FLAG) $(DBG_SH_OBJS)
+	$(CC) $(TARGET_TRIPPLE) -o $@ -shared $(DBG_CFLAG) $(DYNAMIC_FLAG) $(DBG_SH_OBJS)
 else
 PHONY+=$(DBG_DYNMAIC_TARGET)
 $(DBG_DYNAMIC_TARGET) : 
@@ -120,24 +110,24 @@ $(REL_STATIC_TARGET) : $(REL_OBJS)
 	@echo 'Generating Archive File for $(ARCH) ....$@'
 	$(AR) rcs  $@ $(REL_OBJS)
 
-ifneq ($(BAREMETAL),y)
+ifneq ($(CONFIG_BAREMETAL),y)
 $(REL_DYNAMIC_TARGET) : $(REL_SH_OBJS)
 	@echo 'Generating Share Library File for $(ARCH) .... $@'
-	$(CC) -o $@ -shared $(REL_CFLAG) $(DYNAMIC_FLAG) $(REL_SH_OBJS)
+	$(CC) $(TARGET_TRIPPLE) -o $@ -shared $(REL_CFLAG) $(DYNAMIC_FLAG) $(REL_SH_OBJS)
 else
 PHONY+=$(REL_DYNAMIC_TARGET)
 $(REL_DYNAMIC_TARGET) :
 	@echo 'Shared Object is skipped for baremetal'
 endif
 	
-$(TEST_TARGET) : $(REL_CACHE_DIR)/main.o $(REL_OBJS) 
+$(TEST_TARGET) : $(REL_CACHE_DIR)/main.o $(REL_SH_OBJS)
 	@echo 'Building unit-test executable... for $(ARCH) $@'
-	$(CXX) -o $@ $(REL_CFLAG) $< $(REL_OBJS) $(LIBS)
+	$(CXX) -o $@ $(REL_CFLAG) $< $(REL_SH_OBJS) $(LIBS)
 	
 
-$(DEV_TEST_TARGET) : $(DBG_CACHE_DIR)/main.do $(DBG_OBJS) 
+$(DEV_TEST_TARGET) : $(DBG_CACHE_DIR)/main.do $(DBG_SH_OBJS)
 	@echo 'Building unit-test executable... for $(ARCH) $@'
-	$(CXX) -o $@ $(DBG_CFLAG) $< $(DBG_OBJS) $(LIBS)
+	$(CXX) -o $@ $(DBG_CFLAG) $< $(DBG_SH_OBJS) $(LIBS)
 	
 $(DBG_CACHE_DIR)/%.do : %.c
 	@echo '$(ARCH) compile...$@'
@@ -177,7 +167,6 @@ install_include :
 	install -d $(INCDIR) 
 	install ./include/*.* $(INCDIR)
 	install ./$(AUTOGEN_DIR)/autogen.h $(INCDIR)
-	install ./include/arch/$(shell uname -m)/arch.h $(INCDIR)
 
 install_lib : $(REL_STATIC_TARGET)
 	install $(REL_STATIC_TARGET) $(LIBDIR)

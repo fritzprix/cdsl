@@ -1,0 +1,28 @@
+{
+	"SUB_ARCH":{
+		"type":"enum",
+		"enum":[
+			"cortex-m0",
+			"cortex-m3",
+			"cortex-m4"
+		],
+		"gen-list":{
+			"SUB_ARCH":"to_string(this)"
+		}
+	},
+	"SUB_ARCH_CONFIG":{
+		"type":"config",
+		"path":"./$SUB_ARCH/config.json"
+	},
+	"ARCH_RECIPE":{
+		"type":"recipe",
+		"path":"recipe.mk"
+	},
+	"XCOMPILE_PREFIX":{
+		"type":"string",
+		"default":"arm-none-eabi",
+		"gen-list":{
+            "CROSS_COMPILE_PREFIX":"to_string(this)"
+        }
+	}
+}

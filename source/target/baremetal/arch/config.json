@@ -1,0 +1,14 @@
+{
+	"ARCH" : {
+		"type":"enum",
+		"enum":[
+			"arm"
+		],
+		"default":0
+	},
+	"ARCH_CONFIG":{
+		"type":"config",
+		"path":"./$ARCH/config.json"
+	}
+}
+

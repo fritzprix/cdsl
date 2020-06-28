@@ -1,0 +1,19 @@
+{
+    "BAREMETAL_RECIPE":{
+        "type":"recipe",
+        "path":"recipe.mk"
+    },
+    "ARCH_CONFIG":{
+        "type":"config",
+        "path":"./arch/config.json"
+    },
+    "BAREMETAL":{
+        "type":"bool",
+        "default":"y",
+        "force":"y"
+    },
+    "TEST_CONFIG":{
+        "type":"config",
+        "path":"./test/config.json"
+    }
+}

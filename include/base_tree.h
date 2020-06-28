@@ -8,7 +8,6 @@
 #ifndef BASE_TREE_H_
 #define BASE_TREE_H_
 
-#include "arch.h"
 #include "cdsl_defs.h"
 #include "serializer.h"
 

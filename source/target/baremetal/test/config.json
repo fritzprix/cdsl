@@ -1,0 +1,6 @@
+{
+    "BAREMETAL_TEST_RECIPE":{
+        "type":"recipe",
+        "path":"recipe.mk"
+    }
+}

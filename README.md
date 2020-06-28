@@ -92,6 +92,9 @@ $> sudo apt-get install gcc-arm-embedded
 
     > $ sudo make install
 
+4. clear configuration
+    > $ make reset
+
 ## LICENSE
 
 > BSD-2
