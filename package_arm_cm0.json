@@ -1,0 +1,10 @@
+{
+	"name":"cdsl",
+	"include":["./include","./","./include/target/baremetal","./include/serialization"],
+	"output":["libcdsl.a"],
+	"version":"0.1",
+	"buildcmd":[
+		"make config DEFCONF=arm_cortex-m0_baremetal",
+		"make release"
+	]
+}
