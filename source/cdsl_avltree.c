@@ -118,7 +118,7 @@ avltreeNode_t *cdsl_avltreeLookup(avltreeRoot_t *rootp, trkey_t key)
 	{
 		return NULL;
 	}
-	avltreeNode_t *cur = rootp->entry;
+	avltreeNode_t *cur = NULLABLE_ENTRY(rootp);
 	while (cur)
 	{
 		if (cur->key > key)

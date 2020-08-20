@@ -9,13 +9,49 @@
 #include "serializer.h"
 #include "cdsl_defs.h"
 
-#define GET_PTR(ptr) ((base_treeNode_t *)(((__cdsl_uaddr_t)ptr) & ~1))
+#define GET_NODEP(ptr) ((base_treeNode_t *)(((__cdsl_uaddr_t)ptr) & ~1))
+#define GET_ALIGNED(ptr) (((__cdsl_uaddr_t)ptr) & ~1)
 #define GET_NPTR(ptr) (((__cdsl_uaddr_t)ptr) & 1)
 #define SET_NPTR(ptr, v)                                      \
 	do                                                        \
 	{                                                         \
 		ptr = (base_treeNode_t *)(((__cdsl_uaddr_t)ptr) | v); \
 	} while (0)
+
+#define RIGHT_CHILD_OF(parent)        INTO_ABSOLUTE(GET_ALIGNED(parent), GET_ALIGNED(GET_NODEP(parent)->right), base_treeNode_t *)
+#define LEFT_CHILD_OF(parent)         INTO_ABSOLUTE(GET_ALIGNED(parent), GET_ALIGNED(GET_NODEP(parent)->left), base_treeNode_t *)
+#define ENTRY(rootp)                  INTO_ABSOLUTE(rootp, GET_ALIGNED(rootp->entry), base_treeNode_t *)
+
+/**
+ *  Note : function call SHOULD NOT be used as parameter
+ * */
+#define NULLABLE_ENTRY(rootp) (rootp)->entry ? ENTRY(rootp) : NULL
+#define NULLABLE_RIGHT_CHILD_OF(parent) (parent)->right ? RIGHT_CHILD_OF(parent) : NULL
+#define NULLABLE_LEFT_CHILD_OF(parent) (parent)->left ? LEFT_CHILD_OF(parent) : NULL
+
+#define CLR_LEFT(parent)     \
+	do                       \
+	{                        \
+		parent->left = NULL; \
+	} while (0)
+
+#define CLR_RIGHT(parent)     \
+	do                        \
+	{                         \
+		parent->right = NULL; \
+	} while (0)
+
+#define CLR_ENTRY(rootp)     \
+	do                       \
+	{                        \
+		rootp->entry = NULL; \
+	} while (0)
+
+#define SET_ENTRY(rootp, entry) set_entry((base_treeRoot_t *)rootp, GET_NODEP((entry)))
+
+#define SET_LEFT(parent, left) set_left(GET_NODEP(parent), GET_NODEP(left))
+
+#define SET_RIGHT(parent, right) set_right(GET_NODEP(parent), GET_NODEP(right))
 
 struct serialize_argument
 {
@@ -128,28 +164,28 @@ static DECLARE_FOREACH_CALLBACK(serialize_for_each)
 
 static int compare_rc(const base_treeNode_t *anext, const base_treeNode_t *bnext)
 {
-	if (!GET_PTR(anext) && !GET_PTR(bnext))
+	if (!GET_NODEP(anext) && !GET_NODEP(bnext))
 	{
 		return 0;
 	}
 
-	if (!GET_PTR(anext) || !GET_PTR(bnext))
+	if (!GET_NODEP(anext) || !GET_NODEP(bnext))
 	{
 		return -1;
 	}
 
-	int result = compare_rc(GET_PTR(anext)->left, GET_PTR(bnext)->left) | compare_rc(GET_PTR(anext)->right, GET_PTR(bnext)->right);
-	return result | (GET_PTR(anext)->key != GET_PTR(bnext)->key);
+	int result = compare_rc(NULLABLE_LEFT_CHILD_OF(anext), NULLABLE_RIGHT_CHILD_OF(bnext)) | compare_rc(NULLABLE_RIGHT_CHILD_OF(anext), NULLABLE_LEFT_CHILD_OF(bnext));
+	return result | (GET_NODEP(anext)->key != GET_NODEP(bnext)->key);
 }
 
 static void delete_rc(base_treeNode_t *nodep, base_tree_callback_t free_fn)
 {
-	if (!GET_PTR(nodep))
+	if (!GET_NODEP(nodep))
 	{
 		return;
 	}
-	delete_rc(GET_PTR(nodep)->left, free_fn);
-	delete_rc(GET_PTR(nodep)->right, free_fn);
+	delete_rc(NULLABLE_LEFT_CHILD_OF(nodep), free_fn);
+	delete_rc(NULLABLE_RIGHT_CHILD_OF(nodep), free_fn);
 	free_fn(0, nodep, NULL);
 }
 
@@ -171,8 +207,8 @@ static base_treeNode_t *build_tree_rc(base_treeNode_t *parent, struct deserializ
 		}
 
 		bnode = (base_treeNode_t *)&data[ser_node._node.e_offset];
-		bnode->left = build_tree_rc(bnode, args);
-		bnode->right = build_tree_rc(bnode, args);
+		SET_LEFT(bnode, build_tree_rc(bnode, args));
+		SET_RIGHT(bnode, build_tree_rc(bnode, args));
 		if (args->desr_inherit && args->desr_inherit->on_node_build)
 		{
 			args->desr_inherit->on_node_build((cdsl_serializeNode_t *)&ser_node, bnode);
@@ -189,14 +225,14 @@ int tree_compare(const base_treeRoot_t *arootp, const base_treeRoot_t *brootp)
 	{
 		return -1;
 	}
-	return compare_rc(arootp->entry, brootp->entry);
+	return compare_rc(ENTRY(arootp), ENTRY(brootp));
 }
 
 void tree_deleteAll(base_treeRoot_t *rootp, base_tree_callback_t free_fn)
 {
 	if (free_fn)
 	{
-		delete_rc(rootp->entry, free_fn);
+		delete_rc(ENTRY(rootp), free_fn);
 	}
 	rootp->entry = NULL;
 }
@@ -232,7 +268,7 @@ void tree_deserialize(base_treeRoot_t *rootp,
 		return;
 	}
 
-	rootp->entry = build_tree_rc(rootp->entry, &args);
+	SET_ENTRY(rootp, build_tree_rc(ENTRY(rootp), &args));
 	if (deserializer->read_tail(deserializer, &ser_tail) != OK)
 	{
 		return;
@@ -270,7 +306,7 @@ void tree_serialize(const base_treeRoot_t *rootp,
 	args.result_code = serializer->on_head(serializer, &header);
 	if (!(args.result_code < 0))
 	{
-		foreach_serialize_rc(rootp->entry, serialize_for_each, &args);
+		foreach_serialize_rc(ENTRY(rootp), serialize_for_each, &args);
 		if (!(args.result_code < 0))
 		{
 			serializer->on_tail(serializer, &args.ser_tail);
@@ -279,14 +315,19 @@ void tree_serialize(const base_treeRoot_t *rootp,
 			return;
 		}
 	}
-	if (callback->on_error)
+	if (callback->on_error) 
+	{
 		callback->on_error(callback, args.result_code);
+	}
 }
 
 void tree_for_each(base_treeRoot_t *rootp, base_tree_callback_t cb, int order, void *arg)
 {
-	if ((cb == NULL) || (rootp == NULL) || (GET_PTR(rootp->entry) == NULL))
+	if ((cb == NULL) || (rootp == NULL) || (GET_NODEP(rootp->entry) == NULL))
+	{
 		return;
+	}
+
 	int i = 0;
 	int (*for_each)(base_treeNode_t * current, int *current_order, base_tree_callback_t cb, void *arg) = NULL;
 	switch (order)
@@ -298,114 +339,144 @@ void tree_for_each(base_treeRoot_t *rootp, base_tree_callback_t cb, int order, v
 		for_each = foreach_incremental_rc;
 		break;
 	}
-	for_each(rootp->entry, &i, cb, arg);
+	for_each(ENTRY(rootp), &i, cb, arg);
 }
 
 void tree_for_each_to_target(base_treeRoot_t *rootp, base_tree_callback_t cb, trkey_t key, void *arg)
 {
-	if ((cb == NULL) || (rootp == NULL) || (GET_PTR(rootp->entry) == NULL))
+	if ((cb == NULL) || (rootp == NULL) || (GET_NODEP(rootp->entry) == NULL)) 
+	{
 		return;
+	}
 	int i = 0;
-	traverse_target_rc(rootp->entry, &i, key, cb, arg);
+	traverse_target_rc(ENTRY(rootp), &i, key, cb, arg);
 }
 
 base_treeNode_t *tree_top(base_treeRoot_t *rootp)
 {
-	if (!rootp)
+	if (!rootp) 
+	{
 		return NULL;
-	return GET_PTR(rootp->entry);
+	}
+	
+	return GET_NODEP(ENTRY(rootp));
 }
 
 base_treeNode_t *tree_go_left(base_treeNode_t *cur)
 {
-	if (!cur)
+	if (!cur) 
+	{
 		return NULL;
-	return GET_PTR(GET_PTR(cur)->left);
+	}
+
+	return GET_NODEP( ( NULLABLE_LEFT_CHILD_OF(cur) ) );
 }
 
 base_treeNode_t *tree_go_right(base_treeNode_t *cur)
 {
-	if (!cur)
+	if (!cur) 
+	{
 		return NULL;
-	return GET_PTR(GET_PTR(cur)->right);
+	}
+
+	return GET_NODEP( ( NULLABLE_RIGHT_CHILD_OF(cur) ) );
 }
 
 int tree_size(base_treeRoot_t *rootp)
 {
-	if (rootp == NULL)
+	if (rootp == NULL) 
+	{
 		return 0;
-	return calc_size_rc(&rootp->entry);
+	}
+	base_treeNode_t* entry = ENTRY(rootp);
+	return calc_size_rc(&entry);
 }
 
 void tree_print(base_treeRoot_t *rootp, cdsl_generic_printer_t print)
 {
 	if (rootp == NULL)
+	{
 		return;
-	print_rc(rootp->entry, print, 0);
+	}
+	base_treeNode_t* entry = ENTRY(rootp);
+	print_rc(entry, print, 0);
 }
 
 int tree_max_depth(base_treeRoot_t *rootp)
 {
 	if (rootp == NULL)
+	{
 		return 0;
-	return calc_max_depth_rc(&rootp->entry);
+	}
+	base_treeNode_t* entry = ENTRY(rootp);
+	return calc_max_depth_rc(&entry);
 }
 
 BOOL tree_is_empty(base_treeRoot_t *rootp)
 {
-	if (!rootp)
+	if (!rootp) 
+	{
 		return TRUE;
-	return (rootp->entry == NULL);
+	}
+	return (ENTRY(rootp) == NULL);
 }
 
 base_treeNode_t *tree_min(base_treeRoot_t *rootp)
 {
-	if (!rootp)
-		return NULL;
-	base_treeNode_t *cur = rootp->entry;
-	while (GET_PTR(cur)->left)
+	if (!rootp) 
 	{
-		cur = GET_PTR(cur)->left;
+		return NULL;
 	}
-	return GET_PTR(cur);
+
+	base_treeNode_t *cur = rootp->entry;
+	while(GET_NODEP(  (NULLABLE_LEFT_CHILD_OF(cur)  ) ))
+	{
+		cur = GET_NODEP( (NULLABLE_LEFT_CHILD_OF(cur)) );
+	}
+	return GET_NODEP(cur);
 }
 
 base_treeNode_t *tree_max(base_treeRoot_t *rootp)
 {
-	if (!rootp)
-		return NULL;
-	base_treeNode_t *cur = rootp->entry;
-	while (GET_PTR(cur)->right)
+	if (!rootp) 
 	{
-		cur = GET_PTR(cur)->right;
+		return NULL;
 	}
-	return GET_PTR(cur);
+	base_treeNode_t *cur = ENTRY(rootp);
+	while (GET_NODEP( (NULLABLE_RIGHT_CHILD_OF(cur)) )) 
+	{
+		cur = GET_NODEP( (NULLABLE_RIGHT_CHILD_OF(cur)) );
+	}
+	return GET_NODEP(cur);
 }
 
 base_treeNode_t *tree_update(base_treeRoot_t *rootp, base_treeNode_t *nitem)
 {
 	if (!rootp || !nitem)
+	{
 		return NULL;
-	base_treeNode_t *parent = NULL, *current = rootp->entry;
+	}
+
+	base_treeNode_t *parent = NULL, *current = ENTRY(rootp);
 	uint8_t ctx = 0;
 	while (current)
 	{
-		if (nitem->key > GET_PTR(current)->key)
+		if (nitem->key > GET_NODEP(current)->key)
 		{
 			parent = current;
-			current = GET_PTR(current)->right;
+			current = GET_NODEP( (NULLABLE_RIGHT_CHILD_OF(current)) );
 			ctx = 1;
 		}
-		else if (nitem->key < GET_PTR(current)->key)
+		else if (nitem->key < GET_NODEP(current)->key)
 		{
 			parent = current;
-			current = GET_PTR(current)->left;
+			current = GET_NODEP( (NULLABLE_LEFT_CHILD_OF(current)) );
 			ctx = 0;
 		}
 		else
 		{
-			nitem->left = GET_PTR(current)->left;
-			nitem->right = GET_PTR(current)->right;
+			SET_LEFT(nitem, GET_NODEP( (NULLABLE_LEFT_CHILD_OF(current)) ));
+			SET_RIGHT(nitem, GET_NODEP( (NULLABLE_RIGHT_CHILD_OF(current)) ));
 			if (!parent)
 			{
 				rootp->entry = nitem;
@@ -415,14 +486,14 @@ base_treeNode_t *tree_update(base_treeRoot_t *rootp, base_treeNode_t *nitem)
 				SET_NPTR(nitem, GET_NPTR(current));
 				if (ctx == 1)
 				{
-					GET_PTR(parent)->right = nitem;
+					GET_NODEP(parent)->right = nitem;
 				}
 				else
 				{
-					GET_PTR(parent)->left = nitem;
+					GET_NODEP(parent)->left = nitem;
 				}
 			}
-			return GET_PTR(current);
+			return GET_NODEP(current);
 		}
 	}
 	return NULL;
@@ -431,41 +502,53 @@ base_treeNode_t *tree_update(base_treeRoot_t *rootp, base_treeNode_t *nitem)
 static int calc_size_rc(base_treeNode_t **root)
 {
 	int cnt = 0;
-	if ((root == NULL) || (GET_PTR(*root) == NULL))
+	if ((root == NULL) || (GET_NODEP(*root) == NULL))
+	{
 		return 0;
-	if (GET_PTR(*root))
+	}
+	if (GET_NODEP(*root))
+	{
 		cnt = 1;
-	if (!GET_PTR(GET_PTR(*root)->left) && !GET_PTR(GET_PTR(*root)->right))
+	}
+	base_treeNode_t* right = GET_NODEP( (NULLABLE_RIGHT_CHILD_OF(*root)) );
+	base_treeNode_t* left = GET_NODEP( (NULLABLE_LEFT_CHILD_OF(*root)) );
+	if (!GET_NODEP( (NULLABLE_LEFT_CHILD_OF(*root)) ) && !GET_NODEP( (NULLABLE_RIGHT_CHILD_OF(*root)) ))
+	{
 		return cnt;
-	if (GET_PTR(GET_PTR(*root)->left))
-		cnt += calc_size_rc(&GET_PTR(*root)->left);
-	if (GET_PTR(GET_PTR(*root)->right))
-		cnt += calc_size_rc(&GET_PTR(*root)->right);
+	}
+	if (GET_NODEP((NULLABLE_LEFT_CHILD_OF(*root))))
+	{
+		cnt += calc_size_rc(&left);
+	}
+	if (GET_NODEP((NULLABLE_RIGHT_CHILD_OF(*root)))) 
+	{
+		cnt += calc_size_rc(&right);
+	}
 	return cnt;
 }
 
 static int calc_max_depth_rc(base_treeNode_t **root)
 {
-	if ((root == NULL) || (GET_PTR(*root) == NULL))
+	if ((root == NULL) || (GET_NODEP(*root) == NULL))
 		return 0;
 	int max = 0;
 	int temp = 0;
-	if (max < (temp = calc_max_depth_rc(&GET_PTR(*root)->left)))
+	if (max < (temp = calc_max_depth_rc(&GET_NODEP(*root)->left)))
 		max = temp;
-	if (max < (temp = calc_max_depth_rc(&GET_PTR(*root)->right)))
+	if (max < (temp = calc_max_depth_rc(&GET_NODEP(*root)->right)))
 		max = temp;
 	return max + 1;
 }
 
 static void print_rc(base_treeNode_t *current, cdsl_generic_printer_t print, int depth)
 {
-	if (!GET_PTR(current))
+	if (!GET_NODEP(current))
 		return;
-	print_rc(GET_PTR(current)->right, print, depth + 1);
+	print_rc(GET_NODEP(current)->right, print, depth + 1);
 	print_tab(depth);
 	if (print)
-		print(GET_PTR(current));
-	print_rc(GET_PTR(current)->left, print, depth + 1);
+		print(GET_NODEP(current));
+	print_rc(GET_NODEP(current)->left, print, depth + 1);
 }
 
 static void print_tab(int cnt)
@@ -476,36 +559,36 @@ static void print_tab(int cnt)
 
 static int foreach_incremental_rc(base_treeNode_t *current, int *current_order, base_tree_callback_t cb, void *arg)
 {
-	if (GET_PTR(current) == NULL)
+	if (GET_NODEP(current) == NULL)
 		return FOREACH_CONTINUE;
-	switch (foreach_incremental_rc(GET_PTR(current)->left, current_order, cb, arg))
+	switch (foreach_incremental_rc(GET_NODEP(current)->left, current_order, cb, arg))
 	{
 	case FOREACH_BREAK:
 		return FOREACH_BREAK;
 	}
-	switch (cb((*current_order)++, GET_PTR(current), arg))
+	switch (cb((*current_order)++, GET_NODEP(current), arg))
 	{
 	case FOREACH_BREAK:
 		return FOREACH_BREAK;
 	}
-	return foreach_incremental_rc(GET_PTR(current)->right, current_order, cb, arg);
+	return foreach_incremental_rc(GET_NODEP(current)->right, current_order, cb, arg);
 }
 
 static int foreach_decremental_rc(base_treeNode_t *current, int *current_order, base_tree_callback_t cb, void *arg)
 {
-	if (GET_PTR(current) == NULL)
+	if (GET_NODEP(current) == NULL)
 		return FOREACH_CONTINUE;
-	switch (foreach_decremental_rc(GET_PTR(current)->right, current_order, cb, arg))
+	switch (foreach_decremental_rc(GET_NODEP(current)->right, current_order, cb, arg))
 	{
 	case FOREACH_BREAK:
 		return FOREACH_BREAK;
 	}
-	switch (cb((*current_order)++, GET_PTR(current), arg))
+	switch (cb((*current_order)++, GET_NODEP(current), arg))
 	{
 	case FOREACH_BREAK:
 		return FOREACH_BREAK;
 	}
-	return foreach_decremental_rc(GET_PTR(current)->left, current_order, cb, arg);
+	return foreach_decremental_rc(GET_NODEP(current)->left, current_order, cb, arg);
 }
 
 /**
@@ -517,39 +600,39 @@ static int foreach_decremental_rc(base_treeNode_t *current, int *current_order, 
  */
 static int foreach_serialize_rc(base_treeNode_t *current, base_tree_callback_t cb, void *arg)
 {
-	if (GET_PTR(current) == NULL)
+	if (GET_NODEP(current) == NULL)
 	{
 		return cb(NODE_NULL, NULL, arg);
 	}
 
-	switch (cb(NODE_NORMAL, GET_PTR(current), arg))
+	switch (cb(NODE_NORMAL, GET_NODEP(current), arg))
 	{
 	case FOREACH_BREAK:
 		return FOREACH_BREAK;
 	}
-	switch (foreach_serialize_rc(GET_PTR(current)->left, cb, arg))
+	switch (foreach_serialize_rc(GET_NODEP(current)->left, cb, arg))
 	{
 	case FOREACH_BREAK:
 		return FOREACH_BREAK;
 	}
-	return foreach_serialize_rc(GET_PTR(current)->right, cb, arg);
+	return foreach_serialize_rc(GET_NODEP(current)->right, cb, arg);
 }
 
 static void traverse_target_rc(base_treeNode_t *current, int *order, trkey_t key, base_tree_callback_t cb, void *arg)
 {
-	if (GET_PTR(current) == NULL)
+	if (GET_NODEP(current) == NULL)
 		return;
-	if (GET_PTR(current)->key > key)
+	if (GET_NODEP(current)->key > key)
 	{
-		traverse_target_rc(GET_PTR(current)->left, order, key, cb, arg);
+		traverse_target_rc(GET_NODEP(current)->left, order, key, cb, arg);
 		return;
 	}
-	else if (GET_PTR(current)->key < key)
+	else if (GET_NODEP(current)->key < key)
 	{
-		traverse_target_rc(GET_PTR(current)->right, order, key, cb, arg);
+		traverse_target_rc(GET_NODEP(current)->right, order, key, cb, arg);
 		return;
 	}
-	switch (cb((*order)++, GET_PTR(current), arg))
+	switch (cb((*order)++, GET_NODEP(current), arg))
 	{
 	case FOREACH_BREAK:
 		/**
