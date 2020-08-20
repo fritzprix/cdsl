@@ -28,6 +28,10 @@ extern "C" {
 #define FOREACH_CONTINUE   (int) 0
 #define FOREACH_BREAK      (int) 1
 
+
+#define INTO_OFFSET(base, absolute, type)    ((type)  ((uint64_t) absolute - (uint64_t) base))
+#define INTO_ABSOLUTE(base, offset, type)    ((type)  ((uint64_t) base + (uint64_t) offset))
+
 #define DECLARE_FOREACH_CALLBACK(fn) int fn(int order, base_treeNode_t* node,void* arg)
 
 /*!
@@ -202,6 +206,22 @@ extern base_treeNode_t* tree_max(base_treeRoot_t* rootp);
  * \return the item replaced by new item
  */
 extern base_treeNode_t* tree_update(base_treeRoot_t* rootp, base_treeNode_t* nitem);
+
+
+static inline void set_entry(base_treeRoot_t* rootp, base_treeNode_t* entry) 
+{
+	rootp->entry = entry? INTO_OFFSET(rootp, entry, base_treeNode_t*) : NULL;
+}
+
+static inline void set_left(base_treeNode_t* parent, base_treeNode_t* left) 
+{
+	parent->left = left? INTO_OFFSET(parent, left, base_treeNode_t*) : NULL;
+}
+
+static inline void set_right(base_treeNode_t* parent, base_treeNode_t* right) 
+{
+	parent->right = right? INTO_OFFSET(parent, right, base_treeNode_t*) : NULL;
+}
 
 /*!
  * @}

@@ -5,6 +5,7 @@
  *      Author: innocentevil
  */
 
+#include "base_tree.h"
 #include "cdsl_avltree.h"
 
 #define DIR_LEFT ((uint8_t)1)
@@ -18,20 +19,17 @@
 #define RIGHTLEFT_PATTERN ((uint8_t)(DIR_LEFT << 2) | DIR_RIGHT)
 #define RIGHTRIGHT_PATTERN ((uint8_t)(DIR_RIGHT << 2) | DIR_RIGHT)
 
-#define INTO_OFFSET(base, absolute, type)    ((type)  ((uint64_t) absolute - (uint64_t) base))
-#define INTO_ABSOLUTE(base, offset, type)    ((type)  ((uint64_t) base + (uint64_t) offset))
-
 #define RIGHT_CHILD_OF(parent)               INTO_ABSOLUTE(parent, parent->right, avltreeNode_t*)
 #define LEFT_CHILD_OF(parent)                INTO_ABSOLUTE(parent, parent->left, avltreeNode_t*)
 #define ENTRY(rootp)                         INTO_ABSOLUTE(rootp, rootp->entry, avltreeNode_t*)
 
+/**
+ *  Note : function call SHOULD NOT be used as parameter
+ * */
 #define NULLABLE_ENTRY(rootp)                rootp->entry? ENTRY(rootp) : NULL
 #define NULLABLE_RIGHT_CHILD_OF(parent)      parent->right? RIGHT_CHILD_OF(parent) : NULL
 #define NULLABLE_LEFT_CHILD_OF(parent)       parent->left? LEFT_CHILD_OF(parent) : NULL
 
-#define SET_LEFT(parent, nleft)              do {                \
-	parent->left = nleft? INTO_OFFSET(parent, nleft, avltreeNode_t*) : NULL;   \
-} while(0)
 
 #define CLR_LEFT(parent)                     do {                \
 	parent->left = NULL;                                         \
@@ -41,21 +39,16 @@
 	parent->right = NULL;                                        \
 } while(0)
 
-#define SET_RIGHT(parent, nright)            do {                \
-	parent->right = nright? INTO_OFFSET(parent, nright, avltreeNode_t*) : NULL; \
-} while(0)
-
-
-#define SET_ENTRY(rootp, nentry)             do {                \
-	rootp->entry = nentry? INTO_OFFSET(rootp, nentry, avltreeNode_t*) : NULL;   \
-} while(0)
-
 #define CLR_ENTRY(rootp)                     do {                \
 	rootp->entry = NULL;                                         \
 } while(0)
 
+#define SET_ENTRY(rootp, entry)                 set_entry((base_treeRoot_t*) rootp, (base_treeNode_t*) (entry))
 
- 
+#define SET_LEFT(parent, left)                  set_left((base_treeNode_t*) parent, (base_treeNode_t*) (left))
+
+#define SET_RIGHT(parent, right)                set_right((base_treeNode_t*) parent, (base_treeNode_t*) (right))
+
 
 static avltreeNode_t *insert_rc(int bal, avltreeNode_t *sub_root_c, avltreeNode_t *item, uint8_t *rc_dir, avltreeNode_t **replaced);
 static avltreeNode_t *delete_rc(int bal, avltreeNode_t *sub_root_c, avltreeNode_t **deleteed, trkey_t key, base_tree_replacer_t replacer, void *args);
