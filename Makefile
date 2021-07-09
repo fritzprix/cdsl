@@ -11,7 +11,7 @@ VERSION=-D__MAJOR__=$(MAJOR) -D__MINOR__=$(MINOR)
 CC=$(CLANG)
 CXX=g++
 AR=llvm-ar
-PYTHON=python
+PYTHON=python2
 PIP=pip
 MKDIR=mkdir
 
