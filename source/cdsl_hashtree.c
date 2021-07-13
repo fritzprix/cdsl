@@ -27,7 +27,7 @@ static int cdsl_hashtreeReplacer(hashNode_t **node, struct replacer_arg *rep_arg
 void cdsl_hashtreeNodeInit(hashNode_t *node, const char *key)
 {
 	node->_str_key = key;
-	cdsl_rbtreeNodeInit(&node->_base, sbdm_hash((unsigned char *)key));
+	cdsl_rbtreeNodeInit(&node->_base, sbdm_hash((unsigned char *) key));
 	cdsl_slistEntryInit(&node->col_lentry);
 }
 

@@ -7,8 +7,11 @@
 
 #include "cdsl_avltree.h"
 
-#define DIR_LEFT ((uint8_t)1)
-#define DIR_RIGHT ((uint8_t)2)
+#define DIR_LEFT ((uint8_t) 1)
+#define DIR_RIGHT ((uint8_t) 2)
+
+#define ABS(a)          ((a) < 0? -(a) : (a))
+#define MAX(a,b)        ((a) > (b)? (a) : (b))
 
 #define HEIGHT_COMPRESSION_RATE ((uint8_t)4)
 
@@ -355,8 +358,8 @@ static avltreeNode_t *delete_rc(int bal, avltreeNode_t *sub_root_c, avltreeNode_
 		{
 			if (sub_root_c->right)
 			{
-				sub_root_c->height = sub_root_c->right->height > sub_root_c->left->height ? sub_root_c->right->height + 1 : sub_root_c->left->height + 1;
-				if (sub_root_c->right->height - sub_root_c->left->height > bal)
+				sub_root_c->height = MAX(sub_root_c->right->height, sub_root_c->left->height) + 1;
+				if (ABS(sub_root_c->right->height - sub_root_c->left->height) > bal)
 				{
 					if (!sub_root_c->right->right)
 					{
@@ -398,8 +401,8 @@ static avltreeNode_t *delete_rc(int bal, avltreeNode_t *sub_root_c, avltreeNode_
 		{
 			if (sub_root_c->left)
 			{
-				sub_root_c->height = sub_root_c->right->height > sub_root_c->left->height ? sub_root_c->right->height + 1 : sub_root_c->left->height + 1;
-				if (sub_root_c->left->height - sub_root_c->right->height > bal)
+				sub_root_c->height = MAX(sub_root_c->right->height, sub_root_c->left->height) + 1;
+				if (ABS(sub_root_c->left->height - sub_root_c->right->height) > bal)
 				{
 					if (!sub_root_c->left->left)
 					{
@@ -586,14 +589,14 @@ static avltreeNode_t *insert_rc(int bal, avltreeNode_t *sub_root_c, avltreeNode_
 		if (!sub_root_c->left)
 		{
 
-			if (!(sub_root_c->height > bal))
+			if (!(sub_root_c->right->height > bal))
 			{
 				break;
 			}
 		}
 		else
 		{
-			if (!(sub_root_c->right->height - sub_root_c->left->height > bal))
+			if (!(ABS(sub_root_c->right->height - sub_root_c->left->height) > bal))
 			{
 
 				break;
@@ -613,7 +616,7 @@ static avltreeNode_t *insert_rc(int bal, avltreeNode_t *sub_root_c, avltreeNode_
 		}
 		else
 		{
-			if (!(sub_root_c->right->height - sub_root_c->left->height > bal))
+			if (!(ABS(sub_root_c->right->height - sub_root_c->left->height) > bal))
 			{
 
 				break;
@@ -721,7 +724,7 @@ static int max_child_height(avltreeNode_t *node)
 {
 	if (node->right && node->left)
 	{
-		return node->right->height > node->left->height ? node->right->height : node->left->height;
+		return MAX(node->right->height, node->left->height);
 	}
 	else if (node->left)
 	{
