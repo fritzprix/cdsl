@@ -7,6 +7,8 @@
 
 #include "cdsl_hashtree.h"
 #include "cdsl_hashtree_test.h"
+
+#include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
@@ -36,8 +38,7 @@ BOOL cdsl_hashtreeDoTest(void) {
 		cdsl_hashtreeNodeInit(&people[cnt]._base, people[cnt].name);
 		cdsl_hashtreeInsert(&root, &people[cnt]._base);
 	}
-	if(cdsl_hashtreeSize(&root) != TEST_CNT)
-		goto FAIL;
+	assert(cdsl_hashtreeSize(&root) == TEST_CNT);
 	__dev_log("insertion complete!! \n");
 
 	fseek(fp, 0, SEEK_SET);
@@ -45,11 +46,9 @@ BOOL cdsl_hashtreeDoTest(void) {
 	for(cnt = 0;cnt < TEST_CNT; cnt++) {
 		fscanf(fp, "%s",key_buf);
 		p = (person_t*) cdsl_hashtreeLookup(&root, key_buf);
-		if(!p)
-			goto FAIL;
+		assert(p != NULL);
 		p = container_of(p, person_t, _base);
-		if(strcmp(p->name, key_buf) != EXIT_SUCCESS)
-			goto FAIL;
+		assert(strcmp(p->name, key_buf) == EXIT_SUCCESS);
 	}
 
 	__dev_log("lookup complete!! \n");
@@ -58,23 +57,17 @@ BOOL cdsl_hashtreeDoTest(void) {
 	for(cnt = 0; cnt < TEST_CNT;cnt++) {
 		fscanf(fp, "%s", key_buf);
 		p = (person_t*) cdsl_hashtreeRemove(&root, key_buf);
-		if(!p)
-			goto FAIL;
+		assert(p != NULL);
 		p = container_of(p, person_t, _base);
-		if(strcmp(p->name, key_buf) != EXIT_SUCCESS)
-			goto FAIL;
+		assert(strcmp(p->name, key_buf) == EXIT_SUCCESS);
 	}
 
 	__dev_log("delete complete!! \n");
 
-	if(cdsl_hashtreeSize(&root) != 0)
-		goto FAIL;
+	assert(cdsl_hashtreeSize(&root) == 0);
 
 	fclose(fp);
 	return TRUE;
 
-FAIL:
-	fclose(fp);
-	return FALSE;
 
 }

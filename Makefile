@@ -45,7 +45,7 @@ INCS=$(INC-y:%=-I%)
 LIBS=$(LIB-y:%=-l%)
 
 DBG_TEST_OBJS=$(TEST_OBJ-y:%=$(DBG_CACHE_DIR)/%.do)
-REL_TEST_OBJS=$(TEST_OBJ-y:%=$(REL_CACHE_DIR)/%.do)
+REL_TEST_OBJS=$(TEST_OBJ-y:%=$(REL_CACHE_DIR)/%.o)
 
 DBG_OBJS=$(OBJ-y:%=$(DBG_CACHE_DIR)/%.do)
 REL_OBJS=$(OBJ-y:%=$(REL_CACHE_DIR)/%.o)
@@ -125,12 +125,12 @@ endif
 	
 $(TEST_TARGET) : $(REL_CACHE_DIR)/main.o $(REL_SH_OBJS) $(REL_TEST_OBJS)
 	@echo 'Building unit-test executable... for $(ARCH) $@'
-	$(CXX) -o $@ $(REL_CFLAG) $< $(REL_SH_OBJS) $(LIBS)
+	$(CXX) -o $@ $(REL_CFLAG) $< $(REL_SH_OBJS) $(REL_TEST_OBJS) $(LIBS)
 	
 
 $(DEV_TEST_TARGET) : $(DBG_CACHE_DIR)/main.do $(DBG_SH_OBJS) $(DBG_TEST_OBJS)
 	@echo 'Building unit-test executable... for $(ARCH) $@'
-	$(CXX) -o $@ $(DBG_CFLAG) $< $(DBG_SH_OBJS) $(LIBS)
+	$(CXX) -o $@ $(DBG_CFLAG) $< $(DBG_SH_OBJS) $(DBG_TEST_OBJS) $(LIBS)
 	
 $(DBG_CACHE_DIR)/%.do : %.c
 	@echo '$(ARCH) compile...$@'

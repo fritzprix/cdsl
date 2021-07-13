@@ -7,6 +7,7 @@
 
 #include <stddef.h>
 #include <stdio.h>
+#include <assert.h>
 #include "cdsl_dlist.h"
 #include "cdsl_list_test.h"
 #include "sort.h"
@@ -40,8 +41,7 @@ BOOL cdsl_listDoTest(void)
 		if(c)
 		{
 			c = container_of(c, struct card, list_node);
-			if(last_num < c->num)
-				return FALSE;
+			assert(last_num > c->num);
 			last_num = c->num;
 		}
 	}
@@ -66,7 +66,6 @@ BOOL cdsl_listDoTest(void)
 		}
 		prev_num = cp->num;
 	}
-	printf("count %d == TEST_SIZE %d\n", count, TEST_SIZE);
 	return count == TEST_SIZE;
 }
 
