@@ -24,8 +24,9 @@ extern "C" {
 
 #define cdsl_slistIterInit(lentry, iter)                 cdsl_iterInit((listEntry_t*) lentry, iter)
 #define cdsl_slistIterHasNext(iter)                      cdsl_iterHasNext(iter)
-#define cdsl_slistIterNext(iter)                         cdsl_iterNext(iter)
+#define cdsl_slistIterNext(iter)                         (slistNode_t*) cdsl_iterNext(iter)
 #define cdsl_slistSort(lentry, order, compare)           cdsl_listMergeSort((listEntry_t*) lentry, order, compare, FALSE)
+#define cdsl_slistGetHead(lentry)                        (slistNode_t*) cdsl_listGetHead((listEntry_t*) lentry)
 
 
 typedef struct cdsl_slnode slistNode_t;

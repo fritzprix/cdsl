@@ -28,10 +28,10 @@ extern "C" {
 
 #define cdsl_dlistIterInit(lentry, iter)              cdsl_iterInit((listEntry_t*) lentry, iter)
 #define cdsl_dlistIterHasNext(iter)                   cdsl_iterHasNext(iter)
-#define cdsl_dlistIterNext(iter)                      cdsl_iterNext(iter)
+#define cdsl_dlistIterNext(iter)                      (dlistNode_t*) cdsl_iterNext(iter)
 
 #define cdsl_dlistSort(lentry, order, compare)        cdsl_listMergeSort((listEntry_t*) lentry, order, compare, TRUE)
-#define cdsl_dlistGetHead(lentry)                     cdsl_listGetHead((listEntry_t*) lentry)
+#define cdsl_dlistGetHead(lentry)                     (dlistNode_t*) cdsl_listGetHead((listEntry_t*) lentry)
 
 typedef struct cdsl_dlnode dlistNode_t;
 typedef struct cdsl_dlentry dlistEntry_t;
