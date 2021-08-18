@@ -62,7 +62,7 @@ hashNode_t *cdsl_hashtreeInsert(hashRoot_t *root, hashNode_t *node)
 			 */
 		}
 	}
-	return node;
+	return collision;
 }
 
 hashNode_t *cdsl_hashtreeLookup(hashRoot_t *root, const char *key)
