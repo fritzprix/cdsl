@@ -31,9 +31,10 @@ void cdsl_hashtreeNodeInit(hashNode_t *node, const char *key)
 	cdsl_slistEntryInit(&node->col_lentry);
 }
 
-void cdsl_hashtreeRootInit(hashRoot_t *root)
+extern void cdsl_hashtreeRootInit(hashRoot_t* root, HashCollisionPolicy_t col_policy)
 {
 	cdsl_rbtreeRootInit(&root->_base);
+	root->policy = col_policy;
 }
 
 hashNode_t *cdsl_hashtreeInsert(hashRoot_t *root, hashNode_t *node)
@@ -43,23 +44,29 @@ hashNode_t *cdsl_hashtreeInsert(hashRoot_t *root, hashNode_t *node)
 	hashNode_t *collision = (hashNode_t *)cdsl_rbtreeInsert(&root->_base, &node->_base, TRUE);
 	if (collision)
 	{
-		PRINT("collision\n");
-		collision = container_of(collision, hashNode_t, _base);
-		if (STRCMP(collision->_str_key, node->_str_key))
+		if(root->policy == HashCollisionPolicy_DISCARD_OLD)
 		{
-			// if key string of new item is different from collision, otherwise, discard collision
-			cdsl_slistPutHead(&node->col_lentry, (slistNode_t *)&collision->col_lentry); // put collision element in the collision list of new item node
-																						 /*
-			 *  |`````````````|       |``````````````````````|
-			 *  |new item node|       |collision item node #1|
-			 *  |`````````````|       |``````````````````````|
-			 *  | right       |       | right                |
-			 *  | left        |       | left                 |
-			 *  | key         |       | key                  |
-			 *  | str_key     |       | str_key              |
-			 *  | col_lentry  |  ---> | col_lentry           |  ---> ......
-			 *  ``````````````        ```````````````````````
-			 */
+			return collision;
+		}
+		else
+		{
+			collision = container_of(collision, hashNode_t, _base);
+			if (STRCMP(collision->_str_key, node->_str_key))
+			{
+				// if key string of new item is different from collision, otherwise, discard collision
+				cdsl_slistPutHead(&node->col_lentry, (slistNode_t *)&collision->col_lentry); // put collision element in the collision list of new item node
+																							/*
+				*  |`````````````|       |``````````````````````|
+				*  |new item node|       |collision item node #1|
+				*  |`````````````|       |``````````````````````|
+				*  | right       |       | right                |
+				*  | left        |       | left                 |
+				*  | key         |       | key                  |
+				*  | str_key     |       | str_key              |
+				*  | col_lentry  |  ---> | col_lentry           |  ---> ......
+				*  ``````````````        ```````````````````````
+				*/
+			}
 		}
 	}
 	return collision;
