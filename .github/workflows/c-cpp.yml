@@ -9,7 +9,7 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: fritzprix/cbuild:0.0.2
 
     steps:
     - uses: actions/checkout@v2
