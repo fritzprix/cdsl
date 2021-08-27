@@ -22,6 +22,10 @@ extern "C" {
 #define cdsl_hashtreeIsEmpty(root)                      tree_is_empty((base_treeRoot_t*) root)
 
 typedef struct hashtree_node hashNode_t;
+typedef enum {
+	HashCollisionPolicy_DISCARD_OLD,
+	HashCollisionPolicy_BUILD_COL_LIST,
+} HashCollisionPolicy_t;
 
 struct hashtree_node {
 	union {
@@ -41,10 +45,11 @@ typedef struct hashtree_root {
 		rbtreeRoot_t      _base;
 		hashNode_t*        entry;
 	};
+	HashCollisionPolicy_t policy;
 }hashRoot_t;
 
 extern void cdsl_hashtreeNodeInit(hashNode_t* node, const char* key);
-extern void cdsl_hashtreeRootInit(hashRoot_t* root);
+extern void cdsl_hashtreeRootInit(hashRoot_t* root, HashCollisionPolicy_t col_policy);
 extern hashNode_t* cdsl_hashtreeInsert(hashRoot_t* root, hashNode_t* node);
 extern hashNode_t* cdsl_hashtreeLookup(hashRoot_t* root, const char* key);
 extern hashNode_t* cdsl_hashtreeRemove(hashRoot_t* root, const char* key);

@@ -52,21 +52,29 @@ BOOL cdsl_listDoTest(void)
 		cards[idx].num = idx;
 		cdsl_dlistPutHead(&list_entry, &(cards[idx].list_node));
 	}
+
 	cdsl_dlistSort(&list_entry, DESC, compare_sort);
 	listIter_t iter;
 	cdsl_iterInit((listEntry_t*) &list_entry, &iter);
 	int prev_num = TEST_SIZE;
 	int count = 0;
-	while(cdsl_iterHasNext(&iter)) {
+	for(;cdsl_iterHasNext(&iter);count++) {
 		void* node = (void*) cdsl_iterNext(&iter);
-		count++;
 		struct card* cp = container_of(node, struct card, list_node);
 		if(prev_num < cp->num) {
 			return FALSE;
 		}
 		prev_num = cp->num;
 	}
-	return count == TEST_SIZE;
+	assert(count == TEST_SIZE);
+	cdsl_dlistIterInit(&list_entry, &iter);
+	for(;cdsl_dlistIterHasPrev(&iter);count--)
+	{
+		dlistNode_t* ln = cdsl_dlistIterPrev(&iter);
+		assert(ln != NULL);
+	}
+	assert(count == 0);
+	return count == 0;
 }
 
 static int compare_sort(void* one, void* the_other) {

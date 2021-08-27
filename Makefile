@@ -181,6 +181,9 @@ uninstall_lib :
 	
 uninstall_include:
 	rm -rf $(INCDIR)
+
+check : $(TEST_TARGET)
+	./$< 
  
 	
 PHONY += clean

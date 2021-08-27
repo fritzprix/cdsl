@@ -168,6 +168,44 @@ dlistNode_t* cdsl_dlistGetLast(dlistEntry_t* lentry)
 	return lentry->tail;
 }
 
+BOOL cdsl_dlistIterHasPrev(listIter_t* iter)
+{
+	if(!iter)
+	{
+		return FALSE;
+	}
+	if(iter->prev == NULL)
+	{
+		dlistEntry_t* dentry = (dlistEntry_t*) iter->entry;
+		return dentry->tail != NULL;
+	}
+	else
+	{
+		dlistNode_t* dln = (dlistNode_t*) iter->prev;
+		return (dln->prev != NULL) && (dln->prev != (dlistNode_t*) iter->entry);
+	}
+}
+
+dlistNode_t* cdsl_dlistIterPrev(listIter_t* iter)
+{
+	if(!iter)
+	{
+		return NULL;
+	}
+	if(iter->prev == NULL)
+	{
+		dlistEntry_t* dle = (dlistEntry_t*) iter->entry;
+		iter->prev = (listNode_t*) dle->tail;
+		return (dlistNode_t*) iter->prev;
+	}
+	else
+	{
+		dlistNode_t* prev = (dlistNode_t*) iter->prev;
+		iter->prev = (listNode_t*) prev->prev;
+		return (dlistNode_t*) iter->prev;
+	}
+}
+
 void cdsl_dlistIterRemove(listIter_t* iter)
 {
 	if(!iter)
