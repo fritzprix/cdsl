@@ -36,6 +36,7 @@ extern "C" {
 typedef struct cdsl_dlnode dlistNode_t;
 typedef struct cdsl_dlentry dlistEntry_t;
 
+
 struct cdsl_dlnode {
 	union {
 		listNode_t	 __base;
@@ -52,6 +53,17 @@ struct cdsl_dlentry {
 	dlistNode_t* tail;
 };
 
+typedef enum {
+	Direction_BACKWARD,
+	Direction_FORWARD,	
+} Direction_t;
+
+
+typedef struct {
+	listIter_t iter;
+	Direction_t dir;
+} dlistIter_t;
+
 extern void cdsl_dlistEntryInit(dlistEntry_t* lentry);
 extern void cdsl_dlistNodeInit(dlistNode_t* node);
 
@@ -66,6 +78,9 @@ extern dlistNode_t* cdsl_dlistRemoveTail(dlistEntry_t* lentry);
 extern BOOL cdsl_dlistRemove(dlistNode_t* item);
 extern void cdsl_dlistReplace(dlistNode_t* old, dlistNode_t* nu);
 extern void cdsl_dlistIterRemove(listIter_t* iter);
+
+extern BOOL cdsl_dlistIterHasPrev(listIter_t* iter);
+extern dlistNode_t* cdsl_dlistIterPrev(listIter_t* iter);
 
 extern dlistNode_t* cdsl_dlistGetLast(dlistEntry_t* lentry);
 
